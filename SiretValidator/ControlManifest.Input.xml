@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="Carfup" constructor="SiretValidator" version="0.0.5" display-name-key="Carfup.SiretValidator" description-key="Siret Validator for PCF" control-type="standard">
+    <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
+    <property name="SiretValue" display-name-key="SiretValidator_SiretValue" description-key="Siret field value" of-type="SingleLine.Text" usage="bound" required="true" />
+    <property name="IsValid" display-name-key="SiretValidator_IsValid" description-key="Is Siret valid" of-type="TwoOptions" usage="bound" required="false" />
+    <property name="IconValid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" default-value= "https://image.flaticon.com/icons/svg/190/190411.svg" />
+    <property name="IconInvalid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" default-value= "https://image.flaticon.com/icons/svg/291/291202.svg" />
+    <!-- 
+      Property node's of-type attribute can be of-type-group attribute. 
+      Example:
+      <type-group name="numbers">
+        <type>Whole.None</type>
+        <type>Currency</type>
+        <type>FP</type>
+        <type>Decimal</type>
+      </type-group>
+      <property name="sampleProperty" display-name-key="Property_Display_Key" description-key="Property_Desc_Key" of-type-group="numbers" usage="bound" required="true" />
+    -->
+    <resources>
+      <code path="index.ts" order="1"/>
+      <!-- UNCOMMENT TO ADD MORE RESOURCES-->
+      <css path="css/SiretValidator.css" order="1" />
+      <!--<resx path="strings/SiretValidator.1033.resx" version="1.0.0" />
+      -->
+    </resources>
+  </control>
+</manifest>

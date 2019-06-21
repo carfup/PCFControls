@@ -1,0 +1,31 @@
+.pcfinputcontrol
+{
+  border-color: transparent;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+  padding-bottom: 0px;
+  padding-top: 0px;
+  color: rgb(0,0,0);
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 1px;
+  line-height: 2.5rem;
+  font-weight:600;
+  font-size: 1rem;
+  height: 2.5rem;
+  margin-right: 0px;
+  margin-left: 0px;
+  text-overflow: ellipsis;
+  width: 90%
+}
+
+.pcfinputcontrol:hover
+{
+  border-color: black;
+}
+
+.pcfimagecontrol
+{
+  padding-left: 5px;
+  vertical-align: middle;
+}
