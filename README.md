@@ -1,6 +1,6 @@
 # PCF-Controls
-* [IBAN / SIREN / SIRET Validators](#validator)
-* [File Field Manager](#filefieldmanager)
+* [IBAN / SIREN / SIRET Validators](#iban--siren--siret-validators)
+* [File Field Manager](#file-field-manager)
 
 ## IBAN / SIREN / SIRET Validators
 ### Purpose
