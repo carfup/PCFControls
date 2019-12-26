@@ -2,7 +2,7 @@
 * [IBAN / SIREN / SIRET Validators](#validator)
 * [File Field Manager](#filefieldmanager)
 
-##IBAN / SIREN / SIRET Validators
+## IBAN / SIREN / SIRET Validators
 ### Purpose
 In many projects, we need to implement custom logic to validate Account data such as the IBAN, the Siret and the Siren. In few clicks, you can now get the information directly on the form to know if the data is correct and get that information to a custom field.
 
@@ -16,8 +16,8 @@ There are 4 parameters for those controls :
 * The possibility to set your own Valid icon (url)
 * The possibility to set your own Invalid icon (url)
 
-##File Field Manager
-###Purpose
+## File Field Manager
+### Purpose
 Microsoft is currently deploying a new type of field on your favorite CDS environments : the Files !
 Currently, you have the possibility to create the fields and use them on Flow or Canvas App, there is no current possibility to use them on a model driven app form.
 That's where this control comes into the light !
@@ -27,10 +27,10 @@ There are 2 possibilities to use the control :
 * with fields on the same entity (you can upload one file per field) - *Left side on the demo*
 * with fields which are on a sub entity (you can upload as many files as you want !) - *Right side on the demo*
 
-####Demo :
+#### Demo :
 ![](https://carfupstorage.blob.core.windows.net/sharex/2019-12-26_15-12-25.gif)
 
-###Configuration
+### Configuration
 There are a lot of parameters to handle as many cases as I could : 
 
 |Parameter|Description|Required|
