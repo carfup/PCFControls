@@ -48,7 +48,7 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 		this._ibanValueElement.setAttribute("type", "text");
 		this._ibanValueElement.setAttribute("class", "pcfinputcontrol");
 		this._ibanValueElement.addEventListener("change", this._ibanValueChanged);
-		this._ibanValueElement.value = this._context.parameters.IbanValue.raw;
+		this._ibanValueElement.value = this._context.parameters.IbanValue.raw!;
 		
 		// img control
 		this._ibanValueValidationElement = document.createElement("img");
@@ -72,6 +72,8 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 		// Add code to update control view
 		this._iconValid = this._context.parameters.IconValid == undefined ? "" : String(this._context.parameters.IconValid.raw);
 		this._iconInvalid = this._context.parameters.IconInvalid == undefined ? "" : String(this._context.parameters.IconInvalid.raw);
+		this._ibanValue = this._context.parameters.IbanValue == undefined ? "" : String(this._context.parameters.IbanValue.raw);
+		this._isValidIban = this._context.parameters.IsValidIban == undefined ? false : Boolean(this._context.parameters.IsValidIban.raw);
 	}
 
 	/** 

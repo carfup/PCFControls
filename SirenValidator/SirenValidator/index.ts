@@ -67,6 +67,8 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 		// Add code to update control view
 		this._iconValid = this._context.parameters.IconValid == undefined ? "" : String(this._context.parameters.IconValid.raw);
 		this._iconInvalid = this._context.parameters.IconInvalid == undefined ? "" : String(this._context.parameters.IconInvalid.raw);
+		this._value = this._context.parameters.SirenValue == undefined ? "" : String(this._context.parameters.SirenValue.raw);
+		this._isValid = this._context.parameters.IsValid == undefined ? false : Boolean(this._context.parameters.IsValid.raw);
 	}
 
 	/** 

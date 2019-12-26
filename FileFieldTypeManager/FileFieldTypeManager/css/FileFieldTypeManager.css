@@ -73,3 +73,7 @@
 	-o-transform: rotate(90deg);
 	transform: rotate(90deg);
   }
+
+  .downloadFile:hover{
+	font-weight:600;
+  }

@@ -30,6 +30,7 @@ export class FileFieldTypeManager implements ComponentFramework.StandardControl<
 	private _clientUrl : string;
 	private _showRelatedFilesText : string;
 	private _hideRelatedFilesText : string;
+	private _dateFormat : string;
 
 
 
@@ -169,6 +170,7 @@ export class FileFieldTypeManager implements ComponentFramework.StandardControl<
 		this._hideRelatedFilesText = context.parameters.HideRelatedFilesText.raw!;
 		this._areFilesStoredOnSubEntity = (context.parameters.AreFilesStoredOnSubEntity && context.parameters.AreFilesStoredOnSubEntity.raw && context.parameters.AreFilesStoredOnSubEntity.raw.toLowerCase() === "true") ? true : false;
 		this._allowDeleteFile = (context.parameters.AllowDeleteOption && context.parameters.AllowDeleteOption.raw && context.parameters.AllowDeleteOption.raw.toLowerCase() === "true") ? true : false;
+		this._dateFormat = context.parameters.DateDisplayFormat.raw!;
 	}
 
 	/**
@@ -295,6 +297,7 @@ export class FileFieldTypeManager implements ComponentFramework.StandardControl<
 		var span = document.createElement("a");
 		span.setAttribute("id", "filename_"+recordId);
 		span.appendChild(document.createTextNode(record[fieldFileName]));
+		span.setAttribute("class", "downloadFile");
 		span.addEventListener("click", function(e) { thisContext.inputFileNameOnClick(e); });
 		tdElementFileName.appendChild(span);
 		trElement.appendChild(tdElementFileName);
@@ -307,7 +310,8 @@ export class FileFieldTypeManager implements ComponentFramework.StandardControl<
 
 		//created on 
 		var tdElementCreatedOn = document.createElement("td");
-		var createdOn = document.createTextNode(record["createdon"]);
+		var date = new Date(record["createdon"]);
+		var createdOn = document.createTextNode(date.toLocaleDateString(thisContext._dateFormat) + " "+date.toLocaleTimeString(thisContext._dateFormat));
 		tdElementCreatedOn.appendChild(createdOn);
 		trElement.appendChild(tdElementCreatedOn);
 
@@ -478,8 +482,10 @@ export class FileFieldTypeManager implements ComponentFramework.StandardControl<
 	 */
 	public inputFileNameOnClick(e : Event):void{
 		// @ts-ignore
+		var fileName = document.getElementById(e.srcElement.id)!.innerText;
+		// @ts-ignore
 		var recordId = e.srcElement.id.split('_')[1];
-		var fileName = document.getElementById(recordId)!.innerText;
+		
 		var thisContext = this;
 		var url = thisContext._clientUrl+"/api/data/v9.1/"+thisContext._fileEntityNamePlural+"("+recordId+")/"+thisContext._fileFieldName+"/$value";
 		var req = new XMLHttpRequest();
