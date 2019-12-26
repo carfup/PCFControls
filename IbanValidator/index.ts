@@ -48,6 +48,7 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 		this._ibanValueElement.setAttribute("type", "text");
 		this._ibanValueElement.setAttribute("class", "pcfinputcontrol");
 		this._ibanValueElement.addEventListener("change", this._ibanValueChanged);
+		this._ibanValueElement.value = this._context.parameters.IbanValue.raw;
 		
 		// img control
 		this._ibanValueValidationElement = document.createElement("img");
@@ -58,6 +59,7 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 		container.appendChild(this._ibanValueElement);
 		container.appendChild(this._ibanValueValidationElement);	
 
+		this.ibanValueChanged;
 	}
 
 
@@ -94,16 +96,46 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 		this._ibanValueElement.removeEventListener("change", this._ibanValueChanged);
 	}
 
+	/**
+ 	* Called when a change is detected in the phone number input
+	* @param filetype Name of the image extension
+	* @param fileContent Base64 image content
+	*/
+	private generateImageSrcUrl(fileType: string, fileContent: string): string {
+		return "data:image/" + fileType + ";base64," + fileContent;
+	}
+
+	/**
+	 * Called when a change is detected in the phone number input
+	 * @param imageName Name of the image to retrieve
+	 */
+	private findAndSetImage(imageName: string) {
+		if(imageName.startsWith("http") || imageName.startsWith("https")){
+			this._ibanValueValidationElement.setAttribute("src", imageName);
+		} 
+		else {
+			this._context.resources.getResource("img/" + imageName + ".png",
+				data => {
+					this._ibanValueElement.setAttribute("src", this.generateImageSrcUrl(".png", data));
+				},
+				() => {
+					console.log('Error when downloading ' + imageName + '.png image.');
+				});
+		}
+	}
+
 	private ibanValueChanged(evt: Event):void
 	{
 		this._ibanValue = this._ibanValueElement.value;
 		this._isValidIban = this.isValidIBANNumber(this._ibanValue);
 		this._ibanValueValidationElement.removeAttribute("hidden");
-		if(this._isValidIban){
-			this._ibanValueValidationElement.setAttribute("src", this._iconValid);
-		} else{
-			this._ibanValueValidationElement.setAttribute("src", this._iconInvalid);
-		}
+
+		var iconToDisplay = this._iconValid == "" ? "ValidIcon.png" : this._iconValid;
+		if(!this._isValidIban){
+			iconToDisplay = this._iconInvalid == "" ? "InvalidIcon.png" : this._iconInvalid;
+		} 
+
+		this.findAndSetImage(iconToDisplay);
 
 		this._notifyOutputChanged(); 
 	}

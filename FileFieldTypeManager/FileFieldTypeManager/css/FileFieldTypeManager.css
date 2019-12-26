@@ -1,0 +1,75 @@
+.FileFieldTypeManager-input-file {
+	display: inline-block;
+	opacity: 0;
+	position: absolute;
+	margin-left: 20px;
+	margin-right: 20px;
+
+	width: 85%;
+	z-index: 99;
+	margin-top: 10px;
+	cursor:pointer;
+}
+.FileFieldTypeManager-file-upload {
+	position:relative;
+    display: inline-block;
+    cursor: pointer;
+	height: 2.5rem;	
+	background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAcUlEQVRIiWNgGAUEACMa/z+1zWXBInmQgYHhAJkGOzAwMNgjC2Cz4AADA4MAlH2BgYEhgYGBoYCBgWEClL6Ax4IGdAuYyHAlSQBbHFAjiODm0jyS0cF/Bkg4kgsaGNAcSfM4GLVg1IJRC4ZjWTQKMAAAviATH9q/+40AAAAASUVORK5CYII=)  right no-repeat;
+	width:100%;
+	box-sizing: border-box;
+	line-height: 2.5rem;
+	text-align:left;
+	padding-right: 10px;
+    background-origin: content-box;
+    padding-left: 10px;
+	font-weight:600;
+    font-size: 1rem;
+    font-family: 'SegoeUI', 'Segoe UI';
+    color: black;
+}
+
+.FileFieldTypeManager-input-file:hover + .FileFieldTypeManager-file-upload{
+    border-color: black;
+    border-style: solid;
+	border-width: 1px;
+}
+
+
+.FileFieldTypeManager-table {
+    border: solid 1px #DDEEEE;
+    border-collapse: collapse;
+    border-spacing: 0;
+	font: normal 13px Arial, sans-serif;
+	display: none;
+	width:100%;
+}
+
+.FileFieldTypeManager-table tbody td {
+    border: solid 1px #DDEEEE;
+    color: #333;
+    padding: 10px;
+    text-shadow: 1px 1px 1px #fff;
+}
+
+.showRelatedFiles-flexbox {
+	display: flex;
+	align-items: center;
+}
+
+.showRelatedFiles-flexbox img {
+	  padding: 10px;
+	  transition: margin 300ms;
+}
+	
+.showRelatedFiles-flexbox:hover img {
+		margin-left: 15px;
+  }
+
+  .rotateimg90 {
+	-webkit-transform:rotate(90deg);
+	-moz-transform: rotate(90deg);
+	-ms-transform: rotate(90deg);
+	-o-transform: rotate(90deg);
+	transform: rotate(90deg);
+  }
