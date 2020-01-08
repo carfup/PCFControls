@@ -9,14 +9,14 @@ In many projects, we need to implement custom logic to validate Account data suc
 ![](https://carfupstorage.blob.core.windows.net/sharex/2019-06-20_22-41-20.gif)
 
 ### Configuration
-There are 4 parameters for those controls :
+There are 6 parameters for those controls :
 
 * Source field : field on which the control will be based
 * The Two options field to get the output (if the code is valid or not)
-* Display a notification error is the value is incorrect
-* Customize the error message is displayed
-* The possibility to set your own Valid icon (url)
-* The possibility to set your own Invalid icon (url)
+* Display a notification error is the value is incorrect (optional)
+* Customize the error message is displayed (optional)
+* The possibility to set your own Valid icon (url) (optional)
+* The possibility to set your own Invalid icon (url) (optional)
 
 ## File Field Manager
 ### Purpose
