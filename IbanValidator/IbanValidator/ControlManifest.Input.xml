@@ -1,11 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="IbanValidator" version="0.0.7" display-name-key="Carfup.IbanValidator" description-key="IBAN validator for PCF" control-type="standard">
+  <control namespace="Carfup" constructor="IbanValidator" version="0.0.10" display-name-key="Carfup.IbanValidator" description-key="IBAN validator for PCF" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="IbanValue" display-name-key="IbanValidator_IbanValue" description-key="IBAN field value" of-type="SingleLine.Text" usage="bound" required="true" />
     <property name="IsValidIban" display-name-key="IbanValidator_IsValidIban" description-key="Is IBAN valid" of-type="TwoOptions" usage="bound" required="false" />
-    <property name="IconValid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" default-value="https://image.flaticon.com/icons/svg/190/190411.svg" />
-    <property name="IconInvalid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" default-value="https://image.flaticon.com/icons/svg/291/291202.svg" />
+    <property name="DisplayNotificationError" display-name-key="DisplayNotificationError" description-key="Set a Notification if IBAN is invalid ?" of-type="Enum" usage="input" required="false">
+      <value name="true" display-name-key="True" description-key="true">true</value>
+      <value name="false" display-name-key="False" description-key="false">false</value>
+    </property>
+    <property name="DisplayNotificationErrorMessage" display-name-key="DisplayNotificationErrorMessage" description-key="Message displayed in notification" of-type="SingleLine.Text" usage="input" required="false" default-value="The IBAN value entered is incorrect" />
+    <property name="IconValid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="IconInvalid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" />
     <resources>
       <code path="index.ts" order="1" />
       <css path="css/IbanValidator.css" order="1" />

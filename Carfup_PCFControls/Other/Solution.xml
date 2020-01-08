@@ -8,7 +8,7 @@
       <LocalizedName description="Carfup_PCFControls" languagecode="1033" />
     </LocalizedNames>
     <Descriptions />
-    <Version>1.1.0.0</Version>
+    <Version>1.1.0.1</Version>
     <!-- Solution Package Type: Unmanaged(0)/Managed(1)/Both(2)-->
     <Managed>2</Managed>
     <Publisher>
@@ -22,7 +22,7 @@
         <!-- Description of Cds Publisher in language code -->
         <Description description="Carfup" languagecode="1033" />
       </Descriptions>
-      <EMailAddress xsi:nil="true"></EMailAddress>
+      <EMailAddress>crm@carfup.com</EMailAddress>
       <SupportingWebsiteUrl xsi:nil="true"></SupportingWebsiteUrl>
       <!-- Customization Prefix for the Cds Publisher-->
       <CustomizationPrefix>carfup</CustomizationPrefix>

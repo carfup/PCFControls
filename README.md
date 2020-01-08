@@ -13,6 +13,8 @@ There are 4 parameters for those controls :
 
 * Source field : field on which the control will be based
 * The Two options field to get the output (if the code is valid or not)
+* Display a notification error is the value is incorrect
+* Customize the error message is displayed
 * The possibility to set your own Valid icon (url)
 * The possibility to set your own Invalid icon (url)
 

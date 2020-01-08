@@ -1,4 +1,5 @@
 import {IInputs, IOutputs} from "./generated/ManifestTypes";
+import { getUnpackedSettings } from "http2";
 
 export class IbanValidator implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
@@ -7,6 +8,9 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 	private _isValidIban: boolean;
 	private _iconValid: string;
 	private _iconInvalid : string;
+	private _displayNotificationError : boolean;
+	private _displayNotificationErrorMessage : string;
+	private _displayNotificationErrorUniqueId : string;
 	// PCF framework delegate which will be assigned to this object which would be called whenever any update happens. 
 
 	// parameter declarations
@@ -42,13 +46,16 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 		
 		// Add control initialization code
 		this._ibanValueChanged = this.ibanValueChanged.bind(this);
+
+		//Get params
+		this.getParams();
 		
 		// textbox control
 		this._ibanValueElement=document.createElement("input");
 		this._ibanValueElement.setAttribute("type", "text");
 		this._ibanValueElement.setAttribute("class", "pcfinputcontrol");
 		this._ibanValueElement.addEventListener("change", this._ibanValueChanged);
-		this._ibanValueElement.value = this._context.parameters.IbanValue.raw!;
+		this._ibanValueElement.value = this._ibanValue;
 		
 		// img control
 		this._ibanValueValidationElement = document.createElement("img");
@@ -59,7 +66,7 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 		container.appendChild(this._ibanValueElement);
 		container.appendChild(this._ibanValueValidationElement);	
 
-		this.ibanValueChanged;
+		this.ibanValueChanged(null);
 	}
 
 
@@ -70,10 +77,9 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 	public updateView(context: ComponentFramework.Context<IInputs>): void
 	{
 		// Add code to update control view
-		this._iconValid = this._context.parameters.IconValid == undefined ? "" : String(this._context.parameters.IconValid.raw);
-		this._iconInvalid = this._context.parameters.IconInvalid == undefined ? "" : String(this._context.parameters.IconInvalid.raw);
-		this._ibanValue = this._context.parameters.IbanValue == undefined ? "" : String(this._context.parameters.IbanValue.raw);
-		this._isValidIban = this._context.parameters.IsValidIban == undefined ? false : Boolean(this._context.parameters.IsValidIban.raw);
+		
+		this._ibanValueElement.value = this._ibanValue;// this._ibanValue = this._context.parameters.IbanValue == undefined ? "" : String(this._context.parameters.IbanValue.raw);
+		//this._isValidIban = this._context.parameters.IsValidIban == undefined ? false : Boolean(this._context.parameters.IsValidIban.raw);
 	}
 
 	/** 
@@ -96,6 +102,19 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 	{
 		// Add code to cleanup control if necessary
 		this._ibanValueElement.removeEventListener("change", this._ibanValueChanged);
+	}
+
+	/**
+	 * Retrieve all parameters of the PCF control
+	 */
+	public getParams():void{
+		var context = this._context;
+		this._ibanValue = context.parameters.IbanValue.raw!;
+		this._displayNotificationError = (context.parameters.DisplayNotificationError && context.parameters.DisplayNotificationError.raw && context.parameters.DisplayNotificationError.raw.toLowerCase() === "true") ? true : false;
+		this._displayNotificationErrorMessage = context.parameters.DisplayNotificationErrorMessage.raw!;
+		this._displayNotificationErrorUniqueId =  Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+		this._iconValid = this._context.parameters.IconValid == undefined ? "" : String(this._context.parameters.IconValid.raw);
+		this._iconInvalid = this._context.parameters.IconInvalid == undefined ? "" : String(this._context.parameters.IconInvalid.raw);
 	}
 
 	/**
@@ -126,15 +145,25 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 		}
 	}
 
-	private ibanValueChanged(evt: Event):void
+	private ibanValueChanged(evt: Event | null):void
 	{
 		this._ibanValue = this._ibanValueElement.value;
 		this._isValidIban = this.isValidIBANNumber(this._ibanValue);
 		this._ibanValueValidationElement.removeAttribute("hidden");
 
-		var iconToDisplay = this._iconValid == "" ? "ValidIcon.png" : this._iconValid;
+		if(this._displayNotificationError){
+			if(this._isValidIban){
+				// @ts-ignore
+				this._context.utils.clearNotification(this._displayNotificationErrorUniqueId);
+			} else {
+				// @ts-ignore
+				this._context.utils.setNotification(this._displayNotificationErrorMessage,this._displayNotificationErrorUniqueId);
+			}
+		}
+		
+		var iconToDisplay = this._iconValid == "" || this._iconValid == undefined ? "ValidIcon.png" : this._iconValid;
 		if(!this._isValidIban){
-			iconToDisplay = this._iconInvalid == "" ? "InvalidIcon.png" : this._iconInvalid;
+			iconToDisplay = this._iconInvalid == "" || this._iconValid == undefined ? "InvalidIcon.png" : this._iconInvalid;
 		} 
 
 		this.findAndSetImage(iconToDisplay);

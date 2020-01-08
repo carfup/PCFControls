@@ -7,6 +7,9 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 	private _isValid: boolean;
 	private _iconValid: string;
 	private _iconInvalid : string;
+	private _displayNotificationError : boolean;
+	private _displayNotificationErrorMessage : string;
+	private _displayNotificationErrorUniqueId : string;
 	// PCF framework delegate which will be assigned to this object which would be called whenever any update happens. 
 
 	// parameter declarations
@@ -40,12 +43,16 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 		
 		// Add control initialization code
 		this._valueChanged = this.valueChanged.bind(this);
+
+		//Get params
+		this.getParams();
 		
 		// textbox control
 		this._valueElement = document.createElement("input");
 		this._valueElement.setAttribute("type", "text");
 		this._valueElement.setAttribute("class", "pcfinputcontrol");
 		this._valueElement.addEventListener("change", this._valueChanged);
+		this._valueElement.value = this._value;
 		
 		// img control
 		this._valueValidationElement = document.createElement("img");
@@ -55,6 +62,8 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 		
 		container.appendChild(this._valueElement);
 		container.appendChild(this._valueValidationElement);
+
+		this.valueChanged(null);
 	}
 
 
@@ -65,10 +74,7 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 	public updateView(context: ComponentFramework.Context<IInputs>): void
 	{
 		// Add code to update control view
-		this._iconValid = this._context.parameters.IconValid == undefined ? "" : String(this._context.parameters.IconValid.raw);
-		this._iconInvalid = this._context.parameters.IconInvalid == undefined ? "" : String(this._context.parameters.IconInvalid.raw);
-		this._value = this._context.parameters.SirenValue == undefined ? "" : String(this._context.parameters.SirenValue.raw);
-		this._isValid = this._context.parameters.IsValid == undefined ? false : Boolean(this._context.parameters.IsValid.raw);
+		this._valueElement.value = this._value;
 	}
 
 	/** 
@@ -93,10 +99,50 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 		this._valueElement.removeEventListener("change", this._valueChanged);
 	}
 
-	private valueChanged(evt: Event):void
+	/**
+	 * Retrieve all parameters of the PCF control
+	 */
+	public getParams():void{
+		var context = this._context;
+		this._value = context.parameters.SirenValue.raw!;
+		this._displayNotificationError = (context.parameters.DisplayNotificationError && context.parameters.DisplayNotificationError.raw && context.parameters.DisplayNotificationError.raw.toLowerCase() === "true") ? true : false;
+		this._displayNotificationErrorMessage = context.parameters.DisplayNotificationErrorMessage.raw!;
+		this._displayNotificationErrorUniqueId =  Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+		this._iconValid = this._context.parameters.IconValid == undefined ? "" : String(this._context.parameters.IconValid.raw);
+		this._iconInvalid = this._context.parameters.IconInvalid == undefined ? "" : String(this._context.parameters.IconInvalid.raw);
+	}
+
+	/**
+ 	* Called when a change is detected in the phone number input
+	* @param filetype Name of the image extension
+	* @param fileContent Base64 image content
+	*/
+	private generateImageSrcUrl(fileType: string, fileContent: string): string {
+		return "data:image/" + fileType + ";base64," + fileContent;
+	}
+
+	/**
+	 * Called when a change is detected in the phone number input
+	 * @param imageName Name of the image to retrieve
+	 */
+	private findAndSetImage(imageName: string) {
+		if(imageName.startsWith("http") || imageName.startsWith("https")){
+			this._valueValidationElement.setAttribute("src", imageName);
+		} 
+		else {
+			this._context.resources.getResource("img/" + imageName + ".png",
+				data => {
+					this._valueValidationElement.setAttribute("src", this.generateImageSrcUrl(".png", data));
+				},
+				() => {
+					console.log('Error when downloading ' + imageName + ' image.');
+				});
+		}
+	}
+
+	private valueChanged(evt: Event | null):void
 	{
 		this._value = this._valueElement.value.toUpperCase().replace(/[^0-9]/g, '');
-		this._valueElement.value = this._value;
 
 		var isValid = false;
 		if ( (this._value.length != 9) || (isNaN(parseInt(this._value))) ){
@@ -124,7 +170,24 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 		
 		this._isValid = isValid;
 		this._valueValidationElement.removeAttribute("hidden");
-		this._valueValidationElement.setAttribute("src", this._isValid ? this._iconValid : this._iconInvalid);
+
+		if(this._displayNotificationError){
+			if(this._isValid){
+				// @ts-ignore
+				this._context.utils.clearNotification(this._displayNotificationErrorUniqueId);
+			} else {
+				// @ts-ignore
+				this._context.utils.setNotification(this._displayNotificationErrorMessage,this._displayNotificationErrorUniqueId);
+			}
+		}
+
+		var iconToDisplay = this._iconValid == "" || this._iconValid == undefined ? "ValidIcon" : this._iconValid;
+		if(!this._isValid){
+			iconToDisplay = this._iconInvalid == "" || this._iconValid == undefined ? "InvalidIcon" : this._iconInvalid;
+		} 
+
+		this.findAndSetImage(iconToDisplay);
+
 		this._notifyOutputChanged(); 
 	}
 }

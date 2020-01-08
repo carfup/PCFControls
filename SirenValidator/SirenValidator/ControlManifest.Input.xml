@@ -1,11 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="SirenValidator" version="0.0.6" display-name-key="Carfup.SirenValidator" description-key="Siren Validator for PCF" control-type="standard">
+  <control namespace="Carfup" constructor="SirenValidator" version="0.0.8" display-name-key="Carfup.SirenValidator" description-key="Siren Validator for PCF" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="SirenValue" display-name-key="SirenValidator_SirenValue" description-key="Siren field value" of-type="SingleLine.Text" usage="bound" required="true" />
     <property name="IsValid" display-name-key="SiretValidator_IsValid" description-key="Is Siret valid" of-type="TwoOptions" usage="bound" required="false" />
-    <property name="IconValid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" default-value="https://image.flaticon.com/icons/svg/190/190411.svg" />
-    <property name="IconInvalid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" default-value="https://image.flaticon.com/icons/svg/291/291202.svg" />
+    <property name="DisplayNotificationError" display-name-key="DisplayNotificationError" description-key="Set a Notification if SIREN is invalid ?" of-type="Enum" usage="input" required="false">
+      <value name="true" display-name-key="True" description-key="true">true</value>
+      <value name="false" display-name-key="False" description-key="false">false</value>
+    </property>
+    <property name="DisplayNotificationErrorMessage" display-name-key="DisplayNotificationErrorMessage" description-key="Message displayed in notification" of-type="SingleLine.Text" usage="input" required="false" default-value="The IBAN value entered is incorrect" />
+    <property name="IconValid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="IconInvalid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" />
     <!-- 
       Property node's of-type attribute can be of-type-group attribute. 
       Example:
@@ -21,6 +26,8 @@
       <code path="index.ts" order="1" />
       <!-- UNCOMMENT TO ADD MORE RESOURCES -->
       <css path="css/SirenValidator.css" order="1" />
+      <img path="img/IconValid.png" />
+      <img path="img/IconInvalid.png" />
       <!--<resx path="strings/SirenValidator.1033.resx" version="1.0.0" />
       -->
     </resources>
