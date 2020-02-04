@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="FileFieldTypeManager" version="0.0.17" display-name-key="Carfup.FileFieldTypeManager" description-key="FileFieldTypeManager description" control-type="standard">
+  <control namespace="Carfup" constructor="FileFieldTypeManager" version="0.0.22" display-name-key="Carfup.FileFieldTypeManager" description-key="FileFieldTypeManager description" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="FieldToAttachControl" display-name-key="FieldToAttachControl" description-key="Text Control to attach the PCF control" of-type="SingleLine.Text" usage="bound" required="true" />
@@ -8,6 +8,10 @@
     <property name="FileEntityNamePlural" display-name-key="FileEntityNamePlural" description-key="Entity name (plural) which contains the file field." of-type="SingleLine.Text" usage="input" required="true" />
     <property name="FileFieldName" display-name-key="FileFieldName" description-key="Name of the file field." of-type="SingleLine.Text" usage="input" required="true" />
     <property name="OrderFilesBy" display-name-key="OrderFilesBy" description-key="How to order the files by ? (ie : createdon desc)" of-type="SingleLine.Text" usage="input" required="true" default-value="createdon desc" />
+    <property name="ShowFilesByDefault" display-name-key="ShowFilesByDefault" description-key="Show the files by default instead of the text" of-type="Enum" usage="input" required="true">
+      <value name="true" display-name-key="True" description-key="true">true</value>
+      <value name="false" display-name-key="False" description-key="false">false</value>
+    </property>
     <property name="ShowRelatedFilesText" display-name-key="ShowRelatedFilesText" description-key="Customize the Show related files... text" of-type="SingleLine.Text" usage="input" required="false" default-value="Show related file(s) ..." />
     <property name="HideRelatedFilesText" display-name-key="HideRelatedFilesText" description-key="Customize the Hide related files... text" of-type="SingleLine.Text" usage="input" required="false" default-value="Hide related file(s) ..." />
     <property name="DateDisplayFormat" display-name-key="DateDisplayFormat" description-key="Define local format of the dates (ie : en-US or fr-FR)" of-type="SingleLine.Text" usage="input" required="false" default-value="en-US" />

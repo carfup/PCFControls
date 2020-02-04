@@ -27,6 +27,7 @@ export class FileFieldTypeManager implements ComponentFramework.StandardControl<
 	private _mainSubEntityFieldName : string | null;
 	private _areFilesStoredOnSubEntity : boolean;
 	private _allowDeleteFile : boolean;
+	private _showFilesByDefault : boolean;
 	private _clientUrl : string;
 	private _showRelatedFilesText : string;
 	private _hideRelatedFilesText : string;
@@ -106,8 +107,11 @@ export class FileFieldTypeManager implements ComponentFramework.StandardControl<
 		this._fileBlockText = document.createElement("span");
 		this._fileBlockText.innerText = this._showRelatedFilesText;
 		this._fileBlockText.addEventListener("click", this._showHideRelatedFilesOnClick);
+		
 		fileBlockDiv.appendChild(this._fileBlockIcon);
 		fileBlockDiv.appendChild(this._fileBlockText);
+
+
 		this._fileListTable = document.createElement("table");
 		this._fileListTable.setAttribute("class", "FileFieldTypeManager-table");
 		this._fileListTBody = document.createElement("tbody");
@@ -117,6 +121,11 @@ export class FileFieldTypeManager implements ComponentFramework.StandardControl<
 		container.appendChild(this._fileUploadDiv);
 		container.appendChild(fileBlockDiv);
 		container.appendChild(this._fileListTable);
+
+		// If user decide to show table by default, no need to add
+		if(this._showFilesByDefault){
+			this.showHideRelatedFilesOnClick("table");
+		}
 
 		// Set file list visible or not
 		this.retrieveFileList();
@@ -169,6 +178,7 @@ export class FileFieldTypeManager implements ComponentFramework.StandardControl<
 		this._showRelatedFilesText = context.parameters.ShowRelatedFilesText.raw!;
 		this._hideRelatedFilesText = context.parameters.HideRelatedFilesText.raw!;
 		this._areFilesStoredOnSubEntity = (context.parameters.AreFilesStoredOnSubEntity && context.parameters.AreFilesStoredOnSubEntity.raw && context.parameters.AreFilesStoredOnSubEntity.raw.toLowerCase() === "true") ? true : false;
+		this._showFilesByDefault = (context.parameters.ShowFilesByDefault && context.parameters.ShowFilesByDefault.raw && context.parameters.ShowFilesByDefault.raw.toLowerCase() === "true") ? true : false;
 		this._allowDeleteFile = (context.parameters.AllowDeleteOption && context.parameters.AllowDeleteOption.raw && context.parameters.AllowDeleteOption.raw.toLowerCase() === "true") ? true : false;
 		this._dateFormat = context.parameters.DateDisplayFormat.raw!;
 	}
