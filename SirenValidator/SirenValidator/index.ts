@@ -181,9 +181,9 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 			}
 		}
 
-		var iconToDisplay = this._iconValid == "" || this._iconValid == undefined ? "ValidIcon" : this._iconValid;
+		var iconToDisplay = this._iconValid == "null" ||  this._iconValid == "" || this._iconValid == undefined ? "IconValid" : this._iconValid;
 		if(!this._isValid){
-			iconToDisplay = this._iconInvalid == "" || this._iconValid == undefined ? "InvalidIcon" : this._iconInvalid;
+			iconToDisplay = this._iconValid == "null" ||  this._iconInvalid == "" || this._iconValid == undefined ? "IconInvalid" : this._iconInvalid;
 		} 
 
 		this.findAndSetImage(iconToDisplay);

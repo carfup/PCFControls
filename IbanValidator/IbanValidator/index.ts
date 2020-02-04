@@ -137,7 +137,7 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 		else {
 			this._context.resources.getResource("img/" + imageName + ".png",
 				data => {
-					this._ibanValueElement.setAttribute("src", this.generateImageSrcUrl(".png", data));
+					this._ibanValueValidationElement.setAttribute("src", this.generateImageSrcUrl(".png", data));
 				},
 				() => {
 					console.log('Error when downloading ' + imageName + '.png image.');
@@ -161,9 +161,9 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 			}
 		}
 		
-		var iconToDisplay = this._iconValid == "" || this._iconValid == undefined ? "ValidIcon.png" : this._iconValid;
+		var iconToDisplay = this._iconValid == "null" || this._iconValid == "" || this._iconValid == undefined ? "IconValid" : this._iconValid;
 		if(!this._isValidIban){
-			iconToDisplay = this._iconInvalid == "" || this._iconValid == undefined ? "InvalidIcon.png" : this._iconInvalid;
+			iconToDisplay = this._iconValid == "null" ||  this._iconInvalid == "" || this._iconValid == undefined ? "IconInvalid" : this._iconInvalid;
 		} 
 
 		this.findAndSetImage(iconToDisplay);

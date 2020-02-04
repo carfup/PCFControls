@@ -43,6 +43,7 @@
     <ProjectReference Include="..\IbanValidator\IbanValidator.pcfproj" />
     <ProjectReference Include="..\SirenValidator\SirenValidator.pcfproj" />
     <ProjectReference Include="..\SiretValidator\SiretValidator.pcfproj" />
+    <ProjectReference Include="..\BICValidator\BICValidator.pcfproj" />
   </ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
