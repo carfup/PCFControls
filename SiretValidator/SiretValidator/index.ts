@@ -176,24 +176,32 @@ export class SiretValidator implements ComponentFramework.StandardControl<IInput
 		}
 		
 		this._isValid = isValid;
-		this._valueValidationElement.removeAttribute("hidden");
-		
-		if(this._displayNotificationError){
-			if(this._isValid){
-				// @ts-ignore
-				this._context.utils.clearNotification(this._displayNotificationErrorUniqueId);
-			} else {
-				// @ts-ignore
-				this._context.utils.setNotification(this._displayNotificationErrorMessage,this._displayNotificationErrorUniqueId);
-			}
-		}
 
-		var iconToDisplay = this._iconValid == "null" ||  this._iconValid == "" || this._iconValid == undefined ? "IconValid" : this._iconValid;
-		if(!this._isValid){
-			iconToDisplay = this._iconValid == "null" ||  this._iconInvalid == "" || this._iconValid == undefined ? "IconInvalid" : this._iconInvalid;
-		} 
-		
-		this.findAndSetImage(iconToDisplay);
+		if(this._value != ""){
+			this._valueValidationElement.removeAttribute("hidden");
+
+			if(this._displayNotificationError){
+				if(this._isValid){
+					// @ts-ignore
+					this._context.utils.clearNotification(this._displayNotificationErrorUniqueId);
+				} else {
+					// @ts-ignore
+					this._context.utils.setNotification(this._displayNotificationErrorMessage,this._displayNotificationErrorUniqueId);
+				}
+			}
+	
+			var iconToDisplay = this._iconValid == "null" ||  this._iconValid == "" || this._iconValid == undefined ? "IconValid" : this._iconValid;
+			if(!this._isValid){
+				iconToDisplay = this._iconValid == "null" ||  this._iconInvalid == "" || this._iconValid == undefined ? "IconInvalid" : this._iconInvalid;
+			} 
+			
+			this.findAndSetImage(iconToDisplay);
+		}	
+		else {
+			// @ts-ignore
+			this._context.utils.clearNotification(this._displayNotificationErrorUniqueId);
+			this._valueValidationElement.setAttribute("hidden", "hidden");
+		}
 
 		this._notifyOutputChanged(); 
 	}

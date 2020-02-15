@@ -149,24 +149,33 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 	{
 		this._ibanValue = this._ibanValueElement.value;
 		this._isValidIban = this.isValidIBANNumber(this._ibanValue);
+		
+		
 		this._ibanValueValidationElement.removeAttribute("hidden");
 
-		if(this._displayNotificationError){
-			if(this._isValidIban){
-				// @ts-ignore
-				this._context.utils.clearNotification(this._displayNotificationErrorUniqueId);
-			} else {
-				// @ts-ignore
-				this._context.utils.setNotification(this._displayNotificationErrorMessage,this._displayNotificationErrorUniqueId);
+		if(this._ibanValue != ""){
+			if(this._displayNotificationError){
+				if(this._isValidIban){
+					// @ts-ignore
+					this._context.utils.clearNotification(this._displayNotificationErrorUniqueId);
+				} else {
+					// @ts-ignore
+					this._context.utils.setNotification(this._displayNotificationErrorMessage,this._displayNotificationErrorUniqueId);
+				}
 			}
-		}
-		
-		var iconToDisplay = this._iconValid == "null" || this._iconValid == "" || this._iconValid == undefined ? "IconValid" : this._iconValid;
-		if(!this._isValidIban){
-			iconToDisplay = this._iconValid == "null" ||  this._iconInvalid == "" || this._iconValid == undefined ? "IconInvalid" : this._iconInvalid;
-		} 
+			
+			var iconToDisplay = this._iconValid == "null" || this._iconValid == "" || this._iconValid == undefined ? "IconValid" : this._iconValid;
+			if(!this._isValidIban){
+				iconToDisplay = this._iconValid == "null" ||  this._iconInvalid == "" || this._iconValid == undefined ? "IconInvalid" : this._iconInvalid;
+			} 
 
-		this.findAndSetImage(iconToDisplay);
+			this.findAndSetImage(iconToDisplay);
+		}
+		else {
+			// @ts-ignore
+			this._context.utils.clearNotification(this._displayNotificationErrorUniqueId);
+			this._ibanValueValidationElement.setAttribute("hidden", "hidden");
+		}
 
 		this._notifyOutputChanged(); 
 	}

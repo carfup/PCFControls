@@ -147,24 +147,32 @@ export class BicValidator implements ComponentFramework.StandardControl<IInputs,
 		var isValid = /^([A-Z]{6}[A-Z2-9][A-NP-Z1-9])(X{3}|[A-WY-Z0-9][A-Z0-9]{2})?$/.test( this._value.toUpperCase() );
 
 		this._isValid = isValid;
-		this._valueValidationElement.removeAttribute("hidden");
-
-		if(this._displayNotificationError){
-			if(this._isValid){
-				// @ts-ignore
-				this._context.utils.clearNotification(this._displayNotificationErrorUniqueId);
-			} else {
-				// @ts-ignore
-				this._context.utils.setNotification(this._displayNotificationErrorMessage,this._displayNotificationErrorUniqueId);
+		
+		if(this._value != ""){
+			this._valueValidationElement.removeAttribute("hidden");
+		
+			if(this._displayNotificationError){
+				if(this._isValid){
+					// @ts-ignore
+					this._context.utils.clearNotification(this._displayNotificationErrorUniqueId);
+				} else {
+					// @ts-ignore
+					this._context.utils.setNotification(this._displayNotificationErrorMessage,this._displayNotificationErrorUniqueId);
+				}
 			}
+
+			var iconToDisplay = this._iconValid == "null" ||  this._iconValid == "" || this._iconValid == undefined ? "IconValid" : this._iconValid;
+			if(!this._isValid){
+				iconToDisplay = this._iconValid == "null" ||  this._iconInvalid == "" || this._iconValid == undefined ? "IconInvalid" : this._iconInvalid;
+			} 
+
+			this.findAndSetImage(iconToDisplay);
 		}
-
-		var iconToDisplay = this._iconValid == "null" ||  this._iconValid == "" || this._iconValid == undefined ? "IconValid" : this._iconValid;
-		if(!this._isValid){
-			iconToDisplay = this._iconValid == "null" ||  this._iconInvalid == "" || this._iconValid == undefined ? "IconInvalid" : this._iconInvalid;
-		} 
-
-		this.findAndSetImage(iconToDisplay);
+		else {
+			// @ts-ignore
+			this._context.utils.clearNotification(this._displayNotificationErrorUniqueId);
+			this._valueValidationElement.setAttribute("hidden", "hidden");
+		}
 
 		this._notifyOutputChanged(); 
 
