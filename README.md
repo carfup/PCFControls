@@ -3,6 +3,10 @@
 * [IBAN / SIREN / SIRET Validators](#iban--siren--siret-validators)
 * [File Field Manager](#file-field-manager)
 
+# Download
+
+[Get the latest solution here](https://github.com/carfup/PCFControls/releases)
+
 ## Quick Edit Form
 ### Purpose
 We all know the Quick View Form which allow you to display data related to a lookup field.
