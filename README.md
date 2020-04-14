@@ -1,6 +1,26 @@
 # PCF-Controls
+* [Quick Edit Form](#quick-edit-form)
 * [IBAN / SIREN / SIRET Validators](#iban--siren--siret-validators)
 * [File Field Manager](#file-field-manager)
+
+## Quick Edit Form
+### Purpose
+We all know the Quick View Form which allow you to display data related to a lookup field.
+However, it's just display and you have to open the lookup record in order to edit some data.
+This is where the Quick Edit Form takes place, based on a Quick View Form definition, you can display the fields within that form and interact with the data from the lookup record. 
+The text definitions are managed via RESX files. Currently supporting French & English (do not hesite to PR a new language !)
+
+![](https://stuffandtacos.azurewebsites.net/content/images/2020/04/2020_04_09_17-31-41.gif)
+
+### Configuration
+There are 4 parameters to customize the PCF.
+
+|Parameter|Description|Required|
+|:---------|:-----------|:----:|
+|FieldToAttachControl|Field to attach the control|x|
+|QuickVIewFormId|Guid of the Quick View Form you want to use to display the fields|x|
+|LookupFieldMapped|This is the technical name of the lookup field used as reference - ex : *_primarycontactid_value* (for a contact from an account)|x|
+|UseTextFieldAsLookup|Give the ability to the control to dynamically load data based on the GUID put in the mapped field, skipping the value from the lookup except if the field value is empty|x|
 
 ## IBAN / SIREN / SIRET Validators
 ### Purpose
