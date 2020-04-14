@@ -9,6 +9,7 @@ interface IFilteredOptionsetProperties {
     label : string;
     fieldDefinition: DataFieldDefinition;
     disabled? : boolean;
+    isMultiSelect: boolean;
     width:number;
 }
 
@@ -34,15 +35,35 @@ export default class FilteredOptionsetControl extends React.Component<IFilteredO
             }}}>
                 <Stack.Item styles={{root : { width : '170px' }}} ><Label style={{position: 'absolute',fontWeight: 'normal'}}>{this.props.label}</Label></Stack.Item>
                 <Stack.Item grow>
-                    <Dropdown
+                    {!this.props.isMultiSelect && <Dropdown
                     disabled={this.props.disabled!}
                     id={this.props.fieldDefinition.controlId}
                     style={{width:'100%'}}
+                    multiSelect={this.props.isMultiSelect}
+                    placeHolder="--Select--"
+                    options={this.props.options}            
+                    selectedKey={(!this.props.isMultiSelect ?
+                        this.state.fieldDefinition?.fieldValue.toString() : 
+                        null
+                    )}
+                    onChange={this.onChange}
+                    />}
+
+
+                    {this.props.isMultiSelect && <Dropdown
+                    disabled={this.props.disabled!}
+                    id={this.props.fieldDefinition.controlId}
+                    style={{width:'100%'}}
+                    multiSelect={this.props.isMultiSelect}
                     placeHolder="--Select--"
                     options={this.props.options}
-                    selectedKey={this.state.fieldDefinition?.fieldValue}
+
+                    defaultSelectedKeys={(this.props.isMultiSelect && typeof(this.state.fieldDefinition?.fieldValue) == "string" ? 
+                        this.state.fieldDefinition?.fieldValue.split(',') : 
+                        []
+                    )}
                     onChange={this.onChange}
-                    />
+                    />}
                 </Stack.Item>
             </Stack>
         );
@@ -51,7 +72,24 @@ export default class FilteredOptionsetControl extends React.Component<IFilteredO
     private onChange = (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption | undefined, index?: number | undefined) : void => {
         const fieldDefTemp = {...this.state}.fieldDefinition;
         if(fieldDefTemp != undefined){
-            fieldDefTemp["fieldValue"] = option?.key;
+
+            if(this.props.isMultiSelect){
+                let tempArray = fieldDefTemp["fieldValue"]?.split(',');
+
+
+                if(option?.selected)
+                    tempArray.push(option?.key);
+                else {
+                    tempArray  = tempArray.filter(function(ele: any){
+                        return ele != option?.key; 
+                   });
+                }
+                fieldDefTemp["fieldValue"] =  tempArray.toString();
+            }
+                
+            else 
+                fieldDefTemp["fieldValue"] = option?.key;
+
             fieldDefTemp["isDirty"] = true;
             this.setState({ fieldDefinition: fieldDefTemp });
 

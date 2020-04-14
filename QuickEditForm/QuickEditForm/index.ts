@@ -617,10 +617,14 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 					ReactDOM.render(React.createElement(DatePickerControl, dpOptions), item);
 				break;
+			case 'multiselectpicklist':
 			case 'picklist': 
-				const ddvalueOptions: IDropdownOption[] = fieldDetail.attributeDescriptor.OptionSet.map((o : any) => ({ key: o.Value, text : o.Label }));
-				// @ts-ignore
-				ddvalueOptions.unshift({key: null, text : _this._context.resources.getString("SelectOptionDropdown")});
+				const ddvalueOptions: IDropdownOption[] = fieldDetail.attributeDescriptor.OptionSet.map((o : any) => ({ key: o.Value.toString(), text : o.Label }));
+				
+				if(type == "picklist"){
+					// @ts-ignore
+					ddvalueOptions.unshift({key: null, text : _this._context.resources.getString("SelectOptionDropdown")});
+				}
 				let ddOptions = {
 					width : this._context.mode.allocatedWidth,
 					fieldDefinition : {
@@ -633,6 +637,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					disabled : isReadOnly,
 					label : label,
 					options: ddvalueOptions,
+					isMultiSelect : type == "multiselectpicklist",
 					onSelectedChanged :  (dataFieldDefinition? :DataFieldDefinition) => {
 						_this.setDataFieldDefinitionAfterChange(dataFieldDefinition, dataFieldDefinitionsDetails);
 					}
