@@ -59,33 +59,33 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
 </resheader>
 <data name="ReadOnlyRecordMessage" xml:space="preserve">
-    <value>The record is in read only mode.</value>
+    <value>Posten är i skrivskyddat läge.</value>
 </data>
 <data name="MissingPrivilegeOnEntityMessage" xml:space="preserve">
-    <value>You do not have the privileges to see the record.</value>
+    <value>Du har inte behörighet att visa posten.</value>
 </data>
 <data name="MissingPrivilegeOnRecordMessage" xml:space="preserve">
-    <value>You are missing privileges over the record in order to update it.</value>
+    <value>Du saknar privilegier för posten för att kunna uppdatera den.</value>
 </data>
 <data name="UpdateErrorMessage" xml:space="preserve">
-    <value>An error occurred during the update.</value>
+    <value>Ett fel uppstod under uppdateringen.</value>
 </data>
 <data name="UpdateSuccessMessage" xml:space="preserve">
-    <value>The record was updated successfully!</value>
+    <value>Posten har uppdaterats!</value>
 </data>
 <data name="LookupFieldHasNoValue" xml:space="preserve">
-    <value>Fill the field {0} to see its details.</value>
+    <value>Fyll fältet {0} för att visa detaljerna.</value>
 </data>
 <data name="SaveButtonLabel" xml:space="preserve">
-    <value>Save</value>
+    <value>Sparat</value>
 </data>
 <data name="RefreshButtonLabel" xml:space="preserve">
-    <value>Refresh</value>
+    <value>Uppdaterat</value>
 </data>
 <data name="QuickFormIdNotFound" xml:space="preserve">
-    <value>The Quick View Form Id doesn't exist. Please modify it.</value>
+    <value>Formulär-ID för snabb vy finns inte. Ändra den.</value>
 </data>
 <data name="SelectOptionDropdown" xml:space="preserve">
-    <value>--Select--</value>
+    <value>--Välj--</value>
 </data>
 </root>

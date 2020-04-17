@@ -44,6 +44,7 @@
     <ProjectReference Include="..\SirenValidator\SirenValidator.pcfproj" />
     <ProjectReference Include="..\SiretValidator\SiretValidator.pcfproj" />
     <ProjectReference Include="..\BICValidator\BICValidator.pcfproj" />
+    <ProjectReference Include="..\QuickEditForm\QuickEditForm.pcfproj" />
   </ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
