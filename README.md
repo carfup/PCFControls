@@ -12,7 +12,9 @@
 We all know the Quick View Form which allow you to display data related to a lookup field.
 However, it's just display and you have to open the lookup record in order to edit some data.
 This is where the Quick Edit Form takes place, based on a Quick View Form definition, you can display the fields within that form and interact with the data from the lookup record. 
-The text definitions are managed via RESX files. Currently supporting French & English (do not hesite to PR a new language !)
+The text definitions are managed via RESX files. 
+
+Current supported languages : English, French, German, Spanish, Italian, Swedish, Finish, Dutch, Danish, Romanian, Ukrainian, Russian (feel free to send a PR for new languages or wording issues !)
 
 ![](https://stuffandtacos.azurewebsites.net/content/images/2020/04/2020_04_09_17-31-41.gif)
 

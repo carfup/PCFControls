@@ -59,31 +59,31 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
 </resheader>
 <data name="ReadOnlyRecordMessage" xml:space="preserve">
-    <value>The record is in read only mode.</value>
+    <value>Tietue on vain luku-tilassa.</value>
 </data>
 <data name="MissingPrivilegeOnEntityMessage" xml:space="preserve">
-    <value>You do not have the privileges to see the record.</value>
+    <value>Sinulla ei ole tietueen tarkastelu oikeutta.</value>
 </data>
 <data name="MissingPrivilegeOnRecordMessage" xml:space="preserve">
-    <value>You are missing privileges over the record in order to update it.</value>
+    <value>Tietueelle puuttuu oikeuksia, jotta se voidaan päivittää.</value>
 </data>
 <data name="UpdateErrorMessage" xml:space="preserve">
-    <value>An error occurred during the update.</value>
+    <value>Päivityksen aikana tapahtui virhe.</value>
 </data>
 <data name="UpdateSuccessMessage" xml:space="preserve">
-    <value>The record was updated successfully!</value>
+    <value>Tietueen päivitys onnistui!</value>
 </data>
 <data name="LookupFieldHasNoValue" xml:space="preserve">
-    <value>Fill the field {0} to see its details.</value>
+    <value>Täytä kenttä {0} nähdäksesi sen tiedot.</value>
 </data>
 <data name="SaveButtonLabel" xml:space="preserve">
-    <value>Save</value>
+    <value>Tallenna</value>
 </data>
 <data name="RefreshButtonLabel" xml:space="preserve">
-    <value>Refresh</value>
+    <value>Päivitä</value>
 </data>
 <data name="QuickFormIdNotFound" xml:space="preserve">
-    <value>The Quick View Form Id doesn't exist. Please modify it.</value>
+    <value>Pikanäkymän lomake tunnusta ei ole. Muokkaa sitä.</value>
 </data>
 <data name="SelectOptionDropdown" xml:space="preserve">
     <value>--Select--</value>
