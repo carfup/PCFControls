@@ -185,6 +185,9 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		var lookupToClear: string[] = [];
 		dirtyValues.forEach(function(data){
 			switch(data.fieldType){
+				case 'customer':
+					dataToUpdate[`${data.fieldName!}_${data.fieldValue.EntityName}@odata.bind`] =  `/${data.fieldValue.EntityName}s(${data.fieldValue.Id})`;
+					break;
 				case 'owner':
 				case 'lookup':
 					if(data.fieldValue == ""){
@@ -561,6 +564,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		// In order to get the related values / details to render the component
 		switch(type){
 			case 'owner':
+			case 'customer':
 			case 'lookup':
 					let options = {
 						width : this._context.mode.allocatedWidth,
@@ -571,11 +575,12 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							fieldType : type,
 							controlId : controlId,
 							fieldValue : {
-								EntityName : fieldDetail.attributeDescriptor.Targets[0],
+								EntityName : this._parentRecordDetails.Attributes["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"],
 								Name : this._parentRecordDetails.Attributes[`_${techFieldName}_value@OData.Community.Display.V1.FormattedValue`] ?? "",
 								Id: this._parentRecordDetails.Attributes[`_${techFieldName}_value`] ?? ""
 							}
 						},
+						targetEntities : fieldDetail.attributeDescriptor.Targets,
 						disabled : isReadOnly,
 						icon : "Search",
 						context : this._context,
@@ -701,6 +706,12 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				ReactDOM.render(React.createElement(ToggleControl, toggleOptions), item);
 				break;
 			default :
+					let icon = "";
+					if(fieldDetail.attributeDescriptor.Format == "Email")
+						icon = "EditMail";
+					if(fieldDetail.attributeDescriptor.Format == "Url")
+						icon = "Globe";
+
 					let optionsText = {
 						width : this._context.mode.allocatedWidth,
 						label : label,
@@ -711,6 +722,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							controlId : controlId,
 							fieldValue : this._parentRecordDetails.Attributes[techFieldName] ?? ""
 						},
+						icon : icon,
 						disabled : isReadOnly,
 						onClickResult : (dataFieldDefinition?: DataFieldDefinition ) => {
 							_this.setDataFieldDefinitionAfterChange(dataFieldDefinition, dataFieldDefinitionsDetails);				
