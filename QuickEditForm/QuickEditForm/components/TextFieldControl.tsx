@@ -11,6 +11,7 @@ interface ITextFieldControlProperties {
     onClickResult? : (dataFieldDefinition? :DataFieldDefinition) => void;
     disabled? : boolean;
     width : number;
+    targetEntities? : [];
 }
 
 interface ITextFieldControlState {
@@ -109,18 +110,18 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
         let optionsLU = {
             allowMultiSelect: false,
             defaultEntityType : this.props.fieldDefinition.fieldValue.EntityName,
-            entityTypes : [this.props.fieldDefinition.fieldValue.EntityName],
+            entityTypes : this.props.targetEntities!,
             defaultViewId : "",
             viewIds: []
         };
         this.props.context.utils.lookupObjects(optionsLU).then(r =>  {
             if(r === undefined || r.length === 0) return;
 
-
         let fieldVal =  {
             Name : r[0].name,
             Id : r[0].id.toString().replace('{','').replace('}',''),
-            EntityName : this.props.fieldDefinition.fieldValue.EntityName
+            // @ts-ignore
+            EntityName : r[0].entityType
         }
 
         const fieldDefTemp = {...this.state}.fieldDefinition;
