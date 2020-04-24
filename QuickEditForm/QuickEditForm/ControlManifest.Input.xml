@@ -37,6 +37,8 @@
       <!-- Italian -->
       <resx path="strings/QuickEditForm.1043.resx" version="1.0.0" />
       <!-- Dutch -->
+      <resx path="strings/QuickEditForm.1044.resx" version="1.0.0" />
+      <!-- Norwegian -->
       <resx path="strings/QuickEditForm.1048.resx" version="1.0.0" />
       <!-- Romanian -->
       <resx path="strings/QuickEditForm.1049.resx" version="1.0.0" />
