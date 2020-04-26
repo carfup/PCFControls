@@ -184,9 +184,14 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		let dataToUpdate : any = {};
 		var lookupToClear: string[] = [];
 		dirtyValues.forEach(function(data){
+			let entityNamePlural = _this.getEntityPluralName(data.fieldValue.EntityName);
+
 			switch(data.fieldType){
 				case 'customer':
-					dataToUpdate[`${data.fieldName!}_${data.fieldValue.EntityName}@odata.bind`] =  `/${data.fieldValue.EntityName}s(${data.fieldValue.Id})`;
+					dataToUpdate[`${data.fieldName!}_${data.fieldValue.EntityName}@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
+					break;
+				case 'regarding':
+						dataToUpdate[`${data.fieldName!}_${data.fieldValue.EntityName}_email@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
 					break;
 				case 'owner':
 				case 'lookup':
@@ -194,7 +199,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						lookupToClear.push(data.fieldName!);
 					}
 					else {
-						dataToUpdate[data.fieldName!+"@odata.bind"] =  `/${data.fieldValue.EntityName}s(${data.fieldValue.Id})`;
+						dataToUpdate[data.fieldName!+"@odata.bind"] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
 					}
 					break;
 				case 'date': // dateOnly
@@ -564,6 +569,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		// In order to get the related values / details to render the component
 		switch(type){
 			case 'owner':
+			case 'partylist':
 			case 'customer':
 			case 'lookup':
 					let options = {
@@ -572,7 +578,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						fieldDefinition : {
 							idDirty : false,
 							fieldName : techFieldName,
-							fieldType : type,
+							fieldType : (type == "lookup" && fieldDetail.attributeDescriptor.Format == 2)  ? "regarding" : type,
 							controlId : controlId,
 							fieldValue : {
 								EntityName : this._parentRecordDetails.Attributes["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"],
@@ -818,5 +824,14 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		if(this._isRecordReadOnly){
 			this.displayMessage(MessageBarType.warning, this._context.resources.getString("ReadOnlyRecordMessage"));
 		}
+	}
+
+	private getEntityPluralName(entityName : string) : string{
+		if(entityName.endsWith("s"))
+			return entityName+"es";
+		else if(entityName.endsWith("y"))
+			return entityName.slice(0, entityName.length-1)+"ies";
+		else
+			return entityName+"s";
 	}
 }
