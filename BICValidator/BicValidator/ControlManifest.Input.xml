@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="BicValidator" version="0.0.8" display-name-key="Carfup.BicValidator" description-key="BicValidator description" control-type="standard">
+  <control namespace="Carfup" constructor="BicValidator" version="0.0.9" display-name-key="Carfup.BicValidator" description-key="BicValidator description" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="BICValue" display-name-key="BICValidator_BICValue" description-key="BIC field value" of-type="SingleLine.Text" usage="bound" required="true" />
     <property name="IsValid" display-name-key="BICValidator_IsValid" description-key="Is BIC valid" of-type="TwoOptions" usage="bound" required="false" />

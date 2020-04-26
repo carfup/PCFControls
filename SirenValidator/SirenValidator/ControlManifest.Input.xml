@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="SirenValidator" version="0.0.12" display-name-key="Carfup.SirenValidator" description-key="Siren Validator for PCF" control-type="standard">
+  <control namespace="Carfup" constructor="SirenValidator" version="0.0.13" display-name-key="Carfup.SirenValidator" description-key="Siren Validator for PCF" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="SirenValue" display-name-key="SirenValidator_SirenValue" description-key="Siren field value" of-type="SingleLine.Text" usage="bound" required="true" />
     <property name="IsValid" display-name-key="SiretValidator_IsValid" description-key="Is Siret valid" of-type="TwoOptions" usage="bound" required="false" />
