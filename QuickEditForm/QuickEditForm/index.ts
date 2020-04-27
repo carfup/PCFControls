@@ -183,15 +183,27 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		// Processing the dirty fields to prepare the update
 		let dataToUpdate : any = {};
 		var lookupToClear: string[] = [];
+		let entityNamePlural = "";
 		dirtyValues.forEach(function(data){
-			let entityNamePlural = _this.getEntityPluralName(data.fieldValue.EntityName);
+			if(data.fieldValue.EntityName != undefined)
+				entityNamePlural = _this.getEntityPluralName(data.fieldValue.EntityName);
 
 			switch(data.fieldType){
 				case 'customer':
-					dataToUpdate[`${data.fieldName!}_${data.fieldValue.EntityName}@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
+					if(data.fieldValue == ""){
+						lookupToClear.push(`${data.fieldName!}_${_this._recordToUpdate.EntityName}`);
+					}
+					else {
+						dataToUpdate[`${data.fieldName!}_${data.fieldValue.EntityName}@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
+					}
 					break;
 				case 'regarding':
-						dataToUpdate[`${data.fieldName!}_${data.fieldValue.EntityName}_email@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
+					if(data.fieldValue == ""){
+						lookupToClear.push(`${data.fieldName!}_${_this._parentRecordDetails.EntityName}_${_this._recordToUpdate.EntityName}`);
+					}
+					else {
+						dataToUpdate[`${data.fieldName!}_${data.fieldValue.EntityName}_${_this._recordToUpdate.EntityName}@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
+					}
 					break;
 				case 'owner':
 				case 'lookup':
@@ -244,7 +256,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 			//below line is used to delete the entity record  
 			let singularEntity = _this._recordToUpdate.EntityName;
-			let pluralEntity = singularEntity.endsWith("y") ? singularEntity.slice(0, singularEntity.length -1) + "ies" : singularEntity+"s";
+			let pluralEntity = _this.getEntityPluralName(singularEntity);
 
 			let url = `${_this._clientUrl}/api/data/v9.0/${pluralEntity}(${_this._recordToUpdate.Id})/${lookup}/$ref`;
 			xhr.open("DELETE", url, false);
