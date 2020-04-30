@@ -44,7 +44,7 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
                 <Stack.Item grow>
                     <TextField 
                         disabled={this.props.disabled!}
-                        value={this.gradValueFromFieldDefinition(this.state.fieldDefinition)} 
+                        value={this.grabValueFromFieldDefinition(this.state.fieldDefinition)} 
                         id={this.props.fieldDefinition.controlId} 
                         multiline={(this.props.fieldDefinition?.fieldType == "memo")}
                         autoAdjustHeight={(this.props.fieldDefinition?.fieldType == "memo")}
@@ -52,6 +52,7 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
                         iconProps={{ iconName: this.props.icon }} 
                         onClick={this.onClick} 
                         style={{width:"100%"}}
+                        onDoubleClick={this.onDoubleClick}
                         onChange={this.onChange}
                         onFocus={(event) => {
                             if(this.props.icon == "Search"){
@@ -64,11 +65,20 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
         );
     }
 
-    private gradValueFromFieldDefinition = (fieldDef : DataFieldDefinition | undefined) : string => {
+    private grabValueFromFieldDefinition = (fieldDef : DataFieldDefinition | undefined) : string => {
         if(this.state.fieldDefinition?.fieldValue?.Name !== undefined)
             return this.state.fieldDefinition?.fieldValue?.Name;
 
         return this.state.fieldDefinition?.fieldValue;
+    }
+
+    private onDoubleClick = (event: React.MouseEvent<HTMLInputElement | HTMLTextAreaElement, MouseEvent>) : void => {
+        if(this.props.icon == "EditMail"){
+            window.open(`mailto:${this.grabValueFromFieldDefinition(this.state.fieldDefinition?.fieldValue)}`);
+        }
+        else if(this.props.icon == "Globe"){
+            window.open(`${this.grabValueFromFieldDefinition(this.state.fieldDefinition?.fieldValue)}`);
+        }
     }
 
     private onChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) : void => {

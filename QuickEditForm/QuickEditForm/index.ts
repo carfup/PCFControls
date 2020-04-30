@@ -584,6 +584,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			case 'partylist':
 			case 'customer':
 			case 'lookup':
+					let entityName = this._parentRecordDetails.Attributes["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"] == undefined ? fieldDetail.attributeDescriptor.EntityLogicalName : this._parentRecordDetails.Attributes["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"];
 					let options = {
 						width : this._context.mode.allocatedWidth,
 						label : label,
@@ -593,7 +594,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							fieldType : (type == "lookup" && fieldDetail.attributeDescriptor.Format == 2)  ? "regarding" : type,
 							controlId : controlId,
 							fieldValue : {
-								EntityName : this._parentRecordDetails.Attributes["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"],
+								EntityName : entityName,
 								Name : this._parentRecordDetails.Attributes[`_${techFieldName}_value@OData.Community.Display.V1.FormattedValue`] ?? "",
 								Id: this._parentRecordDetails.Attributes[`_${techFieldName}_value`] ?? ""
 							}
