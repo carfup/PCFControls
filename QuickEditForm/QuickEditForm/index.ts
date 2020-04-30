@@ -183,15 +183,35 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		// Processing the dirty fields to prepare the update
 		let dataToUpdate : any = {};
 		var lookupToClear: string[] = [];
+		let entityNamePlural = "";
 		dirtyValues.forEach(function(data){
+			if(data.fieldValue.EntityName != undefined)
+				entityNamePlural = _this.getEntityPluralName(data.fieldValue.EntityName);
+
 			switch(data.fieldType){
+				case 'customer':
+					if(data.fieldValue == ""){
+						lookupToClear.push(`${data.fieldName!}_${_this._recordToUpdate.EntityName}`);
+					}
+					else {
+						dataToUpdate[`${data.fieldName!}_${data.fieldValue.EntityName}@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
+					}
+					break;
+				case 'regarding':
+					if(data.fieldValue == ""){
+						lookupToClear.push(`${data.fieldName!}_${_this._parentRecordDetails.EntityName}_${_this._recordToUpdate.EntityName}`);
+					}
+					else {
+						dataToUpdate[`${data.fieldName!}_${data.fieldValue.EntityName}_${_this._recordToUpdate.EntityName}@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
+					}
+					break;
 				case 'owner':
 				case 'lookup':
 					if(data.fieldValue == ""){
 						lookupToClear.push(data.fieldName!);
 					}
 					else {
-						dataToUpdate[data.fieldName!+"@odata.bind"] =  `/${data.fieldValue.EntityName}s(${data.fieldValue.Id})`;
+						dataToUpdate[data.fieldName!+"@odata.bind"] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
 					}
 					break;
 				case 'date': // dateOnly
@@ -236,7 +256,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 			//below line is used to delete the entity record  
 			let singularEntity = _this._recordToUpdate.EntityName;
-			let pluralEntity = singularEntity.endsWith("y") ? singularEntity.slice(0, singularEntity.length -1) + "ies" : singularEntity+"s";
+			let pluralEntity = _this.getEntityPluralName(singularEntity);
 
 			let url = `${_this._clientUrl}/api/data/v9.0/${pluralEntity}(${_this._recordToUpdate.Id})/${lookup}/$ref`;
 			xhr.open("DELETE", url, false);
@@ -561,21 +581,25 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		// In order to get the related values / details to render the component
 		switch(type){
 			case 'owner':
+			case 'partylist':
+			case 'customer':
 			case 'lookup':
+					let entityName = this._parentRecordDetails.Attributes["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"] == undefined ? fieldDetail.attributeDescriptor.EntityLogicalName : this._parentRecordDetails.Attributes["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"];
 					let options = {
 						width : this._context.mode.allocatedWidth,
 						label : label,
 						fieldDefinition : {
 							idDirty : false,
 							fieldName : techFieldName,
-							fieldType : type,
+							fieldType : (type == "lookup" && fieldDetail.attributeDescriptor.Format == 2)  ? "regarding" : type,
 							controlId : controlId,
 							fieldValue : {
-								EntityName : fieldDetail.attributeDescriptor.Targets[0],
+								EntityName : entityName,
 								Name : this._parentRecordDetails.Attributes[`_${techFieldName}_value@OData.Community.Display.V1.FormattedValue`] ?? "",
 								Id: this._parentRecordDetails.Attributes[`_${techFieldName}_value`] ?? ""
 							}
 						},
+						targetEntities : fieldDetail.attributeDescriptor.Targets,
 						disabled : isReadOnly,
 						icon : "Search",
 						context : this._context,
@@ -701,6 +725,12 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				ReactDOM.render(React.createElement(ToggleControl, toggleOptions), item);
 				break;
 			default :
+					let icon = "";
+					if(fieldDetail.attributeDescriptor.Format == "Email")
+						icon = "EditMail";
+					if(fieldDetail.attributeDescriptor.Format == "Url")
+						icon = "Globe";
+
 					let optionsText = {
 						width : this._context.mode.allocatedWidth,
 						label : label,
@@ -711,6 +741,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							controlId : controlId,
 							fieldValue : this._parentRecordDetails.Attributes[techFieldName] ?? ""
 						},
+						icon : icon,
 						disabled : isReadOnly,
 						onClickResult : (dataFieldDefinition?: DataFieldDefinition ) => {
 							_this.setDataFieldDefinitionAfterChange(dataFieldDefinition, dataFieldDefinitionsDetails);				
@@ -806,5 +837,14 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		if(this._isRecordReadOnly){
 			this.displayMessage(MessageBarType.warning, this._context.resources.getString("ReadOnlyRecordMessage"));
 		}
+	}
+
+	private getEntityPluralName(entityName : string) : string{
+		if(entityName.endsWith("s"))
+			return entityName+"es";
+		else if(entityName.endsWith("y"))
+			return entityName.slice(0, entityName.length-1)+"ies";
+		else
+			return entityName+"s";
 	}
 }
