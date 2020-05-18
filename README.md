@@ -1,5 +1,6 @@
 # PCF-Controls
 * [Quick Edit Form](#quick-edit-form)
+* [Any Composite Fields](#any-composite-fields)
 * [IBAN / SIREN / SIRET Validators](#iban--siren--siret-validators)
 * [File Field Manager](#file-field-manager)
 
@@ -27,6 +28,31 @@ There are 4 parameters to customize the PCF.
 |QuickVIewFormId|Guid of the Quick View Form you want to use to display the fields|x|
 |LookupFieldMapped|This is the technical name of the lookup field used as reference - ex : *_primarycontactid_value* (for a contact from an account)|x|
 |UseTextFieldAsLookup|Give the ability to the control to dynamically load data based on the GUID put in the mapped field, skipping the value from the lookup except if the field value is empty|x|
+
+## Any Composite Fields
+### Purpose
+Now that the UCI is the common interface for all environment we had to deal with the disapearing of the Composite fields rendering.
+Today, if you try to add the "FullName" field on your form, the UCI will render the firstname and lastname separated.
+The idea here was to allow you to "re"build all composite fields you want.
+You can attached up to 8 fields (the order of mapped fields is used for the rendering), choose a separator and tada.
+
+![](https://carfupstorage.blob.core.windows.net/sharex/2020_05_18_11-24-12.gif)
+
+### Capabilities
+If the field holder is locked, then all fields mapped with the control will be rendered as "Read Only" mode.
+You can also lock field by field, the control will retrieve the field definition from the form and render the specific field as "Read only" mode while the others will be editable.
+
+### Configuration
+There are 10 parameters to customize the PCF.
+
+|Parameter|Description|Required|
+|:---------|:-----------|:----:|
+|FieldToAttachControl|Field to attach the control|x|
+|separator|Separator character, space or words between all values (for a space, put %20 in the configuration field)|x|
+|Field 1|Field 1 to be used in the popup of the Composite rendering (text)|x|
+|Field 2|Field 2 to be used in the popup of the Composite rendering (text) |x|
+|Field ..|Field .. to be used in the popup of the Composite rendering (text) ||
+|Field 8|Field 8 to be used in the popup of the Composite rendering (text) ||
 
 ## IBAN / SIREN / SIRET Validators
 ### Purpose
