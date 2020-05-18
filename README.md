@@ -19,6 +19,8 @@ Current supported languages : English, French, German, Spanish, Italian, Swedish
 
 ![](https://stuffandtacos.azurewebsites.net/content/images/2020/04/2020_04_09_17-31-41.gif)
 
+More Details : [https://stuffandtacos.azurewebsites.net/2020/04/15/pcf-quick-edit-form/](https://stuffandtacos.azurewebsites.net/2020/04/15/pcf-quick-edit-form/)
+
 ### Configuration
 There are 4 parameters to customize the PCF.
 
@@ -36,7 +38,7 @@ Today, if you try to add the "FullName" field on your form, the UCI will render 
 The idea here was to allow you to "re"build all composite fields you want.
 You can attached up to 8 fields (the order of mapped fields is used for the rendering), choose a separator and tada.
 
-![](https://carfupstorage.blob.core.windows.net/sharex/2020_05_18_11-24-12.gif)
+![](https://carfupstorage.blob.core.windows.net/sharex/AnyCompositeFields.gif)
 
 ### Capabilities
 If the field holder is locked, then all fields mapped with the control will be rendered as "Read Only" mode.
@@ -81,8 +83,9 @@ There are 2 possibilities to use the control :
 * with fields on the same entity (you can upload one file per field) - *Left side on the demo*
 * with fields which are on a sub entity (you can upload as many files as you want !) - *Right side on the demo*
 
-#### Demo :
 ![](https://carfupstorage.blob.core.windows.net/sharex/2019-12-26_15-12-25.gif)
+
+More Details : [https://stuffandtacos.azurewebsites.net/2019/12/27/file-field-manager-for-model-driven-app/](https://stuffandtacos.azurewebsites.net/2019/12/27/file-field-manager-for-model-driven-app/)
 
 ### Configuration
 There are a lot of parameters to handle as many cases as I could : 
