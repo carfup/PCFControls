@@ -45,12 +45,13 @@ If the field holder is locked, then all fields mapped with the control will be r
 You can also lock field by field, the control will retrieve the field definition from the form and render the specific field as "Read only" mode while the others will be editable.
 
 ### Configuration
-There are 10 parameters to customize the PCF.
+There are 11 parameters to customize the PCF (with 5 mandatory).
 
 |Parameter|Description|Required|
 |:---------|:-----------|:----:|
 |FieldToAttachControl|Field to attach the control|x|
 |separator|Separator character, space or words between all values (for a space, put %20 in the configuration field)|x|
+|returnCompositeValue|Choose if you want to return the value of the composite control to your field holder. (default: true)|x|
 |Field 1|Field 1 to be used in the popup of the Composite rendering (text)|x|
 |Field 2|Field 2 to be used in the popup of the Composite rendering (text) |x|
 |Field ..|Field .. to be used in the popup of the Composite rendering (text) ||
