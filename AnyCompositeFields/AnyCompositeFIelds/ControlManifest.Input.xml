@@ -1,17 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="AnyCompositeFIelds" version="0.0.41" display-name-key="Carfup.AnyCompositeFIelds" description-key="AnyCompositeFIelds will allow  you to display any stack of fields as composite rendering." control-type="standard"  preview-image="img/preview.png">
+  <control namespace="Carfup" constructor="AnyCompositeFIelds" version="0.0.45" display-name-key="Carfup.AnyCompositeFIelds" description-key="AnyCompositeFIelds will allow  you to display any stack of fields as composite rendering." control-type="standard" preview-image="img/preview.png">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
-    <property name="FieldToAttachControl" display-name-key="FieldToAttachControl" description-key="Field to attach the control to" of-type="SingleLine.Text" usage="bound" required="true" />
+    <property name="FieldToAttachControl" display-name-key="FieldToAttachControl" description-key="Field to attach the control to" of-type-group="strings" usage="bound" required="true" />
     <property name="separator" display-name-key="Values separator" description-key="Separator to split the mapped values (for a space, put %20)" of-type="SingleLine.Text" usage="input" required="true" default-value="%20" />
-    <property name="field1" display-name-key="Field 1" description-key="Field 1 to be used" of-type="SingleLine.Text" usage="bound" required="true" />
-    <property name="field2" display-name-key="Field 2" description-key="Field 2 to be used" of-type="SingleLine.Text" usage="bound" required="true" />
-    <property name="field3" display-name-key="Field 3" description-key="Field 3 to be used" of-type="SingleLine.Text" usage="bound" required="false" />
-    <property name="field4" display-name-key="Field 4" description-key="Field 4 to be used" of-type="SingleLine.Text" usage="bound" required="false" />
-    <property name="field5" display-name-key="Field 5" description-key="Field 5 to be used" of-type="SingleLine.Text" usage="bound" required="false" />
-    <property name="field6" display-name-key="Field 6" description-key="Field 6 to be used" of-type="SingleLine.Text" usage="bound" required="false" />
-    <property name="field7" display-name-key="Field 7" description-key="Field 7 to be used" of-type="SingleLine.Text" usage="bound" required="false" />
-    <property name="field8" display-name-key="Field 8" description-key="Field 8 to be used" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="returnCompositeValue" display-name-key="Return the composite value ?" description-key="Do you want to retrieve the composite value ?" of-type="Enum" usage="input" required="true" default-value="true">
+      <value name="true" display-name-key="True" description-key="true">true</value>
+      <value name="false" display-name-key="False" description-key="false">false</value>
+    </property>
+    <property name="field1" display-name-key="Field 1" description-key="Field 1 to be used" of-type-group="strings" usage="bound" required="true" />
+    <property name="field2" display-name-key="Field 2" description-key="Field 2 to be used" of-type-group="strings" usage="bound" required="true" />
+    <property name="field3" display-name-key="Field 3" description-key="Field 3 to be used" of-type-group="strings" usage="bound" required="false" />
+    <property name="field4" display-name-key="Field 4" description-key="Field 4 to be used" of-type-group="strings" usage="bound" required="false" />
+    <property name="field5" display-name-key="Field 5" description-key="Field 5 to be used" of-type-group="strings" usage="bound" required="false" />
+    <property name="field6" display-name-key="Field 6" description-key="Field 6 to be used" of-type-group="strings" usage="bound" required="false" />
+    <property name="field7" display-name-key="Field 7" description-key="Field 7 to be used" of-type-group="strings" usage="bound" required="false" />
+    <property name="field8" display-name-key="Field 8" description-key="Field 8 to be used" of-type-group="strings" usage="bound" required="false" />
+    <type-group name="strings">
+      <type>SingleLine.Email</type>
+      <type>SingleLine.Text</type>
+      <type>SingleLine.Phone</type>
+    </type-group>
     <!-- 
       Property node's of-type attribute can be of-type-group attribute. 
       Example:

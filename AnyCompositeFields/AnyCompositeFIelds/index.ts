@@ -67,7 +67,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 	 */
 	public getOutputs(): IOutputs
 	{
-		return {
+		let valuesToReturn = {
 			field1 : this._compositeValue.fieldValue1.raw,
 			field2 : this._compositeValue.fieldValue2.raw,
 			field3 : this._compositeValue.fieldValue3.raw,
@@ -77,6 +77,13 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 			field7 : this._compositeValue.fieldValue7.raw,
 			field8 : this._compositeValue.fieldValue8.raw
 		};
+
+		if(this._compositeValue.returnCompositeValue){
+			// @ts-ignore
+			valuesToReturn["FieldToAttachControl"] = this._compositeValue.fullValue;
+		}
+
+		return valuesToReturn;
 	}
 
 	/** 
@@ -130,6 +137,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 		this._compositeValue.fieldValue7 = this._context.parameters.field7;
 		this._compositeValue.fieldValue8 = this._context.parameters.field8;
 		this._compositeValue.separator = this._context.parameters.separator.raw! === "%20" ? " " : this._context.parameters.separator.raw!;
+		this._compositeValue.returnCompositeValue = (this._context.parameters.returnCompositeValue && this._context.parameters.returnCompositeValue.raw && this._context.parameters.returnCompositeValue.raw.toLowerCase() === "true") ? true : false;
 		this.buildFullValue();
 	}
 

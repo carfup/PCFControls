@@ -1,5 +1,6 @@
 export class CompositeValue{
 	public separator : string;
+	public returnCompositeValue : boolean;
 	public fullValue : string;
 	public fieldValue1? : any;
 	public fieldValue2? : any;
