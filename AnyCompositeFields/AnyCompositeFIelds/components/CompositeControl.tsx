@@ -7,6 +7,7 @@ export interface ICompositeControlProps {
     visible: boolean;
     compositeValue : CompositeValue;
     doneLabel : string;
+    randNumber: number;
     onClickedDone : (compositeValue? : CompositeValue) => void;
 }
 
@@ -24,9 +25,11 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         super(props);
         this.state = {
             showCallout : false,
-            compositeValue : this.props.compositeValue
+            compositeValue : this.props.compositeValue,
         };
     }
+
+    
 
     render(){
         return (
@@ -36,13 +39,14 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                     readOnly={true}
                     onClick={() => this.setState({ showCallout : true }) }
                     styles={textFieldStyles}
-                    id="acf_compositeFullValue"
+                    id={"acf_compositeFullValue"+this.props.randNumber}
                 />
                 {this.state.showCallout && (
                     <Callout
-                        target={"#acf_compositeFullValue"}
+                        target={"#acf_compositeFullValue"+this.props.randNumber}
                         onDismiss={() => this.setState({ showCallout : false }) }
                         styles={calloutStyles}
+                        directionalHint={DirectionalHint.topCenter}
                     >
                         <Stack style={{margin : "10px"}}>
                           

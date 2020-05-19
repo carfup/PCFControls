@@ -113,6 +113,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 				doneLabel : this._context.resources.getString("doneLabel"),
 				disabled : this._context.mode.isControlDisabled,
 				visible : this._context.mode.isVisible,
+				randNumber : Math.floor(Math.random()*(100-1+1)+1),
 				onClickedDone : (compositeValue? : CompositeValue) => {
 					this._compositeValue = compositeValue!;
 					this.notifyOutputChanged();
