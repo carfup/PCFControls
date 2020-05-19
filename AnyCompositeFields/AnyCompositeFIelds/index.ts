@@ -123,7 +123,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 			this._compositeComponent = ReactDOM.render(React.createElement(CompositeControl, optionsText), this._controlDiv);
 		} 
 		else {
-			this._compositeComponent.setState({compositeValue : this._compositeValue});
+			this._compositeComponent.setState({compositeValue : this._compositeValue, disabled : this._context.mode.isControlDisabled, visible : this._context.mode.isVisible});
 		}
 	}
 

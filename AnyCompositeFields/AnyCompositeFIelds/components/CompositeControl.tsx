@@ -14,6 +14,8 @@ export interface ICompositeControlProps {
 export interface IBCompositeControlState {
     showCallout: boolean,
     compositeValue : CompositeValue;
+    disabled : boolean;
+    visible : boolean;
 }
 
 const stackStyles: Partial<IStackStyles> = { root: { width: "100%" } };
@@ -26,6 +28,8 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         this.state = {
             showCallout : false,
             compositeValue : this.props.compositeValue,
+            disabled : this.props.disabled,
+            visible : this.props.visible
         };
     }
 
@@ -55,7 +59,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                 label={this.state.compositeValue.fieldValue1.attributes.DisplayName}
                                 id={"acf_fieldValue1"}
                                 onChange={this.onChangeField}
-                                disabled={this.props.disabled || this.state.compositeValue.fieldValue1.disabled!}
+                                disabled={this.state.disabled || this.state.compositeValue.fieldValue1.disabled!}
                                 styles={textFieldStyles}
                             />}
                             {this.state.compositeValue.fieldValue2.attributes.LogicalName != undefined && <TextField 
@@ -63,7 +67,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                 label={this.state.compositeValue.fieldValue2.attributes.DisplayName}
                                 id={"acf_fieldValue2"}
                                 onChange={this.onChangeField}
-                                disabled={this.props.disabled || this.state.compositeValue.fieldValue2.disabled!}
+                                disabled={this.state.disabled || this.state.compositeValue.fieldValue2.disabled!}
                                 styles={textFieldStyles}
                             />}
                             {this.state.compositeValue.fieldValue3.attributes.LogicalName != undefined && <TextField 
@@ -71,7 +75,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                 label={this.state.compositeValue.fieldValue3.attributes.DisplayName}
                                 id={"acf_fieldValue3"}
                                 onChange={this.onChangeField}
-                                disabled={this.props.disabled || this.state.compositeValue.fieldValue3.disabled!}
+                                disabled={this.state.disabled || this.state.compositeValue.fieldValue3.disabled!}
                                 styles={textFieldStyles}
                             />}
                             {this.state.compositeValue.fieldValue4.attributes.LogicalName != undefined && <TextField 
@@ -79,7 +83,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                 label={this.state.compositeValue.fieldValue4.attributes.DisplayName}
                                 id={"acf_fieldValue4"}
                                 onChange={this.onChangeField}
-                                disabled={this.props.disabled || this.state.compositeValue.fieldValue4.disabled!}
+                                disabled={this.state.disabled || this.state.compositeValue.fieldValue4.disabled!}
                                 styles={textFieldStyles}
                             />}
                             {this.state.compositeValue.fieldValue5.attributes.LogicalName != undefined && <TextField 
@@ -87,7 +91,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                 label={this.state.compositeValue.fieldValue5.attributes.DisplayName}
                                 id={"acf_fieldValue5"}
                                 onChange={this.onChangeField}
-                                disabled={this.props.disabled || this.state.compositeValue.fieldValue5.disabled!}
+                                disabled={this.state.disabled || this.state.compositeValue.fieldValue5.disabled!}
                                 styles={textFieldStyles}
                             />}
                             {this.state.compositeValue.fieldValue6.attributes.LogicalName != undefined && <TextField 
@@ -95,7 +99,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                 label={this.state.compositeValue.fieldValue6.attributes.DisplayName}
                                 id={"acf_fieldValue6"}
                                 onChange={this.onChangeField}
-                                disabled={this.props.disabled || this.state.compositeValue.fieldValue6.disabled!}
+                                disabled={this.state.disabled || this.state.compositeValue.fieldValue6.disabled!}
                                 styles={textFieldStyles}
                             />}
                             {this.state.compositeValue.fieldValue7.attributes.LogicalName != undefined && <TextField 
@@ -103,7 +107,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                 label={this.state.compositeValue.fieldValue7.attributes.DisplayName}
                                 id={"acf_fieldValue7"}
                                 onChange={this.onChangeField}
-                                disabled={this.props.disabled || this.state.compositeValue.fieldValue7.disabled!}
+                                disabled={this.state.disabled || this.state.compositeValue.fieldValue7.disabled!}
                                 styles={textFieldStyles}
                             />}
                             {this.state.compositeValue.fieldValue8.attributes.LogicalName != undefined && <TextField 
@@ -111,7 +115,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                 label={this.state.compositeValue.fieldValue8.attributes.DisplayName}
                                 id={"acf_fieldValue8"}
                                 onChange={this.onChangeField}
-                                disabled={this.props.disabled || this.state.compositeValue.fieldValue8.disabled!}
+                                disabled={this.state.disabled || this.state.compositeValue.fieldValue8.disabled!}
                                 styles={textFieldStyles}
                             />}
 
