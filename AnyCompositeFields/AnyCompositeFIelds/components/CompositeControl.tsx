@@ -32,7 +32,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         return (
             <Stack horizontal id="acf_compositestack" styles={stackStyles}>
                 <TextField 
-                    value={this.props.compositeValue.fullValue} 
+                    value={this.state.compositeValue.fullValue} 
                     readOnly={true}
                     onClick={() => this.setState({ showCallout : true }) }
                     styles={textFieldStyles}

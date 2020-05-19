@@ -11,6 +11,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 	private _container: HTMLDivElement;
 	private notifyOutputChanged: () => void;
 	private _controlDiv : HTMLDivElement;
+	private _compositeComponent? : any;
 
 	// Field properties
 	private _compositeValue : CompositeValue;
@@ -45,7 +46,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 
 		this._container = container;
 
-	//	this.buildControl();
+		this.buildControl(true);
 	}
 
 
@@ -56,7 +57,6 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 	public async updateView(context: ComponentFramework.Context<IInputs>)
 	{
 		// Add code to update control view
-		this.unmountComponents();
 		this.getParams();
 		this.buildControl(false);
 	}
@@ -98,7 +98,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 
 	private async buildControl(getFormXml: boolean){
 		var _this = this;
-		if(!getFormXml){
+		if(getFormXml){
 			// @ts-ignore
 			var formGuid = this._context.factory._customControlProperties.personalizationConfiguration.formGuid.guid;
 
@@ -107,20 +107,23 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 					_this.extractFieldsFromQVF(form.formxml);
 				}
 			);
-		}
 
-		let optionsText = {
-			compositeValue : this._compositeValue,
-			doneLabel : this._context.resources.getString("doneLabel"),
-			disabled : this._context.mode.isControlDisabled,
-			visible : this._context.mode.isVisible,
-			onClickedDone : (compositeValue? : CompositeValue) => {
-				this._compositeValue = compositeValue!;
-				this.notifyOutputChanged();
+			let optionsText = {
+				compositeValue : this._compositeValue,
+				doneLabel : this._context.resources.getString("doneLabel"),
+				disabled : this._context.mode.isControlDisabled,
+				visible : this._context.mode.isVisible,
+				onClickedDone : (compositeValue? : CompositeValue) => {
+					this._compositeValue = compositeValue!;
+					this.notifyOutputChanged();
+				}
 			}
-		}
 
-		ReactDOM.render(React.createElement(CompositeControl, optionsText), this._controlDiv);
+			this._compositeComponent = ReactDOM.render(React.createElement(CompositeControl, optionsText), this._controlDiv);
+		} 
+		else {
+			this._compositeComponent.setState({compositeValue : this._compositeValue});
+		}
 	}
 
 	/**
@@ -139,11 +142,6 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 		this._compositeValue.separator = this._context.parameters.separator.raw! === "%20" ? " " : this._context.parameters.separator.raw!;
 		this._compositeValue.returnCompositeValue = (this._context.parameters.returnCompositeValue && this._context.parameters.returnCompositeValue.raw && this._context.parameters.returnCompositeValue.raw.toLowerCase() === "true") ? true : false;
 		this.buildFullValue();
-	}
-
-	private unmountComponents (){	
-		ReactDOM.unmountComponentAtNode(this._controlDiv);	
-		//this._controlDiv.innerHTML = "";
 	}
 
 	private buildFullValue(): void {
