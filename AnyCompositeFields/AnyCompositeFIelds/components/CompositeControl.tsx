@@ -36,6 +36,8 @@ export default class CompositeControl extends React.Component<ICompositeControlP
     
 
     render(){
+        const elements = ['fieldValue1', 'fieldValue2', 'fieldValue3', 'fieldValue4', 'fieldValue5', 'fieldValue6', 'fieldValue7', 'fieldValue8'];
+
         return (
             <Stack horizontal id="acf_compositestack" styles={stackStyles}>
                 <TextField 
@@ -53,71 +55,20 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                         directionalHint={DirectionalHint.topCenter}
                     >
                         <Stack style={{margin : "10px"}}>
-                          
-                            {this.state.compositeValue.fieldValue1.attributes.LogicalName != undefined && <TextField 
-                                value={this.state.compositeValue.fieldValue1.raw!} 
-                                label={this.state.compositeValue.fieldValue1.attributes.DisplayName}
-                                id={"acf_fieldValue1"}
-                                onChange={this.onChangeField}
-                                disabled={this.state.disabled || this.state.compositeValue.fieldValue1.disabled!}
-                                styles={textFieldStyles}
-                            />}
-                            {this.state.compositeValue.fieldValue2.attributes.LogicalName != undefined && <TextField 
-                                value={this.state.compositeValue.fieldValue2.raw!} 
-                                label={this.state.compositeValue.fieldValue2.attributes.DisplayName}
-                                id={"acf_fieldValue2"}
-                                onChange={this.onChangeField}
-                                disabled={this.state.disabled || this.state.compositeValue.fieldValue2.disabled!}
-                                styles={textFieldStyles}
-                            />}
-                            {this.state.compositeValue.fieldValue3.attributes.LogicalName != undefined && <TextField 
-                                value={this.state.compositeValue.fieldValue3.raw!} 
-                                label={this.state.compositeValue.fieldValue3.attributes.DisplayName}
-                                id={"acf_fieldValue3"}
-                                onChange={this.onChangeField}
-                                disabled={this.state.disabled || this.state.compositeValue.fieldValue3.disabled!}
-                                styles={textFieldStyles}
-                            />}
-                            {this.state.compositeValue.fieldValue4.attributes.LogicalName != undefined && <TextField 
-                                value={this.state.compositeValue.fieldValue4.raw!} 
-                                label={this.state.compositeValue.fieldValue4.attributes.DisplayName}
-                                id={"acf_fieldValue4"}
-                                onChange={this.onChangeField}
-                                disabled={this.state.disabled || this.state.compositeValue.fieldValue4.disabled!}
-                                styles={textFieldStyles}
-                            />}
-                            {this.state.compositeValue.fieldValue5.attributes.LogicalName != undefined && <TextField 
-                                value={this.state.compositeValue.fieldValue5.raw!} 
-                                label={this.state.compositeValue.fieldValue5.attributes.DisplayName}
-                                id={"acf_fieldValue5"}
-                                onChange={this.onChangeField}
-                                disabled={this.state.disabled || this.state.compositeValue.fieldValue5.disabled!}
-                                styles={textFieldStyles}
-                            />}
-                            {this.state.compositeValue.fieldValue6.attributes.LogicalName != undefined && <TextField 
-                                value={this.state.compositeValue.fieldValue6.raw!} 
-                                label={this.state.compositeValue.fieldValue6.attributes.DisplayName}
-                                id={"acf_fieldValue6"}
-                                onChange={this.onChangeField}
-                                disabled={this.state.disabled || this.state.compositeValue.fieldValue6.disabled!}
-                                styles={textFieldStyles}
-                            />}
-                            {this.state.compositeValue.fieldValue7.attributes.LogicalName != undefined && <TextField 
-                                value={this.state.compositeValue.fieldValue7.raw!} 
-                                label={this.state.compositeValue.fieldValue7.attributes.DisplayName}
-                                id={"acf_fieldValue7"}
-                                onChange={this.onChangeField}
-                                disabled={this.state.disabled || this.state.compositeValue.fieldValue7.disabled!}
-                                styles={textFieldStyles}
-                            />}
-                            {this.state.compositeValue.fieldValue8.attributes.LogicalName != undefined && <TextField 
-                                value={this.state.compositeValue.fieldValue8.raw!} 
-                                label={this.state.compositeValue.fieldValue8.attributes.DisplayName}
-                                id={"acf_fieldValue8"}
-                                onChange={this.onChangeField}
-                                disabled={this.state.disabled || this.state.compositeValue.fieldValue8.disabled!}
-                                styles={textFieldStyles}
-                            />}
+                            {elements.map((value, index) => {
+                                // @ts-ignore
+                                let element = this.state.compositeValue[value];
+                                
+                                return element.attributes.LogicalName != undefined && <TextField 
+                                    value={element.raw!} 
+                                    label={element.attributes.DisplayName}
+                                    id={"acf_"+value}
+                                    onChange={this.onChangeField}
+                                    disabled={this.state.disabled || element.disabled!}
+                                    styles={textFieldStyles}
+                                    maxLength={element.attributes.MaxLength}
+                                />
+                            })}
 
                             <DefaultButton text={this.props.doneLabel} onClick={this.onClick} style={{marginTop:'10px',alignSelf: "flex-end"}}/>
                         </Stack>

@@ -3,7 +3,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import CompositeControl from "./components/CompositeControl";
 import { CompositeValue } from "./EntitiesDefinition";
-import { find } from "office-ui-fabric-react";
 
 export class AnyCompositeFIelds implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
@@ -110,7 +109,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 
 			let optionsText = {
 				compositeValue : this._compositeValue,
-				doneLabel : this._context.resources.getString("doneLabel"),
+				doneLabel : this._context.resources.getString("Done"),
 				disabled : this._context.mode.isControlDisabled,
 				visible : this._context.mode.isVisible,
 				randNumber : Math.floor(Math.random()*(100-1+1)+1),
