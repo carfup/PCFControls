@@ -741,6 +741,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							controlId : controlId,
 							fieldValue : this._parentRecordDetails.Attributes[techFieldName] ?? ""
 						},
+						maxLength: fieldDetail.attributeDescriptor.MaxLength,
 						icon : icon,
 						disabled : isReadOnly,
 						onClickResult : (dataFieldDefinition?: DataFieldDefinition ) => {
