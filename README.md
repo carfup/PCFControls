@@ -38,7 +38,7 @@ Today, if you try to add the "FullName" field on your form, the UCI will render 
 The idea here was to allow you to "re"build all composite fields you want.
 You can attached up to 8 fields (the order of mapped fields is used for the rendering), choose a separator and tada.
 
-![](https://carfupstorage.blob.core.windows.net/sharex/AnyCompositeFields.gif)
+![](https://carfupstorage.blob.core.windows.net/sharex/AnyCompositeFields_demo.gif)
 
 ### Capabilities
 If the field holder is locked, then all fields mapped with the control will be rendered as "Read Only" mode.
