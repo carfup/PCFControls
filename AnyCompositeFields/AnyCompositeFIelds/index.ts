@@ -45,6 +45,10 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 
 		this._container = container;
 
+		if(context.mode.isVisible){
+			container.setAttribute("visibility", "hidden");
+		}
+
 		this.buildControl(true);
 	}
 
