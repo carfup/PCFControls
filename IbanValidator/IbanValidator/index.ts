@@ -57,7 +57,7 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 		this._ibanValueElement.addEventListener("change", this._ibanValueChanged);
 		this._ibanValueElement.value = this._ibanValue;
 		// @ts-ignore
-		this._ibanValueElement.setAttribute("maxlength", context.parameters.IbanValue.attribute?.attributes.MaxLength)
+		this._ibanValueElement.setAttribute("maxlength", context.parameters.IbanValue.attributes?.MaxLength)
 		if(context.mode.isControlDisabled){
 			this._ibanValueElement.setAttribute("disabled", "disabled");
 		}
@@ -72,7 +72,7 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 		container.appendChild(this._ibanValueElement);
 		container.appendChild(this._ibanValueValidationElement);	
 
-		if(context.mode.isVisible){
+		if(!context.mode.isVisible){
 			container.setAttribute("visibility", "hidden");
 		}
 

@@ -54,7 +54,7 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 		this._valueElement.addEventListener("change", this._valueChanged);
 		this._valueElement.value = this._value;
 		// @ts-ignore
-		this._valueElement.setAttribute("maxlength", context.parameters.SirenValue.attribute?.attributes.MaxLength)
+		this._valueElement.setAttribute("maxlength", context.parameters.SirenValue.attributes?.MaxLength)
 
 		if(context.mode.isControlDisabled){
 			this._valueElement.setAttribute("disabled", "disabled");
@@ -69,7 +69,7 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 		container.appendChild(this._valueElement);
 		container.appendChild(this._valueValidationElement);
 
-		if(context.mode.isVisible){
+		if(!context.mode.isVisible){
 			container.setAttribute("visibility", "hidden");
 		}
 
