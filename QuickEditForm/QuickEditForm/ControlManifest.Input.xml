@@ -33,6 +33,8 @@
       <!-- Finnish-->
       <resx path="strings/QuickEditForm.1036.resx" version="1.0.0" />
       <!-- French -->
+      <resx path="strings/QuickEditForm.1037.resx" version="1.0.0" />
+      <!-- Hebrew -->
       <resx path="strings/QuickEditForm.1038.resx" version="1.0.0" />
       <!-- Hungarian -->
       <resx path="strings/QuickEditForm.1040.resx" version="1.0.0" />
@@ -41,6 +43,8 @@
       <!-- Dutch -->
       <resx path="strings/QuickEditForm.1044.resx" version="1.0.0" />
       <!-- Norwegian -->
+      <resx path="strings/QuickEditForm.1045.resx" version="1.0.0" />
+      <!-- Polish -->
       <resx path="strings/QuickEditForm.1048.resx" version="1.0.0" />
       <!-- Romanian -->
       <resx path="strings/QuickEditForm.1049.resx" version="1.0.0" />
@@ -51,6 +55,8 @@
       <!-- Swedish -->
       <resx path="strings/QuickEditForm.1058.resx" version="1.0.0" />
       <!-- Ukrainian -->
+      <resx path="strings/QuickEditForm.1081.resx" version="1.0.0" />
+      <!-- India -->
       <resx path="strings/QuickEditForm.3082.resx" version="1.0.0" />
       <!-- Spanish -->
       <!-- UNCOMMENT TO ADD MORE RESOURCES
