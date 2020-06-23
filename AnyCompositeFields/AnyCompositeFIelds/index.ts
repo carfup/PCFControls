@@ -3,7 +3,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import CompositeControl from "./components/CompositeControl";
 import { CompositeValue } from "./EntitiesDefinition";
-import { find } from "office-ui-fabric-react";
 
 export class AnyCompositeFIelds implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
@@ -45,6 +44,10 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 		container.appendChild(this._controlDiv);
 
 		this._container = container;
+
+		if(context.mode.isVisible){
+			container.setAttribute("visibility", "hidden");
+		}
 
 		this.buildControl(true);
 	}
@@ -110,7 +113,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 
 			let optionsText = {
 				compositeValue : this._compositeValue,
-				doneLabel : this._context.resources.getString("doneLabel"),
+				doneLabel : this._context.resources.getString("Done"),
 				disabled : this._context.mode.isControlDisabled,
 				visible : this._context.mode.isVisible,
 				randNumber : Math.floor(Math.random()*(100-1+1)+1),
@@ -123,7 +126,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 			this._compositeComponent = ReactDOM.render(React.createElement(CompositeControl, optionsText), this._controlDiv);
 		} 
 		else {
-			this._compositeComponent.setState({compositeValue : this._compositeValue});
+			this._compositeComponent.setState({compositeValue : this._compositeValue, disabled : this._context.mode.isControlDisabled, visible : this._context.mode.isVisible});
 		}
 	}
 

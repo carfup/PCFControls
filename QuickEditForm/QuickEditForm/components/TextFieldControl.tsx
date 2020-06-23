@@ -12,6 +12,7 @@ interface ITextFieldControlProperties {
     disabled? : boolean;
     width : number;
     targetEntities? : [];
+    maxLength?: number;
 }
 
 interface ITextFieldControlState {
@@ -59,6 +60,7 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
                                 event.target.select();
                             }
                         }}
+                        maxLength={this.props.maxLength}
                     />
                 </Stack.Item>
             </Stack>

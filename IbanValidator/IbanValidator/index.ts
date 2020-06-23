@@ -56,6 +56,12 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 		this._ibanValueElement.setAttribute("class", "pcfinputcontrol");
 		this._ibanValueElement.addEventListener("change", this._ibanValueChanged);
 		this._ibanValueElement.value = this._ibanValue;
+		// @ts-ignore
+		this._ibanValueElement.setAttribute("maxlength", context.parameters.IbanValue.attributes?.MaxLength)
+		if(context.mode.isControlDisabled){
+			this._ibanValueElement.setAttribute("disabled", "disabled");
+		}
+		
 		
 		// img control
 		this._ibanValueValidationElement = document.createElement("img");
@@ -65,6 +71,10 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 		
 		container.appendChild(this._ibanValueElement);
 		container.appendChild(this._ibanValueValidationElement);	
+
+		if(!context.mode.isVisible){
+			container.setAttribute("visibility", "hidden");
+		}
 
 		this.ibanValueChanged(null);
 	}
@@ -192,7 +202,7 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 			TN: 24, TR: 26, UA: 29, VA: 22, VG: 24, XK: 20
 		};
 
-		var code:RegExpMatchArray, digits:any;
+		var code:RegExpMatchArray |null, digits:any;
 		var iban = input.toUpperCase().replace(/[^A-Z0-9]/g, ''), // keep only alphanumeric characters
 		code = iban.match(/^([A-Z]{2})(\d{2})([A-Z\d]+)$/), // match and capture (1) the country code, (2) the check digits, and (3) the rest
 		digits;

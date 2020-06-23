@@ -41,6 +41,9 @@ export class SiretValidator implements ComponentFramework.StandardControl<IInput
 		this._context = context; 
 		this._notifyOutputChanged = notifyOutputChanged; 
 		
+		//Get params
+		this.getParams();
+
 		// Add control initialization code
 		this._valueChanged = this.valueChanged.bind(this);
 		
@@ -49,15 +52,27 @@ export class SiretValidator implements ComponentFramework.StandardControl<IInput
 		this._valueElement.setAttribute("type", "text");
 		this._valueElement.setAttribute("class", "pcfinputcontrol");
 		this._valueElement.addEventListener("change", this._valueChanged);
+		this._valueElement.value = this._value;
+		// @ts-ignore
+		this._valueElement.setAttribute("maxlength", context.parameters.SiretValue.attributes?.MaxLength)
+
 		
 		// img control
 		this._valueValidationElement = document.createElement("img");
 		this._valueValidationElement.setAttribute("class", "pcfimagecontrol");
 		this._valueValidationElement.setAttribute("hidden", "hidden");
 		this._valueValidationElement.setAttribute("height", "24px");
+
+		if(context.mode.isControlDisabled){
+			this._valueElement.setAttribute("disabled", "disabled");
+		}
 		
 		container.appendChild(this._valueElement);
 		container.appendChild(this._valueValidationElement);
+
+		if(!context.mode.isVisible){
+			container.setAttribute("visibility", "hidden");
+		}
 
 		this.valueChanged(null);
 	}
