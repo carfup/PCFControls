@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="IbanValidator" version="0.0.20" display-name-key="Carfup.IbanValidator" description-key="IBAN validator for PCF" control-type="standard">
+  <control namespace="Carfup" constructor="IbanValidator" version="0.0.21" display-name-key="Carfup.IbanValidator" description-key="IBAN validator for PCF" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="IbanValue" display-name-key="IbanValidator_IbanValue" description-key="IBAN field value" of-type="SingleLine.Text" usage="bound" required="true" />
     <property name="IsValidIban" display-name-key="IbanValidator_IsValidIban" description-key="Is IBAN valid" of-type="TwoOptions" usage="bound" required="false" />
