@@ -88,8 +88,11 @@ export class IbanValidator implements ComponentFramework.StandardControl<IInputs
 	{
 		// Add code to update control view
 		
-		this._ibanValueElement.value = this._ibanValue;// this._ibanValue = this._context.parameters.IbanValue == undefined ? "" : String(this._context.parameters.IbanValue.raw);
-		//this._isValidIban = this._context.parameters.IsValidIban == undefined ? false : Boolean(this._context.parameters.IsValidIban.raw);
+		this._ibanValueElement.value = this._ibanValue;
+		
+		if(context.mode.isControlDisabled){
+			this._ibanValueElement.setAttribute("disabled", "disabled");
+		}
 	}
 
 	/** 
