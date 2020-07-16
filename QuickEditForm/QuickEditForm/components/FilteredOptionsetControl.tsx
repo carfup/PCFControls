@@ -43,7 +43,7 @@ export default class FilteredOptionsetControl extends React.Component<IFilteredO
                     placeHolder="--Select--"
                     options={this.props.options}            
                     selectedKey={(!this.props.isMultiSelect ?
-                        this.state.fieldDefinition?.fieldValue.toString() : 
+                        this.state.fieldDefinition?.fieldValue?.toString() : 
                         null
                     )}
                     onChange={this.onChange}

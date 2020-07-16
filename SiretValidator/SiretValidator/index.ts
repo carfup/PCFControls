@@ -86,6 +86,10 @@ export class SiretValidator implements ComponentFramework.StandardControl<IInput
 	{
 		// Add code to update control view
 		this._valueElement.value = this._value;
+
+		if(context.mode.isControlDisabled){
+			this._valueElement.setAttribute("disabled", "disabled");
+		}
 	}
 
 	/** 

@@ -53,6 +53,8 @@ export class BicValidator implements ComponentFramework.StandardControl<IInputs,
 		this._valueElement.setAttribute("class", "pcfinputcontrol");
 		this._valueElement.addEventListener("change", this._valueChanged);
 		this._valueElement.value = this._value;
+		// @ts-ignore
+		this._valueElement.setAttribute("maxlength", context.parameters.BICValue.attributes?.MaxLength)
 		
 		// img control
 		this._valueValidationElement = document.createElement("img");
@@ -75,6 +77,10 @@ export class BicValidator implements ComponentFramework.StandardControl<IInputs,
 	{
 		// Add code to update control view
 		this._valueElement.value = this._value;
+
+		if(context.mode.isControlDisabled){
+			this._valueElement.setAttribute("disabled", "disabled");
+		}
 	}
 
 	/** 
