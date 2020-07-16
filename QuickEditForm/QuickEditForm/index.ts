@@ -74,8 +74,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		this.addButtons();
 
-		this._quickViewFormId = context.parameters.QuickViewFormId.raw!;
-		this._forceRecordId = context.parameters.FieldToAttachControl.raw!;
+		
 
 		this._container = container;
 	}
@@ -383,6 +382,9 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		this._parentRecordDetails.Id = contextInfo.entityId;
 		this._parentRecordDetails.Name = contextInfo.entityRecordName;
 
+		this._quickViewFormId = this._context.parameters.QuickViewFormId.raw!;
+		this._forceRecordId = this._context.parameters.FieldToAttachControl.raw!;
+
 		this._lookupMapped = this._context.parameters.LookupFieldMapped.raw!;
 
 		this._useTextFieldAsLookup = (this._context.parameters.UseTextFieldAsLookup && this._context.parameters.UseTextFieldAsLookup.raw && this._context.parameters.UseTextFieldAsLookup.raw.toLowerCase() === "true") ? true : false;
@@ -513,22 +515,26 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		for(i = 0; i < sections.length; i++){
 			var section = sections[i].outerHTML;
 			
-			
+			// If we do not load the title or description is empty !
 			// @ts-ignore
 			if($.parseXML(section).getElementsByTagName("label")[0].attributes.description == undefined){
 				continue;
 			}
+
 			// @ts-ignore
-			var sectionLabel =  $.parseXML(section).getElementsByTagName("label")[0].attributes.description.value;
-			
-			// Adding Section Name
-			var sectionh1 =  document.createElement("h1");
-			sectionh1.style.borderBottom = "1px solid rgb(216, 216, 216)";
-			sectionh1.style.marginTop = "10px"
-			sectionh1.setAttribute("class", "js");
-			sectionh1.innerText = sectionLabel.toUpperCase();
-			
-			this._formDiv.appendChild(sectionh1);
+			if($.parseXML(section).getElementsByTagName("section")[0].attributes.showlabel.value == "true"){
+				// @ts-ignore
+				var sectionLabel =  $.parseXML(section).getElementsByTagName("label")[0].attributes.description.value;
+				
+				// Adding Section Name
+				var sectionh1 =  document.createElement("h1");
+				sectionh1.style.borderBottom = "1px solid rgb(216, 216, 216)";
+				sectionh1.style.marginTop = "10px"
+				sectionh1.setAttribute("class", "js");
+				sectionh1.innerText = sectionLabel.toUpperCase();
+				
+				this._formDiv.appendChild(sectionh1);
+			}
 
 			// a row = a field
 			var rows = $.parseXML(section).getElementsByTagName("row");
@@ -643,6 +649,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				break;
 			case 'multiselectpicklist':
 			case 'picklist': 
+			case 'state':
+			case 'status':
 				const ddvalueOptions: IDropdownOption[] = fieldDetail.attributeDescriptor.OptionSet.map((o : any) => ({ key: o.Value.toString(), text : o.Label }));
 				
 				if(type == "picklist"){
@@ -840,6 +848,10 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		}
 	}
 
+	/**
+	 * Return entityname in plural version
+	 * @param entityName entity to retrieve in plural version
+	 */
 	private getEntityPluralName(entityName : string) : string{
 		if(entityName.endsWith("s"))
 			return entityName+"es";
@@ -847,5 +859,12 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			return entityName.slice(0, entityName.length-1)+"ies";
 		else
 			return entityName+"s";
+	}
+
+	private isGuid(guid : string, field : string) {
+		var regexGuid = /^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/gi;
+    	if(regexGuid.test(guid)){
+			this.displayMessage(MessageBarType.error, `The guid for the parameter ${field} has an incorrect format.`);
+		}
 	}
 }
