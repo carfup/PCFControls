@@ -74,9 +74,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		this.addButtons();
 
-		this._quickViewFormId = context.parameters.QuickViewFormId.raw!;
-		this._forceRecordId = context.parameters.FieldToAttachControl.raw!;
-
 		this._container = container;
 	}
 
@@ -165,6 +162,19 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		let _this = this;	
 
 		this._updateError = false;
+		
+
+		// checking if we have empty required fields
+		var emptyRequiredFields = this._dataFieldDefinitions.filter(function (dfd){
+			if(dfd.isRequired && dfd.fieldValue == undefined)
+				return true;
+		});
+
+		if(emptyRequiredFields){
+			_this.displayMessage(MessageBarType.error, _this._context.resources.getString("EmptyRequiredFields"));
+			this._buttonsComponnent.setState({disabled : true});
+			return;
+		}
 
 		// Checking if we have dirty values on the form
 		var dirtyValues = this._dataFieldDefinitions.filter(function(dfd) {
@@ -172,6 +182,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				return dfd.isDirty;
 			}
 		});
+
 
 		if(dirtyValues.length == 0){
 			return;
@@ -185,7 +196,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		var lookupToClear: string[] = [];
 		let entityNamePlural = "";
 		dirtyValues.forEach(function(data){
-			if(data.fieldValue.EntityName != undefined)
+			if(data.fieldValue?.EntityName != undefined)
 				entityNamePlural = _this.getEntityPluralName(data.fieldValue.EntityName);
 
 			switch(data.fieldType){
@@ -383,6 +394,9 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		this._parentRecordDetails.Id = contextInfo.entityId;
 		this._parentRecordDetails.Name = contextInfo.entityRecordName;
 
+		this._quickViewFormId = this._context.parameters.QuickViewFormId.raw!;
+		this._forceRecordId = this._context.parameters.FieldToAttachControl.raw!;
+
 		this._lookupMapped = this._context.parameters.LookupFieldMapped.raw!;
 
 		this._useTextFieldAsLookup = (this._context.parameters.UseTextFieldAsLookup && this._context.parameters.UseTextFieldAsLookup.raw && this._context.parameters.UseTextFieldAsLookup.raw.toLowerCase() === "true") ? true : false;
@@ -405,7 +419,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	 * @param id id of the lookup field which the pcf is attached to
 	 */
 	private async queryQuickViewFormData(id : string){
-
 		try
 		{
 			// Rendering is already in progress !
@@ -513,22 +526,26 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		for(i = 0; i < sections.length; i++){
 			var section = sections[i].outerHTML;
 			
-			
+			// If we do not load the title or description is empty !
 			// @ts-ignore
 			if($.parseXML(section).getElementsByTagName("label")[0].attributes.description == undefined){
 				continue;
 			}
+
 			// @ts-ignore
-			var sectionLabel =  $.parseXML(section).getElementsByTagName("label")[0].attributes.description.value;
-			
-			// Adding Section Name
-			var sectionh1 =  document.createElement("h1");
-			sectionh1.style.borderBottom = "1px solid rgb(216, 216, 216)";
-			sectionh1.style.marginTop = "10px"
-			sectionh1.setAttribute("class", "js");
-			sectionh1.innerText = sectionLabel.toUpperCase();
-			
-			this._formDiv.appendChild(sectionh1);
+			if($.parseXML(section).getElementsByTagName("section")[0].attributes.showlabel.value == "true"){
+				// @ts-ignore
+				var sectionLabel =  $.parseXML(section).getElementsByTagName("label")[0].attributes.description.value;
+				
+				// Adding Section Name
+				var sectionh1 =  document.createElement("h1");
+				sectionh1.style.borderBottom = "1px solid rgb(216, 216, 216)";
+				sectionh1.style.marginTop = "10px"
+				sectionh1.setAttribute("class", "js");
+				sectionh1.innerText = sectionLabel.toUpperCase();
+				
+				this._formDiv.appendChild(sectionh1);
+			}
 
 			// a row = a field
 			var rows = $.parseXML(section).getElementsByTagName("row");
@@ -554,7 +571,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				}
 
 				// Generating the fields rendering
-				this.retrieveFieldOptions(fieldDetail, rowTechName);	
+				this.retrieveFieldOptions(fieldDetail);	
 			}
 		}
 	}
@@ -562,16 +579,17 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	/**
 	 * Render the fields based on the metatada
 	 * @param fieldDetail field metadata
-	 * @param techFieldName field technical name
 	 */
-	private retrieveFieldOptions(fieldDetail: any, techFieldName : string){
+	private retrieveFieldOptions(fieldDetail: any){
 		let _this = this;
 		let item = document.createElement("div");
+		var techFieldName = fieldDetail.attributeDescriptor.LogicalName;
 		var controlId = "carfup_qef_"+techFieldName;
 		var type = fieldDetail.attributeDescriptor.Type;
 		var label = fieldDetail.DisplayName;
 
 		let isReadOnly = !fieldDetail.attributeDescriptor.IsValidForUpdate || this._isRecordReadOnly;
+		let isRequired = fieldDetail.attributeDescriptor.RequiredLevel == 1 || fieldDetail.attributeDescriptor.RequiredLevel == 2;
 
 		// Grabing the proper datafieldDefinition
 		let dataFieldDefinitionsDetails = this.getDataFieldDefinition(techFieldName);
@@ -589,7 +607,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						width : this._context.mode.allocatedWidth,
 						label : label,
 						fieldDefinition : {
-							idDirty : false,
+							isRequired : isRequired,
+							isDirty : false,
 							fieldName : techFieldName,
 							fieldType : (type == "lookup" && fieldDetail.attributeDescriptor.Format == 2)  ? "regarding" : type,
 							controlId : controlId,
@@ -619,6 +638,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						width : this._context.mode.allocatedWidth,
 						fieldDefinition : {
 							isDirty : false,
+							isRequired : isRequired,
 							fieldName : techFieldName,
 							fieldType : detailDateType,
 							controlId : controlId,
@@ -643,6 +663,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				break;
 			case 'multiselectpicklist':
 			case 'picklist': 
+			case 'state':
+			case 'status':
 				const ddvalueOptions: IDropdownOption[] = fieldDetail.attributeDescriptor.OptionSet.map((o : any) => ({ key: o.Value.toString(), text : o.Label }));
 				
 				if(type == "picklist"){
@@ -653,6 +675,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					width : this._context.mode.allocatedWidth,
 					fieldDefinition : {
 						isDirty : false,
+						isRequired : isRequired,
 						fieldName : techFieldName,
 						fieldType : type,
 						controlId : controlId,
@@ -677,7 +700,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						width : this._context.mode.allocatedWidth,
 						label : label,
 						fieldDefinition : {
-							idDirty : false,
+							isDirty : false,
+							isRequired : isRequired,
 							fieldName : techFieldName,
 							fieldType : type,
 							controlId : controlId,
@@ -708,7 +732,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					label : label,
 					disabled : isReadOnly,
 					fieldDefinition : {
-						idDirty : false,
+						isDirty : false,
+						isRequired : isRequired,
 						fieldName : techFieldName,
 						fieldType : type,
 						controlId : controlId,
@@ -735,7 +760,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						width : this._context.mode.allocatedWidth,
 						label : label,
 						fieldDefinition : {
-							idDirty : false,
+							isDirty : false,
+							isRequired : isRequired,
 							fieldName : techFieldName,
 							fieldType : type,
 							controlId : controlId,
@@ -840,6 +866,10 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		}
 	}
 
+	/**
+	 * Return entityname in plural version
+	 * @param entityName entity to retrieve in plural version
+	 */
 	private getEntityPluralName(entityName : string) : string{
 		if(entityName.endsWith("s"))
 			return entityName+"es";
@@ -847,5 +877,12 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			return entityName.slice(0, entityName.length-1)+"ies";
 		else
 			return entityName+"s";
+	}
+
+	private isGuid(guid : string, field : string) {
+		var regexGuid = /^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/gi;
+    	if(regexGuid.test(guid)){
+			this.displayMessage(MessageBarType.error, `The guid for the parameter ${field} has an incorrect format.`);
+		}
 	}
 }

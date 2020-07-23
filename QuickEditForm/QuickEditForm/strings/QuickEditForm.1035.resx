@@ -88,4 +88,7 @@
 <data name="SelectOptionDropdown" xml:space="preserve">
     <value>--Select--</value>
 </data>
+<data name="EmptyRequiredFields" xml:space="preserve">
+    <value>Ainakin yhtä pakollista kenttää ei ole täytetty.</value>
+</data>
 </root>

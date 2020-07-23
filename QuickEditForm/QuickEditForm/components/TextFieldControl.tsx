@@ -34,14 +34,12 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
         };
     }
 
-     
-
     render() {
         return (
             <Stack horizontal  styles={{root : {
                 paddingBottom: "3.5px", paddingTop:"3.5px", borderBottom: "1px solid rgb(216, 216, 216)"
             }}}>
-                <Stack.Item styles={{root : { width : '170px' }}} ><Label style={{position: 'absolute', fontWeight: 'normal'}}>{this.props.label}</Label></Stack.Item>
+                <Stack.Item styles={{root : { width : '170px' }}} ><Label style={{position: 'absolute', fontWeight: 'normal'}} required={this.state.fieldDefinition?.isRequired}>{this.props.label}</Label></Stack.Item>
                 <Stack.Item grow>
                     <TextField 
                         disabled={this.props.disabled!}

@@ -12,6 +12,7 @@ export class EntityReferenceIdName{
 
 export class DataFieldDefinition {
 	public isDirty? : boolean;
+	public isRequired? : boolean;
 	public fieldName? : string;
 	public fieldType? : string;
 	public fieldValue? : any;

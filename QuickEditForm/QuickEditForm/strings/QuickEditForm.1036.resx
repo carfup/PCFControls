@@ -88,4 +88,7 @@
 <data name="SelectOptionDropdown" xml:space="preserve">
     <value>--Selectionner--</value>
 </data>
+<data name="EmptyRequiredFields" xml:space="preserve">
+    <value>Au moins un champ obligatoire n'est pas remplit.</value>
+</data>
 </root>
