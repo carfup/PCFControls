@@ -88,4 +88,7 @@
 <data name="SelectOptionDropdown" xml:space="preserve">
     <value>--Selecteren--</value>
 </data>
+<data name="EmptyRequiredFields" xml:space="preserve">
+    <value>Ten minste één verplicht veld is niet ingevuld.</value>
+</data>
 </root>

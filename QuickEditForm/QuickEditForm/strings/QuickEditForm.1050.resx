@@ -88,4 +88,7 @@
 <data name="SelectOptionDropdown" xml:space="preserve">
     <value>--Odaberi--</value>
 </data>
+<data name="EmptyRequiredFields" xml:space="preserve">
+    <value>Barem jedno obavezno polje nije ispunjeno.</value>
+</data>
 </root>

@@ -74,8 +74,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		this.addButtons();
 
-		
-
 		this._container = container;
 	}
 
@@ -164,6 +162,19 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		let _this = this;	
 
 		this._updateError = false;
+		
+
+		// checking if we have empty required fields
+		var emptyRequiredFields = this._dataFieldDefinitions.filter(function (dfd){
+			if(dfd.isRequired && dfd.fieldValue == undefined)
+				return true;
+		});
+
+		if(emptyRequiredFields){
+			_this.displayMessage(MessageBarType.error, _this._context.resources.getString("EmptyRequiredFields"));
+			this._buttonsComponnent.setState({disabled : true});
+			return;
+		}
 
 		// Checking if we have dirty values on the form
 		var dirtyValues = this._dataFieldDefinitions.filter(function(dfd) {
@@ -171,6 +182,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				return dfd.isDirty;
 			}
 		});
+
 
 		if(dirtyValues.length == 0){
 			return;
@@ -184,7 +196,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		var lookupToClear: string[] = [];
 		let entityNamePlural = "";
 		dirtyValues.forEach(function(data){
-			if(data.fieldValue.EntityName != undefined)
+			if(data.fieldValue?.EntityName != undefined)
 				entityNamePlural = _this.getEntityPluralName(data.fieldValue.EntityName);
 
 			switch(data.fieldType){
@@ -407,7 +419,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	 * @param id id of the lookup field which the pcf is attached to
 	 */
 	private async queryQuickViewFormData(id : string){
-
 		try
 		{
 			// Rendering is already in progress !
@@ -560,7 +571,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				}
 
 				// Generating the fields rendering
-				this.retrieveFieldOptions(fieldDetail, rowTechName);	
+				this.retrieveFieldOptions(fieldDetail);	
 			}
 		}
 	}
@@ -568,16 +579,17 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	/**
 	 * Render the fields based on the metatada
 	 * @param fieldDetail field metadata
-	 * @param techFieldName field technical name
 	 */
-	private retrieveFieldOptions(fieldDetail: any, techFieldName : string){
+	private retrieveFieldOptions(fieldDetail: any){
 		let _this = this;
 		let item = document.createElement("div");
+		var techFieldName = fieldDetail.attributeDescriptor.LogicalName;
 		var controlId = "carfup_qef_"+techFieldName;
 		var type = fieldDetail.attributeDescriptor.Type;
 		var label = fieldDetail.DisplayName;
 
 		let isReadOnly = !fieldDetail.attributeDescriptor.IsValidForUpdate || this._isRecordReadOnly;
+		let isRequired = fieldDetail.attributeDescriptor.RequiredLevel == 1 || fieldDetail.attributeDescriptor.RequiredLevel == 2;
 
 		// Grabing the proper datafieldDefinition
 		let dataFieldDefinitionsDetails = this.getDataFieldDefinition(techFieldName);
@@ -595,7 +607,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						width : this._context.mode.allocatedWidth,
 						label : label,
 						fieldDefinition : {
-							idDirty : false,
+							isRequired : isRequired,
+							isDirty : false,
 							fieldName : techFieldName,
 							fieldType : (type == "lookup" && fieldDetail.attributeDescriptor.Format == 2)  ? "regarding" : type,
 							controlId : controlId,
@@ -625,6 +638,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						width : this._context.mode.allocatedWidth,
 						fieldDefinition : {
 							isDirty : false,
+							isRequired : isRequired,
 							fieldName : techFieldName,
 							fieldType : detailDateType,
 							controlId : controlId,
@@ -661,6 +675,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					width : this._context.mode.allocatedWidth,
 					fieldDefinition : {
 						isDirty : false,
+						isRequired : isRequired,
 						fieldName : techFieldName,
 						fieldType : type,
 						controlId : controlId,
@@ -685,7 +700,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						width : this._context.mode.allocatedWidth,
 						label : label,
 						fieldDefinition : {
-							idDirty : false,
+							isDirty : false,
+							isRequired : isRequired,
 							fieldName : techFieldName,
 							fieldType : type,
 							controlId : controlId,
@@ -716,7 +732,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					label : label,
 					disabled : isReadOnly,
 					fieldDefinition : {
-						idDirty : false,
+						isDirty : false,
+						isRequired : isRequired,
 						fieldName : techFieldName,
 						fieldType : type,
 						controlId : controlId,
@@ -743,7 +760,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						width : this._context.mode.allocatedWidth,
 						label : label,
 						fieldDefinition : {
-							idDirty : false,
+							isDirty : false,
+							isRequired : isRequired,
 							fieldName : techFieldName,
 							fieldType : type,
 							controlId : controlId,

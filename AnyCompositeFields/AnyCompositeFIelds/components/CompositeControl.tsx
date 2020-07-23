@@ -66,6 +66,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                     onChange={this.onChangeField}
                                     disabled={this.state.disabled || element.disabled!}
                                     styles={textFieldStyles}
+                                    required={element.attributes.RequiredLevel == 1 || element.attributes.RequiredLevel == 2}
                                     maxLength={element.attributes.MaxLength}
                                 />
                             })}

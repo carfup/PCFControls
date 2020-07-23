@@ -88,4 +88,7 @@
 <data name="SelectOptionDropdown" xml:space="preserve">
     <value>--Selectare--</value>
 </data>
+<data name="EmptyRequiredFields" xml:space="preserve">
+    <value>Cel puțin un câmp obligatoriu nu este completat.</value>
+</data>
 </root>

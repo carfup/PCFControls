@@ -88,4 +88,7 @@
 <data name="SelectOptionDropdown" xml:space="preserve">
     <value>--Válasszon--</value>
 </data>
+<data name="EmptyRequiredFields" xml:space="preserve">
+    <value>Legalább egy kötelező mező nincs kitöltve.</value>
+</data>
 </root>
