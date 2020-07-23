@@ -170,7 +170,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				return true;
 		});
 
-		if(emptyRequiredFields){
+		if(emptyRequiredFields.length > 0){
 			_this.displayMessage(MessageBarType.error, _this._context.resources.getString("EmptyRequiredFields"));
 			this._buttonsComponnent.setState({disabled : true});
 			return;
@@ -807,6 +807,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		dfd.fieldValue = details.fieldValue;
 		dfd.isDirty = false;
 		dfd.fieldName = details.fieldName;
+		dfd.isRequired = details.isRequired;
 
 		return dfd;
 	}
