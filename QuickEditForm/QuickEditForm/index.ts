@@ -249,6 +249,12 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			_this.displayMessage(MessageBarType.success, _this._context.resources.getString("UpdateSuccessMessage"));
 		}
 
+		// clear the dirty fields from the list
+		dirtyValues.forEach(function(data){ 
+			var index = _this._dataFieldDefinitions.findIndex(x => x.fieldName == data.fieldName);
+			_this._dataFieldDefinitions[index].isDirty = false;
+		});
+
 		// hidding the loading image
 		_this.showLoading(false);
 
@@ -554,7 +560,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			{
 				let row = rows[j].outerHTML;
 				// @ts-ignore
-				if($.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname == undefined || $.parseXML(row).getElementsByTagName("label")[0].attributes.description == undefined){
+				if($.parseXML(row).getElementsByTagName("control").length == 0 || $.parseXML(row).getElementsByTagName("label").length == 0 || $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname == undefined || $.parseXML(row).getElementsByTagName("label")[0].attributes.description == undefined){
 					continue;
 				}
 
@@ -792,7 +798,9 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	 */
 	private setDataFieldDefinitionAfterChange(dfdChange?: DataFieldDefinition, dfdFrom? : DataFieldDefinition) {
 		if(dfdFrom != undefined && dfdChange != undefined){
-			this._dataFieldDefinitions[this._dataFieldDefinitions.indexOf(dfdFrom)] = dfdChange;
+			let index = this._dataFieldDefinitions.findIndex(x => x.fieldName == dfdChange.fieldName);
+
+			this._dataFieldDefinitions[index] = dfdChange;
 			this._buttonsComponnent.setState({disabled : false});
 		}	
 	}
