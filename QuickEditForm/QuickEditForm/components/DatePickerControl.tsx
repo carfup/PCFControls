@@ -1,23 +1,9 @@
 import * as React from 'react';
-import { DatePicker, DayOfWeek, IDatePickerStrings, Stack, Label, ComboBox, IComboBoxOption, IComboBox } from 'office-ui-fabric-react';
+import { DatePicker, IDatePickerStrings } from '@fluentui/react/lib/DatePicker';
+import { Stack } from '@fluentui/react/lib/Stack';
+import { Label } from '@fluentui/react/lib/Label';
+import { IComboBoxOption, ComboBox, IComboBox } from '@fluentui/react/lib/ComboBox';
 import { DataFieldDefinition } from "../EntitiesDefinition";
-
-const DayPickerStrings: IDatePickerStrings = {
-  months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-
-  shortMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-
-  days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-
-  shortDays: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
-
-  goToToday: 'Go to today',
-  prevMonthAriaLabel: 'Go to previous month',
-  nextMonthAriaLabel: 'Go to next month',
-  prevYearAriaLabel: 'Go to previous year',
-  nextYearAriaLabel: 'Go to next year',
-  closeButtonAriaLabel: 'Close date picker'
-};
 
 const availableTimes: IComboBoxOption[] = [
   { key: '24:00', text: '24:00' },

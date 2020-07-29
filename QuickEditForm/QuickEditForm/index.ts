@@ -9,7 +9,8 @@ import DatePickerControl from "./components/DatePickerControl";
 import ButtonControl from "./components/ButtonControl";
 import MessageBarControl from "./components/MessageBarControl";
 import ToggleControl from "./components/ToggleControl";
-import { IDropdownOption, MessageBarType } from "office-ui-fabric-react";
+import { IDropdownOption } from "@fluentui/react/lib/Dropdown";
+import { MessageBarType } from "@fluentui/react/lib/MessageBar";
 
 import { EntityReferenceInfo, DataFieldDefinition} from "./EntitiesDefinition";
 

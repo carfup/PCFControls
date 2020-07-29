@@ -1,5 +1,8 @@
 import * as React from 'react';
-import { TextField, ITextFieldProps, initializeIcons, Stack, Label, IStackStyles } from 'office-ui-fabric-react';
+import { initializeIcons } from '@fluentui/react/lib/Icons';
+import { Label } from '@fluentui/react/lib/Label';
+import { Stack, IStackStyles } from '@fluentui/react/lib/Stack';
+import { TextField, ITextFieldProps } from '@fluentui/react/lib/TextField';
 import {IInputs} from "../generated/ManifestTypes";
 import { DataFieldDefinition } from "../EntitiesDefinition";
 

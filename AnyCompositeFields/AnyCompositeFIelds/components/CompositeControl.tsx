@@ -1,5 +1,8 @@
 import * as React from 'react';
-import { Callout, Stack, TextField, DefaultButton, BaseButton, Button, IStackStyles, ITextFieldStyles, ICalloutContentStyles, DirectionalHint  } from 'office-ui-fabric-react';
+import { DefaultButton, BaseButton, Button  } from '@fluentui/react/lib/Button';
+import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
+import { Stack, IStackStyles } from '@fluentui/react/lib/Stack';
+import { Callout, ICalloutContentStyles, DirectionalHint } from '@fluentui/react/lib/Callout';
 import { CompositeValue } from '../EntitiesDefinition';
 
 export interface ICompositeControlProps {
