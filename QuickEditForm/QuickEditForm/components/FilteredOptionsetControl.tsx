@@ -1,5 +1,8 @@
 import * as React from 'react';
-import {Dropdown, IDropdownOption, initializeIcons,  Stack, Label } from 'office-ui-fabric-react';
+import { initializeIcons } from '@fluentui/react/lib/Icons';
+import { IDropdownOption, Dropdown } from '@fluentui/react/lib/Dropdown';
+import { Label } from '@fluentui/react/lib/Label';
+import { Stack } from '@fluentui/react/lib/Stack';
 import { DataFieldDefinition } from "../EntitiesDefinition";
 
 interface IFilteredOptionsetProperties {

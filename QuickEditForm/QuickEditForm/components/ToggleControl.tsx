@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { Toggle,  Stack, Label } from 'office-ui-fabric-react';
+import { Toggle } from '@fluentui/react/lib/Toggle';
+import { Stack } from '@fluentui/react/lib/Stack';
+import { Label } from '@fluentui/react/lib/Label';
 import { DataFieldDefinition } from "../EntitiesDefinition";
 
 export interface IToggleProps {
