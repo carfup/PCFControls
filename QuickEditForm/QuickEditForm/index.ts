@@ -167,7 +167,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		// checking if we have empty required fields
 		var emptyRequiredFields = this._dataFieldDefinitions.filter(function (dfd){
-			if(dfd.isRequired && dfd.fieldValue == undefined)
+			if(dfd.isRequired && dfd.fieldValue == null)
 				return true;
 		});
 
@@ -179,7 +179,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		// Checking if we have dirty values on the form
 		var dirtyValues = this._dataFieldDefinitions.filter(function(dfd) {
-			if(dfd.fieldName != undefined){
+			if(dfd.fieldName != null){
 				return dfd.isDirty;
 			}
 		});
