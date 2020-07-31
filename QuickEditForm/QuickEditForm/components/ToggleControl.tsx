@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { Toggle,  Stack, Label } from 'office-ui-fabric-react';
+import { Toggle } from '@fluentui/react/lib/Toggle';
+import { Stack } from '@fluentui/react/lib/Stack';
+import { Label } from '@fluentui/react/lib/Label';
 import { DataFieldDefinition } from "../EntitiesDefinition";
 
 export interface IToggleProps {
@@ -30,8 +32,8 @@ export default class ToggleControl  extends React.Component<IToggleProps, IToggl
                 paddingBottom: "3.5px", paddingTop:"3.5px", borderBottom: "1px solid rgb(216, 216, 216)"
             }}}>
                 <Stack.Item styles={{root : { width : '170px' }}} >
-                    <Label style={{position: 'absolute',fontWeight: 'normal'}} required={this.state.fieldDefinition?.isRequired}>{this.props.label}</Label></Stack.Item>
-                <Stack.Item grow>
+                    <Label style={{ fontWeight: 'normal'}} required={this.state.fieldDefinition?.isRequired}>{this.props.label}</Label></Stack.Item>
+                <Stack.Item grow styles={{root : { alignItems: 'center' }}}>
                     <Toggle
                         onText={this.props.options[1].Label}
                         offText={this.props.options[0].Label}
@@ -39,6 +41,7 @@ export default class ToggleControl  extends React.Component<IToggleProps, IToggl
                         onChange={this.onChange}
                         role="checkbox"
                         disabled={this.props.disabled}
+                        style={{width:"100%"}}
                     />
                 </Stack.Item>
             </Stack>

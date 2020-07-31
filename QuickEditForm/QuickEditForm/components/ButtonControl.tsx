@@ -1,6 +1,8 @@
  import * as React from 'react';
-import { DefaultButton, Stack, IStackTokens, MessageBarType, Image, ImageFit } from 'office-ui-fabric-react';
-import { relative } from 'path';
+import { DefaultButton } from '@fluentui/react/lib/Button';
+import { Stack, IStackTokens } from '@fluentui/react/lib/Stack';
+import { MessageBarType } from '@fluentui/react/lib/MessageBar';
+import { Image, ImageFit } from '@fluentui/react/lib/Image';
 
 export interface IButtonProps {
   loadingImage : any;

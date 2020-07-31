@@ -14,6 +14,7 @@ export class DataFieldDefinition {
 	public isDirty? : boolean;
 	public isRequired? : boolean;
 	public fieldName? : string;
+	public fieldSchemaName? : string;
 	public fieldType? : string;
 	public fieldValue? : any;
 	public controlId? : string;

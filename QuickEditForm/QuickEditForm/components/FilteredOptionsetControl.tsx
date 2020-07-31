@@ -1,5 +1,8 @@
 import * as React from 'react';
-import {Dropdown, IDropdownOption, initializeIcons,  Stack, Label } from 'office-ui-fabric-react';
+import { initializeIcons } from '@fluentui/react/lib/Icons';
+import { IDropdownOption, Dropdown } from '@fluentui/react/lib/Dropdown';
+import { Label } from '@fluentui/react/lib/Label';
+import { Stack } from '@fluentui/react/lib/Stack';
 import { DataFieldDefinition } from "../EntitiesDefinition";
 
 interface IFilteredOptionsetProperties {
@@ -34,9 +37,9 @@ export default class FilteredOptionsetControl extends React.Component<IFilteredO
                 paddingBottom: "3.5px", paddingTop:"3.5px", borderBottom: "1px solid rgb(216, 216, 216)"
             }}}>
                 <Stack.Item styles={{root : { width : '170px' }}} >
-                    <Label style={{position: 'absolute',fontWeight: 'normal'}} required={this.state.fieldDefinition?.isRequired}>{this.props.label}</Label>
+                    <Label style={{ fontWeight: 'normal'} } required={this.state.fieldDefinition?.isRequired}>{this.props.label}</Label>
                 </Stack.Item>
-                <Stack.Item grow>
+                <Stack.Item grow styles={{root : { alignItems: 'center'  }}}>
                     {!this.props.isMultiSelect && <Dropdown
                     disabled={this.props.disabled!}
                     id={this.props.fieldDefinition.controlId}
@@ -78,7 +81,6 @@ export default class FilteredOptionsetControl extends React.Component<IFilteredO
             if(this.props.isMultiSelect){
                 let tempArray = fieldDefTemp["fieldValue"]?.split(',');
 
-
                 if(option?.selected)
                     tempArray.push(option?.key);
                 else {
@@ -86,7 +88,7 @@ export default class FilteredOptionsetControl extends React.Component<IFilteredO
                         return ele != option?.key; 
                    });
                 }
-                fieldDefTemp["fieldValue"] =  tempArray.toString();
+                fieldDefTemp["fieldValue"] = tempArray.length == 0 ? null : tempArray.toString();
             }
                 
             else 

@@ -9,7 +9,8 @@ import DatePickerControl from "./components/DatePickerControl";
 import ButtonControl from "./components/ButtonControl";
 import MessageBarControl from "./components/MessageBarControl";
 import ToggleControl from "./components/ToggleControl";
-import { IDropdownOption, MessageBarType } from "office-ui-fabric-react";
+import { IDropdownOption } from "@fluentui/react/lib/Dropdown";
+import { MessageBarType } from "@fluentui/react/lib/MessageBar";
 
 import { EntityReferenceInfo, DataFieldDefinition} from "./EntitiesDefinition";
 
@@ -35,6 +36,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	private _lookupFieldDetails : any;
 	private _useTextFieldAsLookup : boolean;
 	private _forceRecordId : string;
+	private _relationShips : any;
 
 	private notifyOutputChanged: () => void;
 
@@ -166,7 +168,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		// checking if we have empty required fields
 		var emptyRequiredFields = this._dataFieldDefinitions.filter(function (dfd){
-			if(dfd.isRequired && dfd.fieldValue == undefined)
+			if(dfd.isRequired && (dfd.fieldValue == null || dfd.fieldValue === ""))
 				return true;
 		});
 
@@ -178,7 +180,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		// Checking if we have dirty values on the form
 		var dirtyValues = this._dataFieldDefinitions.filter(function(dfd) {
-			if(dfd.fieldName != undefined){
+			if(dfd.fieldName != null){
 				return dfd.isDirty;
 			}
 		});
@@ -222,7 +224,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						lookupToClear.push(data.fieldName!);
 					}
 					else {
-						dataToUpdate[data.fieldName!+"@odata.bind"] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
+						dataToUpdate[data.fieldSchemaName!+"@odata.bind"] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
 					}
 					break;
 				case 'date': // dateOnly
@@ -247,6 +249,12 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		if(!this._updateError) {
 			_this.displayMessage(MessageBarType.success, _this._context.resources.getString("UpdateSuccessMessage"));
 		}
+
+		// clear the dirty fields from the list
+		dirtyValues.forEach(function(data){ 
+			var index = _this._dataFieldDefinitions.findIndex(x => x.fieldName == data.fieldName);
+			_this._dataFieldDefinitions[index].isDirty = false;
+		});
 
 		// hidding the loading image
 		_this.showLoading(false);
@@ -460,6 +468,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					// Getting the metadata of the fields which are in the QuickViewForm
 					_this._context.utils.getEntityMetadata(form.objecttypecode, allFields).then(em => {
 						let attributes = em.Attributes.getAll();
+						_this._relationShips = em.ManyToOneRelationships.getAll();
 						//console.log("[queryQuickViewFormData] attributes metadata retrieved");
 
 						// Processing the form with the details about the related attributes
@@ -553,7 +562,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			{
 				let row = rows[j].outerHTML;
 				// @ts-ignore
-				if($.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname == undefined || $.parseXML(row).getElementsByTagName("label")[0].attributes.description == undefined){
+				if($.parseXML(row).getElementsByTagName("control").length == 0 || $.parseXML(row).getElementsByTagName("label").length == 0 || $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname == undefined || $.parseXML(row).getElementsByTagName("label")[0].attributes.description == undefined){
 					continue;
 				}
 
@@ -602,11 +611,15 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			case 'partylist':
 			case 'customer':
 			case 'lookup':
+					let schemaName = this._relationShips.filter(function(relation : any){
+						return relation._referencingAttribute == techFieldName;
+					});
 					let entityName = this._parentRecordDetails.Attributes["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"] == undefined ? fieldDetail.attributeDescriptor.EntityLogicalName : this._parentRecordDetails.Attributes["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"];
 					let options = {
 						width : this._context.mode.allocatedWidth,
 						label : label,
 						fieldDefinition : {
+							fieldSchemaName: schemaName.length == 1 ? schemaName[0]._referencingEntityNavigationPropertyName : null,
 							isRequired : isRequired,
 							isDirty : false,
 							fieldName : techFieldName,
@@ -791,7 +804,9 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	 */
 	private setDataFieldDefinitionAfterChange(dfdChange?: DataFieldDefinition, dfdFrom? : DataFieldDefinition) {
 		if(dfdFrom != undefined && dfdChange != undefined){
-			this._dataFieldDefinitions[this._dataFieldDefinitions.indexOf(dfdFrom)] = dfdChange;
+			let index = this._dataFieldDefinitions.findIndex(x => x.fieldName == dfdChange.fieldName);
+
+			this._dataFieldDefinitions[index] = dfdChange;
 			this._buttonsComponnent.setState({disabled : false});
 		}	
 	}
@@ -808,6 +823,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		dfd.isDirty = false;
 		dfd.fieldName = details.fieldName;
 		dfd.isRequired = details.isRequired;
+		dfd.fieldSchemaName = details.schemaName;
 
 		return dfd;
 	}

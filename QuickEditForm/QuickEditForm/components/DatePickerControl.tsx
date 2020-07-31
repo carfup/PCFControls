@@ -1,23 +1,9 @@
 import * as React from 'react';
-import { DatePicker, DayOfWeek, IDatePickerStrings, Stack, Label, ComboBox, IComboBoxOption, IComboBox } from 'office-ui-fabric-react';
+import { DatePicker, IDatePickerStrings } from '@fluentui/react/lib/DatePicker';
+import { Stack } from '@fluentui/react/lib/Stack';
+import { Label } from '@fluentui/react/lib/Label';
+import { IComboBoxOption, ComboBox, IComboBox } from '@fluentui/react/lib/ComboBox';
 import { DataFieldDefinition } from "../EntitiesDefinition";
-
-const DayPickerStrings: IDatePickerStrings = {
-  months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-
-  shortMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-
-  days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-
-  shortDays: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
-
-  goToToday: 'Go to today',
-  prevMonthAriaLabel: 'Go to previous month',
-  nextMonthAriaLabel: 'Go to next month',
-  prevYearAriaLabel: 'Go to previous year',
-  nextYearAriaLabel: 'Go to next year',
-  closeButtonAriaLabel: 'Close date picker'
-};
 
 const availableTimes: IComboBoxOption[] = [
   { key: '24:00', text: '24:00' },
@@ -101,8 +87,8 @@ export default class DatePickerControl extends React.Component<IDatePickerProper
       <Stack horizontal  styles={{root : {
         paddingBottom: "3.5px", paddingTop:"3.5px", borderBottom: "1px solid rgb(216, 216, 216)"
         }}}>
-        <Stack.Item styles={{root : { width : '170px' }}} ><Label style={{position: 'absolute',fontWeight: 'normal'}} required={this.state.fieldDefinition?.isRequired}>{this.props.label}</Label></Stack.Item>
-        <Stack.Item grow={(this.props.showTime ? 1 : 1)}>
+        <Stack.Item styles={{root : { width : '170px' }}} ><Label style={{ fontWeight: 'normal'} } required={this.state.fieldDefinition?.isRequired}>{this.props.label}</Label></Stack.Item>
+        <Stack.Item grow={(this.props.showTime ? 1 : 1)} styles={{root : { alignItems: 'center'  }}}>
           <DatePicker
             disabled={this.props.disabled!}
             id={this.props.fieldDefinition.controlId}
