@@ -36,6 +36,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	private _lookupFieldDetails : any;
 	private _useTextFieldAsLookup : boolean;
 	private _forceRecordId : string;
+	private _relationShips : any;
 
 	private notifyOutputChanged: () => void;
 
@@ -167,7 +168,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		// checking if we have empty required fields
 		var emptyRequiredFields = this._dataFieldDefinitions.filter(function (dfd){
-			if(dfd.isRequired && dfd.fieldValue == null)
+			if(dfd.isRequired && (dfd.fieldValue == null || dfd.fieldValue === ""))
 				return true;
 		});
 
@@ -223,7 +224,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						lookupToClear.push(data.fieldName!);
 					}
 					else {
-						dataToUpdate[data.fieldName!+"@odata.bind"] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
+						dataToUpdate[data.fieldSchemaName!+"@odata.bind"] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
 					}
 					break;
 				case 'date': // dateOnly
@@ -467,6 +468,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					// Getting the metadata of the fields which are in the QuickViewForm
 					_this._context.utils.getEntityMetadata(form.objecttypecode, allFields).then(em => {
 						let attributes = em.Attributes.getAll();
+						_this._relationShips = em.ManyToOneRelationships.getAll();
 						//console.log("[queryQuickViewFormData] attributes metadata retrieved");
 
 						// Processing the form with the details about the related attributes
@@ -609,11 +611,15 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			case 'partylist':
 			case 'customer':
 			case 'lookup':
+					let schemaName = this._relationShips.filter(function(relation : any){
+						return relation._referencingAttribute == techFieldName;
+					});
 					let entityName = this._parentRecordDetails.Attributes["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"] == undefined ? fieldDetail.attributeDescriptor.EntityLogicalName : this._parentRecordDetails.Attributes["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"];
 					let options = {
 						width : this._context.mode.allocatedWidth,
 						label : label,
 						fieldDefinition : {
+							fieldSchemaName: schemaName.length == 1 ? schemaName[0]._referencingEntityNavigationPropertyName : null,
 							isRequired : isRequired,
 							isDirty : false,
 							fieldName : techFieldName,
@@ -817,6 +823,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		dfd.isDirty = false;
 		dfd.fieldName = details.fieldName;
 		dfd.isRequired = details.isRequired;
+		dfd.fieldSchemaName = details.schemaName;
 
 		return dfd;
 	}
