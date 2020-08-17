@@ -33,7 +33,7 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
         super(props);
         this.state = {
             fieldDefinition: this.props.fieldDefinition,
-            type: props.icon === "Money" ? "number": "text",
+            type: props.icon === "" ? "text": "number",
         };
     }
 
