@@ -568,6 +568,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 				// @ts-ignore
 				var rowTechName =  $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname.value;
+				// @ts-ignore
+				let isReadOnly =  $.parseXML(row).getElementsByTagName("control")[0].attributes.disabled.value === "true";
 
 				// Checking if in the attributes metadata we find the current field
 				let fieldDetail = attributesDetail.filter(function(a: any){
@@ -580,7 +582,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				}
 
 				// Generating the fields rendering
-				this.retrieveFieldOptions(fieldDetail);	
+				this.retrieveFieldOptions(fieldDetail, isReadOnly);	
 			}
 		}
 	}
@@ -589,7 +591,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	 * Render the fields based on the metatada
 	 * @param fieldDetail field metadata
 	 */
-	private retrieveFieldOptions(fieldDetail: any){
+	private retrieveFieldOptions(fieldDetail: any, fieldReadOnly : boolean){
 		let _this = this;
 		let item = document.createElement("div");
 		var techFieldName = fieldDetail.attributeDescriptor.LogicalName;
@@ -597,7 +599,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		var type = fieldDetail.attributeDescriptor.Type;
 		var label = fieldDetail.DisplayName;
 
-		let isReadOnly = !fieldDetail.attributeDescriptor.IsValidForUpdate || this._isRecordReadOnly;
+		let isReadOnly = !fieldDetail.attributeDescriptor.IsValidForUpdate || this._isRecordReadOnly || fieldReadOnly;
 		let isRequired = fieldDetail.attributeDescriptor.RequiredLevel == 1 || fieldDetail.attributeDescriptor.RequiredLevel == 2;
 
 		// Grabing the proper datafieldDefinition
@@ -711,6 +713,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			case 'money':
 			case 'decimal':
 			case 'double':
+			case 'integer':
 					let moneyOptions = {
 						width : this._context.mode.allocatedWidth,
 						label : label,
@@ -723,7 +726,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							fieldValue : this._parentRecordDetails.Attributes[techFieldName] ?? ""
 						},
 						disabled : isReadOnly,
-						icon : type == "money" ? "Money" : "",
+						icon : type === "money" ? "Money" : "NumberField",
 						onClickResult : (fieldDefinition?: DataFieldDefinition) => {
 							if(dataFieldDefinitionsDetails != undefined && fieldDefinition != undefined){
 								dataFieldDefinitionsDetails.isDirty = true;
