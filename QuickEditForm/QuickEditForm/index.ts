@@ -709,6 +709,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				ReactDOM.render(React.createElement(FilteredOptionsetControl, ddOptions), item);
 				break;
 			case 'money':
+			case 'decimal':
+			case 'double':
 					let moneyOptions = {
 						width : this._context.mode.allocatedWidth,
 						label : label,
@@ -721,7 +723,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							fieldValue : this._parentRecordDetails.Attributes[techFieldName] ?? ""
 						},
 						disabled : isReadOnly,
-						icon : "Money",
+						icon : type == "money" ? "Money" : "",
 						onClickResult : (fieldDefinition?: DataFieldDefinition) => {
 							if(dataFieldDefinitionsDetails != undefined && fieldDefinition != undefined){
 								dataFieldDefinitionsDetails.isDirty = true;
@@ -733,7 +735,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							}							
 						}
 					};
-
 					dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, moneyOptions.fieldDefinition);
 
 					ReactDOM.render(React.createElement(TextFieldControl, moneyOptions), item);
