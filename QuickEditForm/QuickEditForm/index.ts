@@ -13,6 +13,7 @@ import { IDropdownOption } from "@fluentui/react/lib/Dropdown";
 import { MessageBarType } from "@fluentui/react/lib/MessageBar";
 
 import { EntityReferenceInfo, DataFieldDefinition} from "./EntitiesDefinition";
+import { unwatchFile } from "fs";
 
 
 export class QuickEditForm implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -87,9 +88,10 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	public async updateView(context: ComponentFramework.Context<IInputs>)
 	{
 		// Add code to update control view
-		/*if(this._context.updatedProperties.length === 1 && this._context.updatedProperties[0] === "layout"){
+		if(this._context.updatedProperties.length === 1 && this._context.updatedProperties[0] === "layout"){
 			return;
-		}*/
+		}
+
 		if(this._context.updatedProperties.includes("FieldToAttachControl")){
 			if(this._useTextFieldAsLookup)
 				this._forceRecordId = context.parameters.FieldToAttachControl.raw!;
@@ -330,14 +332,15 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	 */
 	private displayMessage(type : MessageBarType, message : string){
 	//	this._messageDiv.innerHTML = "";
-
+		let _this = this;
 		let options = {
 			messageText : message,
 			messageType : type,
 			showMessageBar: true,
+			showQuickCreateButton : _this._recordToUpdate.QuickCreateEnabled,
 			onClickQuickCreate : () => {
 				this._context.navigation.openForm({
-					entityName : "contact",
+					entityName : _this._recordToUpdate.EntityName,
 					useQuickCreateForm: true,
 					createFromEntity : {
 						// @ts-ignore
@@ -345,6 +348,30 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						name : this._parentRecordDetails.Name,
 						entityType : this._parentRecordDetails.EntityName
 					}
+				}).then(function success(data: any){
+					if(data.savedEntityReference.length === 0 || data.savedEntityReference.length > 1){
+						return;
+					}
+
+					let savedRecord = data.savedEntityReference[0];
+					let dataToUpdate : any = {};
+					dataToUpdate[_this._recordToUpdate.SchemaName!+"@odata.bind"] =  `/${_this.getEntityPluralName(savedRecord.entityType)}(${savedRecord.id.slice(1,-1)})`;
+					_this._context.webAPI.updateRecord(_this._parentRecordDetails.EntityName, _this._parentRecordDetails.Id, dataToUpdate).then(
+						function success(result){
+							console.log(result);
+							_this.displayMessage(MessageBarType.success, "Record successfully created, please refresh in order to see the newly created record.");
+						},
+						function (error){
+							// Error.code for privilege
+							if(error.code != undefined && error.code == 2147746336){
+								_this.displayMessage(MessageBarType.blocked, `${_this._context.resources.getString("UpdateErrorMessage")}\n\r${_this._context.resources.getString("MissingPrivilegeOnRecordMessage")}.\n\r${error.message}`);
+							} else{
+								_this.displayMessage(MessageBarType.blocked, `${_this._context.resources.getString("UpdateErrorMessage")}\n\r${error.message}`);
+							}
+							
+							_this._updateError = true;
+						}
+					);
 				});
 			}
 		};
@@ -358,7 +385,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		}
 		else {
 			this._messageComponent = ReactDOM.render(React.createElement(MessageBarControl, options), this._messageDiv);
-			//console.log("displayMessage : Rendering message ");
 		}
 	}
 
@@ -380,11 +406,13 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		this._lookupFieldDetails = lookupDetails;
 
+		// Creating the new instance here
+		_this._recordToUpdate = new EntityReferenceInfo();
+
 		if(lookup != undefined ){
 			let id = this._lookupFieldDetails[_this._lookupMapped] ?? "";
 			let entity = this._lookupFieldDetails[_this._lookupMapped+"@Microsoft.Dynamics.CRM.lookuplogicalname"] ?? "";
 
-			_this._recordToUpdate = new EntityReferenceInfo();
 			_this._recordToUpdate.EntityName = entity;
 			_this._recordToUpdate.Id = (_this._useTextFieldAsLookup &&  _this._forceRecordId != undefined && _this._forceRecordId != null) ?  _this._forceRecordId : id;
 			_this._recordToUpdate.Name = "lookup name here";
@@ -393,12 +421,28 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			let attr = await _this._context.webAPI.retrieveRecord(_this._recordToUpdate.EntityName, _this._recordToUpdate.Id);
 			_this.isRecordReadOnly(attr["statecode"]);
 			_this._parentRecordDetails.Attributes = attr;
-			//console.log("[getLookupDetails] _this._parentRecordDetails.Attributes : record values retrieved ");
 		}
+		// We display a message and get property for potential quick create button
 		else {
-			this.displayMessage(MessageBarType.info, _this._context.resources.getString("LookupFieldHasNoValue").replace("{0}", this._context.parameters.LookupFieldMapped.raw!));
-			this._renderingInProgress = false;
-			this.showLoading(false);
+			// Grabbing necessary info for quick create possibility
+			let lookupCleaned = this._lookupMapped.replace("_value","").replace("_","");
+			let lookupField : string[] = [];
+			lookupField.push(lookupCleaned);
+			this._context.utils.getEntityMetadata(this._parentRecordDetails.EntityName, lookupField ).then(em => {
+				let relationships = em.ManyToOneRelationships.getAll();
+				let relationshipDetails = relationships.filter(function(relation : any){
+					return relation._referencingAttribute === lookupCleaned;
+				})[0];
+
+				this._recordToUpdate.SchemaName = relationshipDetails?.ReferencingEntityNavigationPropertyName;
+				this._recordToUpdate.EntityName = relationshipDetails?.ReferencedEntity;
+				this._recordToUpdate.QuickCreateEnabled = em.IsQuickCreateEnabled as boolean;	
+				
+				// displaying message to warn user that lookup is empty
+				this.displayMessage(MessageBarType.info, _this._context.resources.getString("LookupFieldHasNoValue").replace("{0}", this._context.parameters.LookupFieldMapped.raw!));
+				this._renderingInProgress = false;
+				this.showLoading(false);
+			});
 		}
 	}
 
@@ -633,7 +677,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						width : this._context.mode.allocatedWidth,
 						label : label,
 						fieldDefinition : {
-							fieldSchemaName: schemaName.length == 1 ? schemaName[0]._referencingEntityNavigationPropertyName : null,
+							fieldSchemaName: schemaName.length == 1 ? schemaName[0].ReferencingEntityNavigationPropertyName : null,
 							isRequired : isRequired,
 							isDirty : false,
 							fieldName : techFieldName,

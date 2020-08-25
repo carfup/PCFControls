@@ -2,12 +2,12 @@ import * as React from 'react';
 import {MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { MessageBarButton } from '@fluentui/react/lib/Button';
 
-
 export interface IMessageProps {
     messageType? : MessageBarType;
     messageText? : string;
     showMessageBar : boolean;
     onClickQuickCreate: () => void;
+    showQuickCreateButton?: boolean;
   }
 
 export interface IMessageState {
@@ -36,7 +36,7 @@ export default class MessageBarControl extends React.Component<IMessageProps, IM
             <div style={{marginTop: "5px"}}>
                 {this.state.showMessageBar && 
                 <MessageBar 
-                    actions={this.state.messageType == MessageBarType.info ? <div>
+                    actions={this.state.messageType == MessageBarType.info && this.props.showQuickCreateButton ? <div>
                         <MessageBarButton
                         onClick={this.props.onClickQuickCreate}                >Open Quick Create Form
                         </MessageBarButton>
