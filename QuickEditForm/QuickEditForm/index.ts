@@ -87,10 +87,10 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	public async updateView(context: ComponentFramework.Context<IInputs>)
 	{
 		// Add code to update control view
-		ReactDOM.unmountComponentAtNode(this._container); 
+		/*if(this._context.updatedProperties.length === 1 && this._context.updatedProperties[0] === "layout"){
+			return;
+		}*/
 		if(this._context.updatedProperties.includes("FieldToAttachControl")){
-			//if(this._forceRecordId == context.parameters.FieldToAttachControl.raw! || !this._useTextFieldAsLookup)
-			//	return;
 			if(this._useTextFieldAsLookup)
 				this._forceRecordId = context.parameters.FieldToAttachControl.raw!;
 		}
@@ -334,7 +334,19 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		let options = {
 			messageText : message,
 			messageType : type,
-			showMessageBar: true
+			showMessageBar: true,
+			onClickQuickCreate : () => {
+				this._context.navigation.openForm({
+					entityName : "contact",
+					useQuickCreateForm: true,
+					createFromEntity : {
+						// @ts-ignore
+						id : this._parentRecordDetails.Id,
+						name : this._parentRecordDetails.Name,
+						entityType : this._parentRecordDetails.EntityName
+					}
+				});
+			}
 		};
 
 		if(this._messageComponent != undefined || this._messageComponent != null){
@@ -489,7 +501,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		catch (e){
 			this._renderingInProgress = false;
 			this.showLoading(false);
-			this.displayMessage(MessageBarType.error, `An error occured ${e.mesage}`);
+			this.displayMessage(MessageBarType.error, `An error occured : ${e}`);
 		}
 		
 	}
