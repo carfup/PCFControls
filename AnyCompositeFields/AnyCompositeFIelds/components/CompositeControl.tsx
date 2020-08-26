@@ -61,6 +61,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                             {elements.map((value, index) => {
                                 // @ts-ignore
                                 let element = this.state.compositeValue[value];
+                                const isMultiline = element.type === "SingleLine.TextArea" || element.type === "Multiple";
                                 
                                 return element.attributes.LogicalName != undefined && <TextField 
                                     value={element.raw!} 
@@ -69,6 +70,8 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                     onChange={this.onChangeField}
                                     disabled={this.state.disabled || element.disabled!}
                                     styles={textFieldStyles}
+                                    multiline={isMultiline}
+                                    autoAdjustHeight={isMultiline}
                                     required={element.attributes.RequiredLevel == 1 || element.attributes.RequiredLevel == 2}
                                     maxLength={element.attributes.MaxLength}
                                 />

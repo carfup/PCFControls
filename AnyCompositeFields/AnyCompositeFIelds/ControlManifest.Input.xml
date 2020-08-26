@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="AnyCompositeFIelds" version="0.0.72" display-name-key="Carfup.AnyCompositeFIelds" description-key="AnyCompositeFIelds will allow  you to display any stack of fields as composite rendering." control-type="standard" preview-image="img/preview.png">
+  <control namespace="Carfup" constructor="AnyCompositeFIelds" version="0.0.74" display-name-key="Carfup.AnyCompositeFIelds" description-key="AnyCompositeFIelds will allow  you to display any stack of fields as composite rendering." control-type="standard" preview-image="img/preview.png">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="FieldToAttachControl" display-name-key="FieldToAttachControl" description-key="Field to attach the control to" of-type-group="strings" usage="bound" required="true" />
     <property name="separator" display-name-key="Values separator" description-key="Separator to split the mapped values (for a space, put %20)" of-type="SingleLine.Text" usage="input" required="true" default-value="%20" />
@@ -20,6 +20,9 @@
       <type>SingleLine.Email</type>
       <type>SingleLine.Text</type>
       <type>SingleLine.Phone</type>
+      <type>SingleLine.TextArea</type>
+      <type>SingleLine.URL</type>
+      <type>Multiple</type>
     </type-group>
     <!-- 
       Property node's of-type attribute can be of-type-group attribute. 
