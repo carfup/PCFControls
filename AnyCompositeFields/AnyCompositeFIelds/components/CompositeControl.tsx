@@ -4,6 +4,7 @@ import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
 import { Stack, IStackStyles } from '@fluentui/react/lib/Stack';
 import { Callout, ICalloutContentStyles, DirectionalHint } from '@fluentui/react/lib/Callout';
 import { CompositeValue } from '../EntitiesDefinition';
+import { IInputs } from '../generated/ManifestTypes';
 
 export interface ICompositeControlProps {
     disabled : boolean;
@@ -12,6 +13,7 @@ export interface ICompositeControlProps {
     doneLabel : string;
     randNumber: number;
     onClickedDone : (compositeValue? : CompositeValue) => void;
+    context?: ComponentFramework.Context<IInputs>;
 }
 
 export interface IBCompositeControlState {
@@ -68,6 +70,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                     label={element.attributes.DisplayName}
                                     id={"acf_"+value}
                                     onChange={this.onChangeField}
+                                    onClick={this.onClickPhone}
                                     disabled={this.state.disabled || element.disabled!}
                                     styles={textFieldStyles}
                                     multiline={isMultiline}
@@ -100,6 +103,20 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         this.buildFullValue(compositeValue);
         this.setState({showCallout : false});
         this.props.onClickedDone(this.state.compositeValue);
+    }
+
+    private onClickPhone = (event: React.MouseEvent<HTMLInputElement | HTMLTextAreaElement, MouseEvent>) : void => {
+        // @ts-ignore
+        let target = event.target.id.replace('acf_', '');
+        const compositeValue = {...this.state}.compositeValue;
+        // @ts-ignore
+        let isPhoneType = compositeValue[target].type === "SingleLine.Phone";
+
+        if(!isPhoneType) return;
+
+        // @ts-ignore
+        const currentValue : any = compositeValue[target].raw!;
+        this.props.context?.navigation.openUrl(`tel:${currentValue}`);
     }
 
     private buildFullValue = (compositeValue : CompositeValue) : void => {
