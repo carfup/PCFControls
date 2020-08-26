@@ -38,6 +38,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	private _useTextFieldAsLookup : boolean;
 	private _forceRecordId : string;
 	private _relationShips : any;
+	private _columnNumber : number;
 
 	private notifyOutputChanged: () => void;
 
@@ -463,6 +464,9 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		this._lookupMapped = this._context.parameters.LookupFieldMapped.raw!;
 
+		// Since it's a new parameter, it can be undefined.
+		this._columnNumber = this._context.parameters.NumberOfColumn === undefined ? 1 : this._context.parameters.NumberOfColumn?.raw!;
+
 		this._useTextFieldAsLookup = (this._context.parameters.UseTextFieldAsLookup && this._context.parameters.UseTextFieldAsLookup.raw && this._context.parameters.UseTextFieldAsLookup.raw.toLowerCase() === "true") ? true : false;
 
 		this._clientUrl = (<any>this._context).page.getClientUrl();
@@ -587,7 +591,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		//console.log("[processFormXmlData] : processing fields from formxml ");
 		// Building the result details
 		var sections = $.parseXML(formxml).getElementsByTagName("section");
-		var i, j;
+		var i, j, k;
 		for(i = 0; i < sections.length; i++){
 			var section = sections[i].outerHTML;
 			
@@ -597,6 +601,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				continue;
 			}
 
+			// We prepare the section block
 			// @ts-ignore
 			if($.parseXML(section).getElementsByTagName("section")[0].attributes.showlabel.value == "true"){
 				// @ts-ignore
@@ -611,34 +616,53 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				
 				this._formDiv.appendChild(sectionh1);
 			}
+			
+			const divWidth = Math.ceil(100 / this._columnNumber); 
 
-			// a row = a field
-			var rows = $.parseXML(section).getElementsByTagName("row");
-			for(j = 0; j < rows.length; j++)
-			{
-				let row = rows[j].outerHTML;
-				// @ts-ignore
-				if($.parseXML(row).getElementsByTagName("control").length == 0 || $.parseXML(row).getElementsByTagName("label").length == 0 || $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname == undefined || $.parseXML(row).getElementsByTagName("label")[0].attributes.description == undefined){
-					continue;
-				}
+			// Creating the parent div handling column management
+			var divflex = document.createElement("div");
+			divflex.style.display = "flex";
+			this._formDiv.appendChild(divflex);
 
-				// @ts-ignore
-				var rowTechName =  $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname.value;
-				// @ts-ignore
-				let isReadOnly =  $.parseXML(row).getElementsByTagName("control")[0].attributes.disabled.value === "true";
-
-				// Checking if in the attributes metadata we find the current field
-				let fieldDetail = attributesDetail.filter(function(a: any){
-					return a._logicalName == rowTechName}
-				);
+			for(k = 0; k < this._columnNumber; k++){
 				
-				if(fieldDetail.length == 1)
-				{
-					fieldDetail = fieldDetail[0];
-				}
+				var subColumnDiv = document.createElement("div");
+				subColumnDiv.style.width = divWidth+"%";
+				subColumnDiv.style.marginRight = "5px";
+				divflex.appendChild(subColumnDiv);
 
-				// Generating the fields rendering
-				this.retrieveFieldOptions(fieldDetail, isReadOnly);	
+				// a row = a field
+				var rows = $.parseXML(section).getElementsByTagName("row");
+				let numberOfRowPerColumn = Math.ceil(rows.length / this._columnNumber);
+				let nextColumnCount = numberOfRowPerColumn * (k+1) > rows.length ? rows.length : numberOfRowPerColumn * (k+1);
+
+				for(j = numberOfRowPerColumn * k; j < nextColumnCount; j++)
+				{
+					console.log("K : "+k+" - J:"+j);
+					let row = rows[j].outerHTML;
+					// @ts-ignore
+					if($.parseXML(row).getElementsByTagName("control").length == 0 || $.parseXML(row).getElementsByTagName("label").length == 0 || $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname == undefined || $.parseXML(row).getElementsByTagName("label")[0].attributes.description == undefined){
+						continue;
+					}
+
+					// @ts-ignore
+					var rowTechName =  $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname.value;
+					// @ts-ignore
+					let isReadOnly =  $.parseXML(row).getElementsByTagName("control")[0].attributes.disabled.value === "true";
+
+					// Checking if in the attributes metadata we find the current field
+					let fieldDetail = attributesDetail.filter(function(a: any){
+						return a._logicalName == rowTechName}
+					);
+					
+					if(fieldDetail.length == 1)
+					{
+						fieldDetail = fieldDetail[0];
+					}
+
+					// Generating the fields rendering
+					this.retrieveFieldOptions(fieldDetail, isReadOnly, subColumnDiv);	
+				}
 			}
 		}
 	}
@@ -647,7 +671,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	 * Render the fields based on the metatada
 	 * @param fieldDetail field metadata
 	 */
-	private retrieveFieldOptions(fieldDetail: any, fieldReadOnly : boolean){
+	private retrieveFieldOptions(fieldDetail: any, fieldReadOnly : boolean, divflex : HTMLDivElement){
 		let _this = this;
 		let item = document.createElement("div");
 		var techFieldName = fieldDetail.attributeDescriptor.LogicalName;
@@ -854,7 +878,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				break;
 		}
 
-		this._formDiv.appendChild(item);
+		divflex.appendChild(item);
 	}
 
 	/**

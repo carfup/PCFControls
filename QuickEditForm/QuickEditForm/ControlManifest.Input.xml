@@ -9,6 +9,7 @@
       <value name="true" display-name-key="True" description-key="true">true</value>
       <value name="false" display-name-key="False" description-key="false">false</value>
     </property>
+    <property name="NumberOfColumn" display-name-key="Number of columns" description-key="Ability to split the fields in several columns" of-type="Whole.None" usage="input" required="false" default-value="1"/>
     <!-- 
       Property node's of-type attribute can be of-type-group attribute. 
       Example:
