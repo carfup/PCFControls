@@ -5,6 +5,7 @@ import { Stack, IStackStyles } from '@fluentui/react/lib/Stack';
 import { Callout, ICalloutContentStyles, DirectionalHint } from '@fluentui/react/lib/Callout';
 import { CompositeValue } from '../EntitiesDefinition';
 import { IInputs } from '../generated/ManifestTypes';
+import { cpuUsage } from 'process';
 
 export interface ICompositeControlProps {
     disabled : boolean;
@@ -111,11 +112,24 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         let target = event.target.id.replace('acf_', '');
         const compositeValue = {...this.state}.compositeValue;
         // @ts-ignore
+		var contextInfo = this.props.context?.mode.contextInfo;
+        // @ts-ignore
         switch(compositeValue[target].type){
             case "SingleLine.Phone":
                 // @ts-ignore
                 const currentValue : any = compositeValue[target].raw!;
                 this.props.context?.navigation.openUrl(`tel:${currentValue}`);
+                this.props.context?.navigation.openForm({
+                    entityName : "phonecall",
+                    createFromEntity : {
+                        // @ts-ignore
+                        id : contextInfo.entityId,
+                        // @ts-ignore
+                        entityType : contextInfo.entityTypeName,
+                        // @ts-ignore
+                        name : contextInfo.entityRecordName
+                    }
+                });
             break;
             case "SingleLine.URL":
                 // @ts-ignore
