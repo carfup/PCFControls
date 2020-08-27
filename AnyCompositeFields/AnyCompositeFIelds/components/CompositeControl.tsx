@@ -70,13 +70,14 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                     label={element.attributes.DisplayName}
                                     id={"acf_"+value}
                                     onChange={this.onChangeField}
-                                    onClick={this.onClickPhone}
+                                    onDoubleClick={this.onDoubleClick}
                                     disabled={this.state.disabled || element.disabled!}
                                     styles={textFieldStyles}
                                     multiline={isMultiline}
                                     autoAdjustHeight={isMultiline}
                                     required={element.attributes.RequiredLevel == 1 || element.attributes.RequiredLevel == 2}
                                     maxLength={element.attributes.MaxLength}
+                                    iconProps={{ iconName: this.getIcon(element.type) }} 
                                 />
                             })}
 
@@ -105,18 +106,31 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         this.props.onClickedDone(this.state.compositeValue);
     }
 
-    private onClickPhone = (event: React.MouseEvent<HTMLInputElement | HTMLTextAreaElement, MouseEvent>) : void => {
+    private onDoubleClick = (event: React.MouseEvent<HTMLInputElement | HTMLTextAreaElement, MouseEvent>) : void => {
         // @ts-ignore
         let target = event.target.id.replace('acf_', '');
         const compositeValue = {...this.state}.compositeValue;
         // @ts-ignore
-        let isPhoneType = compositeValue[target].type === "SingleLine.Phone";
-
-        if(!isPhoneType) return;
-
-        // @ts-ignore
-        const currentValue : any = compositeValue[target].raw!;
-        this.props.context?.navigation.openUrl(`tel:${currentValue}`);
+        switch(compositeValue[target].type){
+            case "SingleLine.Phone":
+                // @ts-ignore
+                const currentValue : any = compositeValue[target].raw!;
+                this.props.context?.navigation.openUrl(`tel:${currentValue}`);
+            break;
+            case "SingleLine.URL":
+                // @ts-ignore
+                const currentValue : any = compositeValue[target].raw!;
+                this.props.context?.navigation.openUrl(`${currentValue}`);
+            break;
+            case "SingleLine.Email":
+                // @ts-ignore
+                const currentValue : any = compositeValue[target].raw!;
+                this.props.context?.navigation.openUrl(`mailto:${currentValue}`);
+            break;
+            default : 
+            return;
+        }
+       
     }
 
     private buildFullValue = (compositeValue : CompositeValue) : void => {
@@ -134,6 +148,24 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         compositeValue.fullValue = arrayValues.join(compositeValue.separator);	
                   
         this.setState({compositeValue : compositeValue});
+    }
+
+    private getIcon = (type: string) : string => {
+        let icon = "";
+
+        switch(type){
+            case "SingleLine.Phone" :
+                icon = "Phone";
+                break;
+            case "SingleLine.URL": 
+                icon = "Globe";
+                break;
+            case "SingleLine.Email":
+                icon = "EditMail";
+                break;
+        }
+
+        return icon;
     }
 };
 
