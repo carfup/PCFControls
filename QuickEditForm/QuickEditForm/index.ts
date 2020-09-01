@@ -13,7 +13,6 @@ import { IDropdownOption } from "@fluentui/react/lib/Dropdown";
 import { MessageBarType } from "@fluentui/react/lib/MessageBar";
 
 import { EntityReferenceInfo, DataFieldDefinition} from "./EntitiesDefinition";
-import { unwatchFile } from "fs";
 
 
 export class QuickEditForm implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -38,7 +37,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	private _useTextFieldAsLookup : boolean;
 	private _forceRecordId : string;
 	private _relationShips : any;
-	private _columnNumber : number;
 
 	private notifyOutputChanged: () => void;
 
@@ -89,11 +87,10 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	public async updateView(context: ComponentFramework.Context<IInputs>)
 	{
 		// Add code to update control view
-		if(this._context.updatedProperties.length === 1 && this._context.updatedProperties[0] === "layout"){
-			return;
-		}
-
+		ReactDOM.unmountComponentAtNode(this._container); 
 		if(this._context.updatedProperties.includes("FieldToAttachControl")){
+			//if(this._forceRecordId == context.parameters.FieldToAttachControl.raw! || !this._useTextFieldAsLookup)
+			//	return;
 			if(this._useTextFieldAsLookup)
 				this._forceRecordId = context.parameters.FieldToAttachControl.raw!;
 		}
@@ -333,48 +330,11 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	 */
 	private displayMessage(type : MessageBarType, message : string){
 	//	this._messageDiv.innerHTML = "";
-		let _this = this;
+
 		let options = {
 			messageText : message,
 			messageType : type,
-			showMessageBar: true,
-			showQuickCreateButton : _this._recordToUpdate.QuickCreateEnabled,
-			onClickQuickCreate : () => {
-				this._context.navigation.openForm({
-					entityName : _this._recordToUpdate.EntityName,
-					useQuickCreateForm: true,
-					createFromEntity : {
-						// @ts-ignore
-						id : this._parentRecordDetails.Id,
-						name : this._parentRecordDetails.Name,
-						entityType : this._parentRecordDetails.EntityName
-					}
-				}).then(function success(data: any){
-					if(data.savedEntityReference.length === 0 || data.savedEntityReference.length > 1){
-						return;
-					}
-
-					let savedRecord = data.savedEntityReference[0];
-					let dataToUpdate : any = {};
-					dataToUpdate[_this._recordToUpdate.SchemaName!+"@odata.bind"] =  `/${_this.getEntityPluralName(savedRecord.entityType)}(${savedRecord.id.slice(1,-1)})`;
-					_this._context.webAPI.updateRecord(_this._parentRecordDetails.EntityName, _this._parentRecordDetails.Id, dataToUpdate).then(
-						function success(result){
-							console.log(result);
-							_this.displayMessage(MessageBarType.success, "Record successfully created, please refresh in order to see the newly created record.");
-						},
-						function (error){
-							// Error.code for privilege
-							if(error.code != undefined && error.code == 2147746336){
-								_this.displayMessage(MessageBarType.blocked, `${_this._context.resources.getString("UpdateErrorMessage")}\n\r${_this._context.resources.getString("MissingPrivilegeOnRecordMessage")}.\n\r${error.message}`);
-							} else{
-								_this.displayMessage(MessageBarType.blocked, `${_this._context.resources.getString("UpdateErrorMessage")}\n\r${error.message}`);
-							}
-							
-							_this._updateError = true;
-						}
-					);
-				});
-			}
+			showMessageBar: true
 		};
 
 		if(this._messageComponent != undefined || this._messageComponent != null){
@@ -386,6 +346,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		}
 		else {
 			this._messageComponent = ReactDOM.render(React.createElement(MessageBarControl, options), this._messageDiv);
+			//console.log("displayMessage : Rendering message ");
 		}
 	}
 
@@ -407,13 +368,11 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		this._lookupFieldDetails = lookupDetails;
 
-		// Creating the new instance here
-		_this._recordToUpdate = new EntityReferenceInfo();
-
 		if(lookup != undefined ){
 			let id = this._lookupFieldDetails[_this._lookupMapped] ?? "";
 			let entity = this._lookupFieldDetails[_this._lookupMapped+"@Microsoft.Dynamics.CRM.lookuplogicalname"] ?? "";
 
+			_this._recordToUpdate = new EntityReferenceInfo();
 			_this._recordToUpdate.EntityName = entity;
 			_this._recordToUpdate.Id = (_this._useTextFieldAsLookup &&  _this._forceRecordId != undefined && _this._forceRecordId != null) ?  _this._forceRecordId : id;
 			_this._recordToUpdate.Name = "lookup name here";
@@ -422,28 +381,12 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			let attr = await _this._context.webAPI.retrieveRecord(_this._recordToUpdate.EntityName, _this._recordToUpdate.Id);
 			_this.isRecordReadOnly(attr["statecode"]);
 			_this._parentRecordDetails.Attributes = attr;
+			//console.log("[getLookupDetails] _this._parentRecordDetails.Attributes : record values retrieved ");
 		}
-		// We display a message and get property for potential quick create button
 		else {
-			// Grabbing necessary info for quick create possibility
-			let lookupCleaned = this._lookupMapped.replace("_value","").replace("_","");
-			let lookupField : string[] = [];
-			lookupField.push(lookupCleaned);
-			this._context.utils.getEntityMetadata(this._parentRecordDetails.EntityName, lookupField ).then(em => {
-				let relationships = em.ManyToOneRelationships.getAll();
-				let relationshipDetails = relationships.filter(function(relation : any){
-					return relation._referencingAttribute === lookupCleaned;
-				})[0];
-
-				this._recordToUpdate.SchemaName = relationshipDetails?.ReferencingEntityNavigationPropertyName;
-				this._recordToUpdate.EntityName = relationshipDetails?.ReferencedEntity;
-				this._recordToUpdate.QuickCreateEnabled = em.IsQuickCreateEnabled as boolean;	
-				
-				// displaying message to warn user that lookup is empty
-				this.displayMessage(MessageBarType.info, _this._context.resources.getString("LookupFieldHasNoValue").replace("{0}", this._context.parameters.LookupFieldMapped.raw!));
-				this._renderingInProgress = false;
-				this.showLoading(false);
-			});
+			this.displayMessage(MessageBarType.info, _this._context.resources.getString("LookupFieldHasNoValue").replace("{0}", this._context.parameters.LookupFieldMapped.raw!));
+			this._renderingInProgress = false;
+			this.showLoading(false);
 		}
 	}
 
@@ -463,9 +406,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		this._forceRecordId = this._context.parameters.FieldToAttachControl.raw!;
 
 		this._lookupMapped = this._context.parameters.LookupFieldMapped.raw!;
-
-		// Since it's a new parameter, it can be undefined.
-		this._columnNumber = this._context.parameters.NumberOfColumn === undefined ? 1 : this._context.parameters.NumberOfColumn?.raw!;
 
 		this._useTextFieldAsLookup = (this._context.parameters.UseTextFieldAsLookup && this._context.parameters.UseTextFieldAsLookup.raw && this._context.parameters.UseTextFieldAsLookup.raw.toLowerCase() === "true") ? true : false;
 
@@ -549,7 +489,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		catch (e){
 			this._renderingInProgress = false;
 			this.showLoading(false);
-			this.displayMessage(MessageBarType.error, `An error occured : ${e}`);
+			this.displayMessage(MessageBarType.error, `An error occured ${e.mesage}`);
 		}
 		
 	}
@@ -591,7 +531,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		//console.log("[processFormXmlData] : processing fields from formxml ");
 		// Building the result details
 		var sections = $.parseXML(formxml).getElementsByTagName("section");
-		var i, j, k;
+		var i, j;
 		for(i = 0; i < sections.length; i++){
 			var section = sections[i].outerHTML;
 			
@@ -601,7 +541,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				continue;
 			}
 
-			// We prepare the section block
 			// @ts-ignore
 			if($.parseXML(section).getElementsByTagName("section")[0].attributes.showlabel.value == "true"){
 				// @ts-ignore
@@ -616,53 +555,32 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				
 				this._formDiv.appendChild(sectionh1);
 			}
-			
-			const divWidth = Math.ceil(100 / this._columnNumber); 
 
-			// Creating the parent div handling column management
-			var divflex = document.createElement("div");
-			divflex.style.display = "flex";
-			this._formDiv.appendChild(divflex);
-
-			for(k = 0; k < this._columnNumber; k++){
-				
-				var subColumnDiv = document.createElement("div");
-				subColumnDiv.style.width = divWidth+"%";
-				subColumnDiv.style.marginRight = "5px";
-				divflex.appendChild(subColumnDiv);
-
-				// a row = a field
-				var rows = $.parseXML(section).getElementsByTagName("row");
-				let numberOfRowPerColumn = Math.ceil(rows.length / this._columnNumber);
-				let nextColumnCount = numberOfRowPerColumn * (k+1) > rows.length ? rows.length : numberOfRowPerColumn * (k+1);
-
-				for(j = numberOfRowPerColumn * k; j < nextColumnCount; j++)
-				{
-					console.log("K : "+k+" - J:"+j);
-					let row = rows[j].outerHTML;
-					// @ts-ignore
-					if($.parseXML(row).getElementsByTagName("control").length == 0 || $.parseXML(row).getElementsByTagName("label").length == 0 || $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname == undefined || $.parseXML(row).getElementsByTagName("label")[0].attributes.description == undefined){
-						continue;
-					}
-
-					// @ts-ignore
-					var rowTechName =  $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname.value;
-					// @ts-ignore
-					let isReadOnly =  $.parseXML(row).getElementsByTagName("control")[0].attributes.disabled.value === "true";
-
-					// Checking if in the attributes metadata we find the current field
-					let fieldDetail = attributesDetail.filter(function(a: any){
-						return a._logicalName == rowTechName}
-					);
-					
-					if(fieldDetail.length == 1)
-					{
-						fieldDetail = fieldDetail[0];
-					}
-
-					// Generating the fields rendering
-					this.retrieveFieldOptions(fieldDetail, isReadOnly, subColumnDiv);	
+			// a row = a field
+			var rows = $.parseXML(section).getElementsByTagName("row");
+			for(j = 0; j < rows.length; j++)
+			{
+				let row = rows[j].outerHTML;
+				// @ts-ignore
+				if($.parseXML(row).getElementsByTagName("control").length == 0 || $.parseXML(row).getElementsByTagName("label").length == 0 || $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname == undefined || $.parseXML(row).getElementsByTagName("label")[0].attributes.description == undefined){
+					continue;
 				}
+
+				// @ts-ignore
+				var rowTechName =  $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname.value;
+
+				// Checking if in the attributes metadata we find the current field
+				let fieldDetail = attributesDetail.filter(function(a: any){
+					return a._logicalName == rowTechName}
+				);
+				
+				if(fieldDetail.length == 1)
+				{
+					fieldDetail = fieldDetail[0];
+				}
+
+				// Generating the fields rendering
+				this.retrieveFieldOptions(fieldDetail);	
 			}
 		}
 	}
@@ -671,7 +589,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	 * Render the fields based on the metatada
 	 * @param fieldDetail field metadata
 	 */
-	private retrieveFieldOptions(fieldDetail: any, fieldReadOnly : boolean, divflex : HTMLDivElement){
+	private retrieveFieldOptions(fieldDetail: any){
 		let _this = this;
 		let item = document.createElement("div");
 		var techFieldName = fieldDetail.attributeDescriptor.LogicalName;
@@ -679,7 +597,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		var type = fieldDetail.attributeDescriptor.Type;
 		var label = fieldDetail.DisplayName;
 
-		let isReadOnly = !fieldDetail.attributeDescriptor.IsValidForUpdate || this._isRecordReadOnly || fieldReadOnly;
+		let isReadOnly = !fieldDetail.attributeDescriptor.IsValidForUpdate || this._isRecordReadOnly;
 		let isRequired = fieldDetail.attributeDescriptor.RequiredLevel == 1 || fieldDetail.attributeDescriptor.RequiredLevel == 2;
 
 		// Grabing the proper datafieldDefinition
@@ -701,7 +619,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						width : this._context.mode.allocatedWidth,
 						label : label,
 						fieldDefinition : {
-							fieldSchemaName: schemaName.length == 1 ? schemaName[0].ReferencingEntityNavigationPropertyName : null,
+							fieldSchemaName: schemaName.length == 1 ? schemaName[0]._referencingEntityNavigationPropertyName : null,
 							isRequired : isRequired,
 							isDirty : false,
 							fieldName : techFieldName,
@@ -791,9 +709,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				ReactDOM.render(React.createElement(FilteredOptionsetControl, ddOptions), item);
 				break;
 			case 'money':
-			case 'decimal':
-			case 'double':
-			case 'integer':
 					let moneyOptions = {
 						width : this._context.mode.allocatedWidth,
 						label : label,
@@ -806,7 +721,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							fieldValue : this._parentRecordDetails.Attributes[techFieldName] ?? ""
 						},
 						disabled : isReadOnly,
-						icon : type === "money" ? "Money" : "NumberField",
+						icon : "Money",
 						onClickResult : (fieldDefinition?: DataFieldDefinition) => {
 							if(dataFieldDefinitionsDetails != undefined && fieldDefinition != undefined){
 								dataFieldDefinitionsDetails.isDirty = true;
@@ -818,6 +733,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							}							
 						}
 					};
+
 					dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, moneyOptions.fieldDefinition);
 
 					ReactDOM.render(React.createElement(TextFieldControl, moneyOptions), item);
@@ -878,7 +794,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				break;
 		}
 
-		divflex.appendChild(item);
+		this._formDiv.appendChild(item);
 	}
 
 	/**
