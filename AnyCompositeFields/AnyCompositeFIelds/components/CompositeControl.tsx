@@ -56,7 +56,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                 {this.state.showCallout && (
                     <Callout
                         target={"#acf_compositeFullValue"+this.props.randNumber}
-                        onDismiss={() => this.setState({ showCallout : false }) }
+                        onDismiss={this.onDismissCallout}
                         styles={calloutStyles}
                         directionalHint={DirectionalHint.topCenter}
                     >
@@ -89,6 +89,12 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                 )}
             </Stack>
         );
+    }
+
+    private onDismissCallout = (ev?: any) : void => {
+        if(this.props.context?.client.getClient() !== "Mobile"){
+            this.setState({ showCallout : false });
+        }
     }
 
     private onChangeField = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) : void => {
@@ -130,6 +136,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                         name : contextInfo.entityRecordName
                     }
                 });
+                this.setState({showCallout : false});
             break;
             case "SingleLine.URL":
                 // @ts-ignore
