@@ -4,6 +4,8 @@ import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
 import { Stack, IStackStyles } from '@fluentui/react/lib/Stack';
 import { Callout, ICalloutContentStyles, DirectionalHint } from '@fluentui/react/lib/Callout';
 import { CompositeValue } from '../EntitiesDefinition';
+import { IInputs } from '../generated/ManifestTypes';
+import { cpuUsage } from 'process';
 
 export interface ICompositeControlProps {
     disabled : boolean;
@@ -12,6 +14,7 @@ export interface ICompositeControlProps {
     doneLabel : string;
     randNumber: number;
     onClickedDone : (compositeValue? : CompositeValue) => void;
+    context?: ComponentFramework.Context<IInputs>;
 }
 
 export interface IBCompositeControlState {
@@ -53,7 +56,7 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                 {this.state.showCallout && (
                     <Callout
                         target={"#acf_compositeFullValue"+this.props.randNumber}
-                        onDismiss={() => this.setState({ showCallout : false }) }
+                        onDismiss={this.onDismissCallout}
                         styles={calloutStyles}
                         directionalHint={DirectionalHint.topCenter}
                     >
@@ -68,12 +71,14 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                     label={element.attributes.DisplayName}
                                     id={"acf_"+value}
                                     onChange={this.onChangeField}
+                                    onDoubleClick={this.onDoubleClick}
                                     disabled={this.state.disabled || element.disabled!}
                                     styles={textFieldStyles}
                                     multiline={isMultiline}
                                     autoAdjustHeight={isMultiline}
                                     required={element.attributes.RequiredLevel == 1 || element.attributes.RequiredLevel == 2}
                                     maxLength={element.attributes.MaxLength}
+                                    iconProps={{ iconName: this.getIcon(element.type) }} 
                                 />
                             })}
 
@@ -86,6 +91,21 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         );
     }
 
+    /**
+     * Ability to auto hide the callout on desktop and manually done on mobile
+     * @param ev 
+     */
+    private onDismissCallout = (ev?: any) : void => {
+        if(this.props.context?.client.getClient() !== "Mobile"){
+            this.setState({ showCallout : false });
+        }
+    }
+
+    /**
+     * when a value is modified on a field
+     * @param event the event
+     * @param newValue the new value
+     */
     private onChangeField = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) : void => {
         // @ts-ignore
         let target = event.target.id.replace('acf_', '');
@@ -95,6 +115,10 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         this.setState({compositeValue : compositeValue});
     }
 
+    /**
+     * Clicking on Done to hide the callout
+     * @param event 
+     */
     private onClick = (event: React.MouseEvent<HTMLDivElement | HTMLAnchorElement | HTMLButtonElement | BaseButton | Button | HTMLSpanElement, MouseEvent>) : void =>  {
         const compositeValue = {...this.state}.compositeValue;
         this.buildFullValue(compositeValue);
@@ -102,6 +126,55 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         this.props.onClickedDone(this.state.compositeValue);
     }
 
+    /**
+     * When double clicking on url/phone/email opening the related tool
+     * @param event event
+     */
+    private onDoubleClick = (event: React.MouseEvent<HTMLInputElement | HTMLTextAreaElement, MouseEvent>) : void => {
+        // @ts-ignore
+        let target = event.target.id.replace('acf_', '');
+        const compositeValue = {...this.state}.compositeValue;
+        // @ts-ignore
+		var contextInfo = this.props.context?.mode.contextInfo;
+        // @ts-ignore
+        switch(compositeValue[target].type){
+            case "SingleLine.Phone":
+                // @ts-ignore
+                const currentValue : any = compositeValue[target].raw!;
+                this.props.context?.navigation.openUrl(`tel:${currentValue}`);
+                this.props.context?.navigation.openForm({
+                    entityName : "phonecall",
+                    createFromEntity : {
+                        // @ts-ignore
+                        id : contextInfo.entityId,
+                        // @ts-ignore
+                        entityType : contextInfo.entityTypeName,
+                        // @ts-ignore
+                        name : contextInfo.entityRecordName
+                    }
+                });
+                this.setState({showCallout : false});
+            break;
+            case "SingleLine.URL":
+                // @ts-ignore
+                const currentValue : any = compositeValue[target].raw!;
+                this.props.context?.navigation.openUrl(`${currentValue}`);
+            break;
+            case "SingleLine.Email":
+                // @ts-ignore
+                const currentValue : any = compositeValue[target].raw!;
+                this.props.context?.navigation.openUrl(`mailto:${currentValue}`);
+            break;
+            default : 
+            return;
+        }
+       
+    }
+
+    /**
+     * 
+     * @param compositeValue the composite value to enrich
+     */
     private buildFullValue = (compositeValue : CompositeValue) : void => {
         let arrayValues = [];
 		
@@ -117,6 +190,24 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         compositeValue.fullValue = arrayValues.join(compositeValue.separator);	
                   
         this.setState({compositeValue : compositeValue});
+    }
+
+    private getIcon = (type: string) : string => {
+        let icon = "";
+
+        switch(type){
+            case "SingleLine.Phone" :
+                icon = "Phone";
+                break;
+            case "SingleLine.URL": 
+                icon = "Globe";
+                break;
+            case "SingleLine.Email":
+                icon = "EditMail";
+                break;
+        }
+
+        return icon;
     }
 };
 
