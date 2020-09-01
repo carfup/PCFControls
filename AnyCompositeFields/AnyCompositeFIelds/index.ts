@@ -112,6 +112,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 			);
 
 			let optionsText = {
+				context : this._context,
 				compositeValue : this._compositeValue,
 				doneLabel : this._context.resources.getString("Done"),
 				disabled : this._context.mode.isControlDisabled,
