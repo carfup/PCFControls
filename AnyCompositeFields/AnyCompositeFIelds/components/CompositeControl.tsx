@@ -91,12 +91,21 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         );
     }
 
+    /**
+     * Ability to auto hide the callout on desktop and manually done on mobile
+     * @param ev 
+     */
     private onDismissCallout = (ev?: any) : void => {
         if(this.props.context?.client.getClient() !== "Mobile"){
             this.setState({ showCallout : false });
         }
     }
 
+    /**
+     * when a value is modified on a field
+     * @param event the event
+     * @param newValue the new value
+     */
     private onChangeField = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) : void => {
         // @ts-ignore
         let target = event.target.id.replace('acf_', '');
@@ -106,6 +115,10 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         this.setState({compositeValue : compositeValue});
     }
 
+    /**
+     * Clicking on Done to hide the callout
+     * @param event 
+     */
     private onClick = (event: React.MouseEvent<HTMLDivElement | HTMLAnchorElement | HTMLButtonElement | BaseButton | Button | HTMLSpanElement, MouseEvent>) : void =>  {
         const compositeValue = {...this.state}.compositeValue;
         this.buildFullValue(compositeValue);
@@ -113,6 +126,10 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         this.props.onClickedDone(this.state.compositeValue);
     }
 
+    /**
+     * When double clicking on url/phone/email opening the related tool
+     * @param event event
+     */
     private onDoubleClick = (event: React.MouseEvent<HTMLInputElement | HTMLTextAreaElement, MouseEvent>) : void => {
         // @ts-ignore
         let target = event.target.id.replace('acf_', '');
@@ -154,6 +171,10 @@ export default class CompositeControl extends React.Component<ICompositeControlP
        
     }
 
+    /**
+     * 
+     * @param compositeValue the composite value to enrich
+     */
     private buildFullValue = (compositeValue : CompositeValue) : void => {
         let arrayValues = [];
 		
