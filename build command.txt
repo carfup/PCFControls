@@ -1,1 +1,2 @@
+cd C:\Projets\CRM\PCF\PCFControls\Carfup_PCFControls
 msbuild /t:build /restore /p:configuration=Release
