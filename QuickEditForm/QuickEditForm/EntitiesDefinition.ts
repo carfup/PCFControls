@@ -3,8 +3,6 @@ export class EntityReferenceInfo{
 	public Id:string;
 	public Name:string;
 	public Attributes?: any;
-	public SchemaName?: string;
-	public QuickCreateEnabled?: boolean;
 }
 
 export class EntityReferenceIdName{

@@ -20,9 +20,6 @@
       <type>SingleLine.Email</type>
       <type>SingleLine.Text</type>
       <type>SingleLine.Phone</type>
-      <type>SingleLine.TextArea</type>
-      <type>SingleLine.URL</type>
-      <type>Multiple</type>
     </type-group>
     <!-- 
       Property node's of-type attribute can be of-type-group attribute. 

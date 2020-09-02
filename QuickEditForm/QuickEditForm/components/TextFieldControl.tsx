@@ -33,7 +33,7 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
         super(props);
         this.state = {
             fieldDefinition: this.props.fieldDefinition,
-            type: props.icon === "NumberField" || props.icon === "Money" ? "number": "text",
+            type: props.icon === "Money" ? "number": "text",
         };
     }
 
@@ -69,15 +69,10 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
     }
 
     private grabValueFromFieldDefinition = (fieldDef : DataFieldDefinition | undefined) : string => {
-        let result = "";
-        if(this.state.fieldDefinition?.fieldValue?.Name != undefined) {
-            result = this.state.fieldDefinition?.fieldValue?.Name;
-        }
-        else {
-            result =  this.state.fieldDefinition?.fieldValue;
-        }
+        if(this.state.fieldDefinition?.fieldValue?.Name !== undefined)
+            return this.state.fieldDefinition?.fieldValue?.Name;
 
-        return result;
+        return this.state.fieldDefinition?.fieldValue;
     }
 
     private onDoubleClick = (event: React.MouseEvent<HTMLInputElement | HTMLTextAreaElement, MouseEvent>) : void => {
