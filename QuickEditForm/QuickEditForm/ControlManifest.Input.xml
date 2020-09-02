@@ -1,14 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="QuickEditForm" version="0.0.235" display-name-key="Carfup.QuickEditForm" description-key="QuickEditForm allows you to edit data from a lookup record using a Quick View Form definition as enty form." control-type="standard" preview-image="img/preview.png">
+  <control namespace="Carfup" constructor="QuickEditForm" version="0.0.238" display-name-key="Carfup.QuickEditForm" description-key="QuickEditForm allows you to edit data from a lookup record using a Quick View Form definition as enty form." control-type="standard" preview-image="img/preview.png">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="FieldToAttachControl" display-name-key="FieldToAttachControl" description-key="Property_Desc_Key" of-type="SingleLine.Text" usage="bound" required="true" />
     <property name="QuickViewFormId" display-name-key="QuickViewFormId" description-key="GUID of the Quick View Form to render" of-type="SingleLine.Text" usage="input" required="true" />
     <property name="LookupFieldMapped" display-name-key="LookupFieldMapped" description-key="Lookup Field Mapped to retrieve the Quick View Form from" of-type="SingleLine.Text" usage="input" required="true" />
-    <property name="UseTextFieldAsLookup" display-name-key="UseTextFieldAsLookup" description-key="Display a field which can hold the guid of the Lookup record to load the Quick Edit Form." of-type="Enum" usage="input" required="true">
-      <value name="true" display-name-key="True" description-key="true">true</value>
+    <property name="UseTextFieldAsLookup" display-name-key="UseTextFieldAsLookup" description-key="Display a field which can hold the guid of the Lookup record to load the Quick Edit Form." of-type="Enum" usage="input" required="true" default-value="false">
       <value name="false" display-name-key="False" description-key="false">false</value>
+      <value name="true" display-name-key="True" description-key="true">true</value>
     </property>
+    <property name="NumberOfColumn" display-name-key="Number of columns" description-key="Ability to split the fields in several columns" of-type="Whole.None" usage="input" required="false" default-value="1" />
     <!-- 
       Property node's of-type attribute can be of-type-group attribute. 
       Example:

@@ -47,7 +47,7 @@ export default class FilteredOptionsetControl extends React.Component<IFilteredO
                     multiSelect={this.props.isMultiSelect}
                     placeHolder="--Select--"
                     options={this.props.options}            
-                    selectedKey={(!this.props.isMultiSelect ?
+                    defaultSelectedKey={(!this.props.isMultiSelect ?
                         this.state.fieldDefinition?.fieldValue?.toString() : 
                         null
                     )}
@@ -80,6 +80,8 @@ export default class FilteredOptionsetControl extends React.Component<IFilteredO
 
             if(this.props.isMultiSelect){
                 let tempArray = fieldDefTemp["fieldValue"]?.split(',');
+                if(tempArray === undefined)
+                    tempArray = [];
 
                 if(option?.selected)
                     tempArray.push(option?.key);
@@ -92,7 +94,7 @@ export default class FilteredOptionsetControl extends React.Component<IFilteredO
             }
                 
             else 
-                fieldDefTemp["fieldValue"] = option?.key;
+                fieldDefTemp["fieldValue"] = this.props.options[index!].key; //option?.key;
 
             fieldDefTemp["isDirty"] = true;
             this.setState({ fieldDefinition: fieldDefTemp });
