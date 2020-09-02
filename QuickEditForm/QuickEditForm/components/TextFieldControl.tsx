@@ -81,11 +81,17 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
     }
 
     private onDoubleClick = (event: React.MouseEvent<HTMLInputElement | HTMLTextAreaElement, MouseEvent>) : void => {
-        if(this.props.icon == "EditMail"){
-            window.open(`mailto:${this.grabValueFromFieldDefinition(this.state.fieldDefinition?.fieldValue)}`);
-        }
-        else if(this.props.icon == "Globe"){
-            window.open(`${this.grabValueFromFieldDefinition(this.state.fieldDefinition?.fieldValue)}`);
+        
+        switch(this.props.icon){
+            case "EditMail":
+                this.props.context?.navigation.openUrl(`mailto:${this.grabValueFromFieldDefinition(this.state.fieldDefinition?.fieldValue)}`);
+            break;
+            case "Globe":
+                this.props.context?.navigation.openUrl(`${this.grabValueFromFieldDefinition(this.state.fieldDefinition?.fieldValue)}`);
+            break;
+            case "Phone":
+                this.props.context?.navigation.openUrl(`tel:${this.grabValueFromFieldDefinition(this.state.fieldDefinition?.fieldValue)}`);
+            break;
         }
     }
 

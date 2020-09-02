@@ -855,6 +855,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						icon = "Phone"; 
 
 					let optionsText = {
+						context : this._context,
 						width : this._context.mode.allocatedWidth,
 						label : label,
 						fieldDefinition : {
