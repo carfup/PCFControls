@@ -465,7 +465,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		this._lookupMapped = this._context.parameters.LookupFieldMapped.raw!;
 
 		// Since it's a new parameter, it can be undefined.
-		this._columnNumber = this._context.parameters.NumberOfColumn === undefined ? 1 : this._context.parameters.NumberOfColumn?.raw!;
+		this._columnNumber = this._context.parameters.NumberOfColumn === undefined || this._context.parameters.NumberOfColumn.raw === null ? 1 : this._context.parameters.NumberOfColumn?.raw!;
 
 		this._useTextFieldAsLookup = (this._context.parameters.UseTextFieldAsLookup && this._context.parameters.UseTextFieldAsLookup.raw && this._context.parameters.UseTextFieldAsLookup.raw.toLowerCase() === "true") ? true : false;
 
@@ -638,7 +638,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 				for(j = numberOfRowPerColumn * k; j < nextColumnCount; j++)
 				{
-					console.log("K : "+k+" - J:"+j);
 					let row = rows[j].outerHTML;
 					// @ts-ignore
 					if($.parseXML(row).getElementsByTagName("control").length == 0 || $.parseXML(row).getElementsByTagName("label").length == 0 || $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname == undefined || $.parseXML(row).getElementsByTagName("label")[0].attributes.description == undefined){
@@ -852,8 +851,11 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						icon = "EditMail";
 					if(fieldDetail.attributeDescriptor.Format == "Url")
 						icon = "Globe";
+					if(fieldDetail.attributeDescriptor.Format == "Phone")
+						icon = "Phone"; 
 
 					let optionsText = {
+						context : this._context,
 						width : this._context.mode.allocatedWidth,
 						label : label,
 						fieldDefinition : {
