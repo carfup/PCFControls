@@ -13,7 +13,6 @@ import { IDropdownOption } from "@fluentui/react/lib/Dropdown";
 import { MessageBarType } from "@fluentui/react/lib/MessageBar";
 
 import { EntityReferenceInfo, DataFieldDefinition} from "./EntitiesDefinition";
-import { unwatchFile } from "fs";
 
 
 export class QuickEditForm implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -39,6 +38,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	private _forceRecordId : string;
 	private _relationShips : any;
 	private _columnNumber : number;
+	private _buttonLoaded : boolean = false;
 
 	private notifyOutputChanged: () => void;
 
@@ -64,9 +64,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		this._context = context; 
 		this.notifyOutputChanged = notifyOutputChanged;
 		this._context.mode.trackContainerResize(true);
-		
-		// Load params
-		this.getParams();
 
 		this._buttonsDiv = document.createElement("div");
 		this._messageDiv = document.createElement("div");
@@ -75,8 +72,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		container.appendChild(this._buttonsDiv);
 		container.appendChild(this._messageDiv);
 		container.appendChild(this._formDiv);
-
-		this.addButtons();
 
 		this._container = container;
 	}
@@ -96,6 +91,14 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		if(this._context.updatedProperties.includes("FieldToAttachControl")){
 			if(this._useTextFieldAsLookup)
 				this._forceRecordId = context.parameters.FieldToAttachControl.raw!;
+		}
+
+		// Load params
+		this.getParams();
+
+		if(this._parentRecordDetails.Id != null && !this._buttonLoaded){
+			this.addButtons();
+			this._buttonLoaded = true;
 		}
 
 		this.queryQuickViewFormData(this._quickViewFormId);
@@ -143,8 +146,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			},
 			() => {
 				console.log('Error when downloading loading.gif image.');
-			});
-		//console.log("addButtons : Rendering buttons ");
+		});
 	}
 
 	/**
@@ -168,7 +170,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		this._updateError = false;
 		
-
 		// checking if we have empty required fields
 		var emptyRequiredFields = this._dataFieldDefinitions.filter(function (dfd){
 			if(dfd.isRequired && (dfd.fieldValue == null || dfd.fieldValue === ""))
@@ -490,7 +491,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		try
 		{
 			// Rendering is already in progress !
-			if(this._renderingInProgress)
+			if(this._renderingInProgress || this._parentRecordDetails.Id == null)
 				return;
 
 			this._renderingInProgress = true;
