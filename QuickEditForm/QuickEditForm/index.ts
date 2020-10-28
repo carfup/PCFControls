@@ -231,7 +231,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					}
 					break;
 				case 'date': // dateOnly
-					dataToUpdate[data.fieldName!] = data.fieldValue.format("yyyy-MM-dd");
+					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : data.fieldValue.format("yyyy-MM-dd");
 					break;
 				default:
 					dataToUpdate[data.fieldName!] = data.fieldValue
@@ -736,7 +736,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							fieldName : techFieldName,
 							fieldType : detailDateType,
 							controlId : controlId,
-							fieldValue : new Date(this._parentRecordDetails.Attributes[techFieldName]) ?? null
+							fieldValue : this._parentRecordDetails.Attributes[techFieldName] === null ? null : new Date(this._parentRecordDetails.Attributes[techFieldName])
 						},
 						disabled : isReadOnly,
 						showTime : detailDateType == "datetime",
