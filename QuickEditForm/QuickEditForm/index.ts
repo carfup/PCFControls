@@ -232,7 +232,10 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					}
 					break;
 				case 'date': // dateOnly
-					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : data.fieldValue.format("yyyy-MM-dd");
+					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : (<any>_this.convertDate(data.fieldValue, "utc")).format("yyyy-MM-dd");
+					break;
+					case 'datetime': 
+					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this.convertDate(data.fieldValue, "utc");
 					break;
 				default:
 					dataToUpdate[data.fieldName!] = data.fieldValue
@@ -679,7 +682,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		var type = fieldDetail.attributeDescriptor.Type;
 		var label = fieldDetail.DisplayName;
 
-		let isReadOnly = !fieldDetail.attributeDescriptor.IsValidForUpdate || this._isRecordReadOnly || fieldReadOnly;
+		let isReadOnly = !fieldDetail.attributeDescriptor.IsValidForUpdate || this._isRecordReadOnly || fieldReadOnly || this._context.mode.isControlDisabled;
 		let isRequired = fieldDetail.attributeDescriptor.RequiredLevel == 1 || fieldDetail.attributeDescriptor.RequiredLevel == 2;
 
 		// Grabing the proper datafieldDefinition
@@ -737,7 +740,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							fieldName : techFieldName,
 							fieldType : detailDateType,
 							controlId : controlId,
-							fieldValue : this._parentRecordDetails.Attributes[techFieldName] === null ? null : new Date(this._parentRecordDetails.Attributes[techFieldName])
+							fieldValue : this._parentRecordDetails.Attributes[techFieldName] === null ? null : this.convertDate(new Date(this._parentRecordDetails.Attributes[techFieldName]), "local")
 						},
 						disabled : isReadOnly,
 						showTime : detailDateType == "datetime",
@@ -989,4 +992,41 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			this.displayMessage(MessageBarType.error, `The guid for the parameter ${field} has an incorrect format.`);
 		}
 	}
+
+	/**
+	 * convert the date into local user timezone
+	 * @param value date to convert
+	 */
+	private convertDate(value: Date, convertTo: "utc" | "local") {
+		var offsetMinutes = this._context.userSettings.getTimeZoneOffsetMinutes(value);
+		var browserOffset = new Date().getTimezoneOffset();
+		var convert = convertTo;
+		// The offset returned is the Timezone offset minutes from UTC to Local
+		// E.g. Central Time (UTC-6) - getTimeZoneOffsetMinutes will return -360 minutes
+		// To get to a utc time we must add 360 (offset)
+		// To get to local we must add -360 (offset)
+		//offsetMinutes = offsetMinutes  * (convertTo == "local" ? 1 : -1);
+		
+		var localDate = this.addMinutes(value, offsetMinutes);
+
+		if(convertTo == "utc"){
+			let offsetMinutesMinusBrowser = (offsetMinutes + browserOffset)  * (convert == "local" ? 1 : -1);
+			localDate = this.addMinutes(value, offsetMinutesMinusBrowser);
+			return localDate;
+		}
+			
+		return this.getUtcDate(localDate);
+	  }
+	  private addMinutes(date: Date, minutes: number): Date {
+		return new Date(date.getTime() + minutes * 60000);
+	  }
+	  private getUtcDate(localDate: Date) {
+		return new Date(
+		  localDate.getUTCFullYear(),
+		  localDate.getUTCMonth(),
+		  localDate.getUTCDate(),
+		  localDate.getUTCHours(),
+		  localDate.getUTCMinutes(),
+		);
+	  }
 }
