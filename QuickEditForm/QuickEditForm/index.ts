@@ -940,7 +940,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	*/
 	private generateImageSrcUrl(fileType: string, fileContent: string): string {
 		return "data:image/" + fileType + ";base64," + fileContent;
-	
 	}
 
 	/**
@@ -986,13 +985,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			return entityName+"s";
 	}
 
-	private isGuid(guid : string, field : string) {
-		var regexGuid = /^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/gi;
-    	if(regexGuid.test(guid)){
-			this.displayMessage(MessageBarType.error, `The guid for the parameter ${field} has an incorrect format.`);
-		}
-	}
-
 	/**
 	 * convert the date into local user timezone
 	 * @param value date to convert
@@ -1010,7 +1002,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		var localDate = this.addMinutes(value, offsetMinutes);
 
 		if(convertTo == "utc"){
-			let offsetMinutesMinusBrowser = (offsetMinutes + browserOffset)  * (convert == "local" ? 1 : -1);
+			let offsetMinutesMinusBrowser = -offsetMinutes - browserOffset;
 			localDate = this.addMinutes(value, offsetMinutesMinusBrowser);
 			return localDate;
 		}
@@ -1028,5 +1020,5 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		  localDate.getUTCHours(),
 		  localDate.getUTCMinutes(),
 		);
-	  }
+	}
 }
