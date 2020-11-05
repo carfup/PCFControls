@@ -441,12 +441,14 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 				this._recordToUpdate.SchemaName = relationshipDetails?.ReferencingEntityNavigationPropertyName;
 				this._recordToUpdate.EntityName = relationshipDetails?.ReferencedEntity;
-				this._recordToUpdate.QuickCreateEnabled = em.IsQuickCreateEnabled as boolean;	
-				
-				// displaying message to warn user that lookup is empty
-				this.displayMessage(MessageBarType.info, _this._context.resources.getString("LookupFieldHasNoValue").replace("{0}", this._context.parameters.LookupFieldMapped.raw!));
-				this._renderingInProgress = false;
-				this.showLoading(false);
+
+				this._context.utils.getEntityMetadata(this._recordToUpdate.EntityName, relationshipDetails?.ReferencedAttribute).then(emSubEntity => {
+					this._recordToUpdate.QuickCreateEnabled = emSubEntity.IsQuickCreateEnabled as boolean;	
+					// displaying message to warn user that lookup is empty
+					this.displayMessage(MessageBarType.info, _this._context.resources.getString("LookupFieldHasNoValue").replace("{0}", this._context.parameters.LookupFieldMapped.raw!));
+					this._renderingInProgress = false;
+					this.showLoading(false);
+				});
 			});
 		}
 	}
@@ -651,7 +653,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					// @ts-ignore
 					var rowTechName =  $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname.value;
 					// @ts-ignore
-					let isReadOnly =  $.parseXML(row).getElementsByTagName("control")[0].attributes.disabled.value === "true";
+					let isReadOnly =  $.parseXML(row).getElementsByTagName("control")[0].attributes.disabled?.value === "true";
 
 					// Checking if in the attributes metadata we find the current field
 					let fieldDetail = attributesDetail.filter(function(a: any){
