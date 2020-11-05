@@ -30,6 +30,7 @@ There are 4 parameters to customize the PCF.
 |QuickVIewFormId|Guid of the Quick View Form you want to use to display the fields|x|
 |LookupFieldMapped|This is the technical name of the lookup field used as reference - ex : *_primarycontactid_value* (for a contact from an account)|x|
 |UseTextFieldAsLookup|Give the ability to the control to dynamically load data based on the GUID put in the mapped field, skipping the value from the lookup except if the field value is empty|x|
+|NumberOfColumn|If you want to split the fields into several columns, just provide the number of columns you want.||
 
 ## Any Composite Fields
 ### Purpose
