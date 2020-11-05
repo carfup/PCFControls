@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="FileFieldTypeManager" version="0.0.23" display-name-key="Carfup.FileFieldTypeManager" description-key="FileFieldTypeManager description" control-type="standard">
+  <control namespace="Carfup" constructor="FileFieldTypeManager" version="0.0.24" display-name-key="Carfup.FileFieldTypeManager" description-key="FileFieldTypeManager description" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="FieldToAttachControl" display-name-key="FieldToAttachControl" description-key="Text Control to attach the PCF control" of-type="SingleLine.Text" usage="bound" required="true" />
