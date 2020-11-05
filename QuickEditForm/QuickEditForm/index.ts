@@ -13,7 +13,6 @@ import { IDropdownOption } from "@fluentui/react/lib/Dropdown";
 import { MessageBarType } from "@fluentui/react/lib/MessageBar";
 
 import { EntityReferenceInfo, DataFieldDefinition} from "./EntitiesDefinition";
-import { unwatchFile } from "fs";
 
 
 export class QuickEditForm implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -39,6 +38,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	private _forceRecordId : string;
 	private _relationShips : any;
 	private _columnNumber : number;
+	private _buttonLoaded : boolean = false;
 
 	private notifyOutputChanged: () => void;
 
@@ -64,9 +64,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		this._context = context; 
 		this.notifyOutputChanged = notifyOutputChanged;
 		this._context.mode.trackContainerResize(true);
-		
-		// Load params
-		this.getParams();
 
 		this._buttonsDiv = document.createElement("div");
 		this._messageDiv = document.createElement("div");
@@ -75,8 +72,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		container.appendChild(this._buttonsDiv);
 		container.appendChild(this._messageDiv);
 		container.appendChild(this._formDiv);
-
-		this.addButtons();
 
 		this._container = container;
 	}
@@ -96,6 +91,14 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		if(this._context.updatedProperties.includes("FieldToAttachControl")){
 			if(this._useTextFieldAsLookup)
 				this._forceRecordId = context.parameters.FieldToAttachControl.raw!;
+		}
+
+		// Load params
+		this.getParams();
+
+		if(this._parentRecordDetails.Id != null && !this._buttonLoaded){
+			this.addButtons();
+			this._buttonLoaded = true;
 		}
 
 		this.queryQuickViewFormData(this._quickViewFormId);
@@ -143,8 +146,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			},
 			() => {
 				console.log('Error when downloading loading.gif image.');
-			});
-		//console.log("addButtons : Rendering buttons ");
+		});
 	}
 
 	/**
@@ -168,7 +170,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		this._updateError = false;
 		
-
 		// checking if we have empty required fields
 		var emptyRequiredFields = this._dataFieldDefinitions.filter(function (dfd){
 			if(dfd.isRequired && (dfd.fieldValue == null || dfd.fieldValue === ""))
@@ -231,7 +232,10 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					}
 					break;
 				case 'date': // dateOnly
-					dataToUpdate[data.fieldName!] = data.fieldValue.format("yyyy-MM-dd");
+					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : (<any>_this.convertDate(data.fieldValue, "utc")).format("yyyy-MM-dd");
+					break;
+					case 'datetime': 
+					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this.convertDate(data.fieldValue, "utc");
 					break;
 				default:
 					dataToUpdate[data.fieldName!] = data.fieldValue
@@ -437,12 +441,14 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 				this._recordToUpdate.SchemaName = relationshipDetails?.ReferencingEntityNavigationPropertyName;
 				this._recordToUpdate.EntityName = relationshipDetails?.ReferencedEntity;
-				this._recordToUpdate.QuickCreateEnabled = em.IsQuickCreateEnabled as boolean;	
-				
-				// displaying message to warn user that lookup is empty
-				this.displayMessage(MessageBarType.info, _this._context.resources.getString("LookupFieldHasNoValue").replace("{0}", this._context.parameters.LookupFieldMapped.raw!));
-				this._renderingInProgress = false;
-				this.showLoading(false);
+
+				this._context.utils.getEntityMetadata(this._recordToUpdate.EntityName, relationshipDetails?.ReferencedAttribute).then(emSubEntity => {
+					this._recordToUpdate.QuickCreateEnabled = emSubEntity.IsQuickCreateEnabled as boolean;	
+					// displaying message to warn user that lookup is empty
+					this.displayMessage(MessageBarType.info, _this._context.resources.getString("LookupFieldHasNoValue").replace("{0}", this._context.parameters.LookupFieldMapped.raw!));
+					this._renderingInProgress = false;
+					this.showLoading(false);
+				});
 			});
 		}
 	}
@@ -490,7 +496,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		try
 		{
 			// Rendering is already in progress !
-			if(this._renderingInProgress)
+			if(this._renderingInProgress || this._parentRecordDetails.Id == null)
 				return;
 
 			this._renderingInProgress = true;
@@ -647,7 +653,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					// @ts-ignore
 					var rowTechName =  $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname.value;
 					// @ts-ignore
-					let isReadOnly =  $.parseXML(row).getElementsByTagName("control")[0].attributes.disabled.value === "true";
+					let isReadOnly =  $.parseXML(row).getElementsByTagName("control")[0].attributes.disabled?.value === "true";
 
 					// Checking if in the attributes metadata we find the current field
 					let fieldDetail = attributesDetail.filter(function(a: any){
@@ -678,7 +684,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		var type = fieldDetail.attributeDescriptor.Type;
 		var label = fieldDetail.DisplayName;
 
-		let isReadOnly = !fieldDetail.attributeDescriptor.IsValidForUpdate || this._isRecordReadOnly || fieldReadOnly;
+		let isReadOnly = !fieldDetail.attributeDescriptor.IsValidForUpdate || this._isRecordReadOnly || fieldReadOnly || this._context.mode.isControlDisabled;
 		let isRequired = fieldDetail.attributeDescriptor.RequiredLevel == 1 || fieldDetail.attributeDescriptor.RequiredLevel == 2;
 
 		// Grabing the proper datafieldDefinition
@@ -736,7 +742,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							fieldName : techFieldName,
 							fieldType : detailDateType,
 							controlId : controlId,
-							fieldValue : new Date(this._parentRecordDetails.Attributes[techFieldName]) ?? null
+							fieldValue : this._parentRecordDetails.Attributes[techFieldName] === null ? null : this.convertDate(new Date(this._parentRecordDetails.Attributes[techFieldName]), "local")
 						},
 						disabled : isReadOnly,
 						showTime : detailDateType == "datetime",
@@ -936,7 +942,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	*/
 	private generateImageSrcUrl(fileType: string, fileContent: string): string {
 		return "data:image/" + fileType + ";base64," + fileContent;
-	
 	}
 
 	/**
@@ -982,10 +987,40 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			return entityName+"s";
 	}
 
-	private isGuid(guid : string, field : string) {
-		var regexGuid = /^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/gi;
-    	if(regexGuid.test(guid)){
-			this.displayMessage(MessageBarType.error, `The guid for the parameter ${field} has an incorrect format.`);
+	/**
+	 * convert the date into local user timezone
+	 * @param value date to convert
+	 */
+	private convertDate(value: Date, convertTo: "utc" | "local") {
+		var offsetMinutes = this._context.userSettings.getTimeZoneOffsetMinutes(value);
+		var browserOffset = new Date().getTimezoneOffset();
+		var convert = convertTo;
+		// The offset returned is the Timezone offset minutes from UTC to Local
+		// E.g. Central Time (UTC-6) - getTimeZoneOffsetMinutes will return -360 minutes
+		// To get to a utc time we must add 360 (offset)
+		// To get to local we must add -360 (offset)
+		//offsetMinutes = offsetMinutes  * (convertTo == "local" ? 1 : -1);
+		
+		var localDate = this.addMinutes(value, offsetMinutes);
+
+		if(convertTo == "utc"){
+			let offsetMinutesMinusBrowser = -offsetMinutes - browserOffset;
+			localDate = this.addMinutes(value, offsetMinutesMinusBrowser);
+			return localDate;
 		}
+			
+		return this.getUtcDate(localDate);
+	  }
+	  private addMinutes(date: Date, minutes: number): Date {
+		return new Date(date.getTime() + minutes * 60000);
+	  }
+	  private getUtcDate(localDate: Date) {
+		return new Date(
+		  localDate.getUTCFullYear(),
+		  localDate.getUTCMonth(),
+		  localDate.getUTCDate(),
+		  localDate.getUTCHours(),
+		  localDate.getUTCMinutes(),
+		);
 	}
 }

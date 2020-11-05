@@ -33,7 +33,7 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
         super(props);
         this.state = {
             fieldDefinition: this.props.fieldDefinition,
-            type: props.icon === "Money" ? "number": "text",
+            type: props.icon === "NumberField" || props.icon === "Money" ? "number": "text",
         };
     }
 
@@ -46,7 +46,7 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
                 <Stack.Item grow={1} styles={{root : { alignItems: 'center'  }}}>
                     <TextField 
                         disabled={this.props.disabled!}
-                        value={this.grabValueFromFieldDefinition(this.state.fieldDefinition)} 
+                        value={this.grabValueFromFieldDefinition()} 
                         id={this.props.fieldDefinition.controlId} 
                         multiline={(this.props.fieldDefinition?.fieldType == "memo")}
                         autoAdjustHeight={(this.props.fieldDefinition?.fieldType == "memo")}
@@ -68,24 +68,29 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
         );
     }
 
-    private grabValueFromFieldDefinition = (fieldDef : DataFieldDefinition | undefined) : string => {
-        if(this.state.fieldDefinition?.fieldValue?.Name !== undefined)
-            return this.state.fieldDefinition?.fieldValue?.Name;
+    private grabValueFromFieldDefinition = () : string => {
+        let result = "";
+        if(this.state.fieldDefinition?.fieldValue?.Name != undefined) {
+            result = this.state.fieldDefinition?.fieldValue?.Name;
+        }
+        else {
+            result =  this.state.fieldDefinition?.fieldValue;
+        }
 
-        return this.state.fieldDefinition?.fieldValue;
+        return result;
     }
 
     private onDoubleClick = (event: React.MouseEvent<HTMLInputElement | HTMLTextAreaElement, MouseEvent>) : void => {
         
         switch(this.props.icon){
             case "EditMail":
-                this.props.context?.navigation.openUrl(`mailto:${this.grabValueFromFieldDefinition(this.state.fieldDefinition?.fieldValue)}`);
+                this.props.context?.navigation.openUrl(`mailto:${this.grabValueFromFieldDefinition()}`);
             break;
             case "Globe":
-                this.props.context?.navigation.openUrl(`${this.grabValueFromFieldDefinition(this.state.fieldDefinition?.fieldValue)}`);
+                this.props.context?.navigation.openUrl(`${this.grabValueFromFieldDefinition()}`);
             break;
             case "Phone":
-                this.props.context?.navigation.openUrl(`tel:${this.grabValueFromFieldDefinition(this.state.fieldDefinition?.fieldValue)}`);
+                this.props.context?.navigation.openUrl(`tel:${this.grabValueFromFieldDefinition()}`);
             break;
         }
     }

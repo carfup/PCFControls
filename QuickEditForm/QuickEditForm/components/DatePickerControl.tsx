@@ -157,18 +157,23 @@ export default class DatePickerControl extends React.Component<IDatePickerProper
   }
 
     private onSelectedDate = (date: Date | null | undefined) : void => {
-      let currentDateValue = this.state.fieldDefinition?.fieldValue as Date;
+      let currentDateValue = this.state.fieldDefinition?.fieldValue === null ? new Date() : this.state.fieldDefinition?.fieldValue as Date;
       const fieldDefTemp = {...this.state}.fieldDefinition;
       
       if(fieldDefTemp != undefined){
-        // @ts-ignore
-        currentDateValue.setYear(date?.getFullYear());
-        // @ts-ignore
-        currentDateValue.setMonth(date?.getMonth());
-        // @ts-ignore
-        currentDateValue.setDate(date?.getDate());
-        
-        fieldDefTemp["fieldValue"] = currentDateValue;
+        if(date === null){
+          fieldDefTemp["fieldValue"] = null;
+        }
+        else {
+          // @ts-ignore
+          currentDateValue.setYear(date?.getFullYear());
+          // @ts-ignore
+          currentDateValue.setMonth(date?.getMonth());
+          // @ts-ignore
+          currentDateValue.setDate(date?.getDate());
+          
+          fieldDefTemp["fieldValue"] = currentDateValue;
+        }
         fieldDefTemp["isDirty"] = true;
         this.setState({ fieldDefinition: fieldDefTemp });
 
@@ -179,6 +184,11 @@ export default class DatePickerControl extends React.Component<IDatePickerProper
     }
 
     private formatDate = function date2str(x: Date, y: string) {
+
+      if(x === null){
+        return undefined;
+      }
+
       var z = {
           M: x.getMonth() + 1,
           d: x.getDate(),
