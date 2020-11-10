@@ -41,7 +41,7 @@ export default class ToggleControl  extends React.Component<IToggleProps, IToggl
                         onChange={this.onChange}
                         role="checkbox"
                         disabled={this.props.disabled}
-                        style={{width:"100%"}}
+                        // style={{width:"100%"}}
                     />
                 </Stack.Item>
             </Stack>
