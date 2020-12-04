@@ -650,6 +650,13 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						continue;
 					}
 
+					//@ts-ignore
+					let isHidden = $.parseXML(row).getElementsByTagName("cell")[0].attributes?.visible?.value === "false";
+
+					if (isHidden) {
+						continue;
+					}
+
 					// @ts-ignore
 					var rowTechName =  $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname.value;
 					// @ts-ignore
