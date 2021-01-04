@@ -645,15 +645,11 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				for(j = numberOfRowPerColumn * k; j < nextColumnCount; j++)
 				{
 					let row = rows[j].outerHTML;
-					// @ts-ignore
-					if($.parseXML(row).getElementsByTagName("control").length == 0 || $.parseXML(row).getElementsByTagName("label").length == 0 || $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname == undefined || $.parseXML(row).getElementsByTagName("label")[0].attributes.description == undefined){
-						continue;
-					}
-
 					//@ts-ignore
 					let isHidden = $.parseXML(row).getElementsByTagName("cell")[0].attributes?.visible?.value === "false";
-
-					if (isHidden) {
+					
+					// @ts-ignore
+					if($.parseXML(row).getElementsByTagName("control").length == 0 || $.parseXML(row).getElementsByTagName("label").length == 0 || $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname == undefined || $.parseXML(row).getElementsByTagName("label")[0].attributes.description == undefined || isHidden){
 						continue;
 					}
 
