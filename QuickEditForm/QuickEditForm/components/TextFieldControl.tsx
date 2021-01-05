@@ -49,11 +49,11 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
                         value={this.grabValueFromFieldDefinition()} 
                         id={this.props.fieldDefinition.controlId} 
                         multiline={(this.props.fieldDefinition?.fieldType == "memo")}
-                        autoAdjustHeight={(this.props.fieldDefinition?.fieldType == "memo")}
                         type={this.state.type}
                         iconProps={{ iconName: this.props.icon }} 
                         onClick={this.onClick} 
                         style={{width:"100%"}}
+                        rows={(this.props.fieldDefinition?.fieldType == "memo" ? 4 : 1)}
                         onDoubleClick={this.onDoubleClick}
                         onChange={this.onChange}
                         onFocus={(event) => {

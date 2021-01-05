@@ -645,8 +645,11 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				for(j = numberOfRowPerColumn * k; j < nextColumnCount; j++)
 				{
 					let row = rows[j].outerHTML;
+					//@ts-ignore
+					let isHidden = $.parseXML(row).getElementsByTagName("cell")[0].attributes?.visible?.value === "false";
+					
 					// @ts-ignore
-					if($.parseXML(row).getElementsByTagName("control").length == 0 || $.parseXML(row).getElementsByTagName("label").length == 0 || $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname == undefined || $.parseXML(row).getElementsByTagName("label")[0].attributes.description == undefined){
+					if($.parseXML(row).getElementsByTagName("control").length == 0 || $.parseXML(row).getElementsByTagName("label").length == 0 || $.parseXML(row).getElementsByTagName("control")[0].attributes.datafieldname == undefined || $.parseXML(row).getElementsByTagName("label")[0].attributes.description == undefined || isHidden){
 						continue;
 					}
 
@@ -665,8 +668,15 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						fieldDetail = fieldDetail[0];
 					}
 
+					// @ts-ignore
+					var labelName =  $.parseXML(row).getElementsByTagName("label")[0].attributes.description?.value;
+
+					if(labelName == null){
+						labelName = fieldDetail.DisplayName;
+					}
+
 					// Generating the fields rendering
-					this.retrieveFieldOptions(fieldDetail, isReadOnly, subColumnDiv);	
+					this.retrieveFieldOptions(fieldDetail, isReadOnly, labelName, subColumnDiv);	
 				}
 			}
 		}
@@ -676,13 +686,13 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	 * Render the fields based on the metatada
 	 * @param fieldDetail field metadata
 	 */
-	private retrieveFieldOptions(fieldDetail: any, fieldReadOnly : boolean, divflex : HTMLDivElement){
+	private retrieveFieldOptions(fieldDetail: any, fieldReadOnly : boolean, labelName : string, divflex : HTMLDivElement){
 		let _this = this;
 		let item = document.createElement("div");
 		var techFieldName = fieldDetail.attributeDescriptor.LogicalName;
 		var controlId = "carfup_qef_"+techFieldName;
 		var type = fieldDetail.attributeDescriptor.Type;
-		var label = fieldDetail.DisplayName;
+		var label = labelName;
 
 		let isReadOnly = !fieldDetail.attributeDescriptor.IsValidForUpdate || this._isRecordReadOnly || fieldReadOnly || this._context.mode.isControlDisabled;
 		let isRequired = fieldDetail.attributeDescriptor.RequiredLevel == 1 || fieldDetail.attributeDescriptor.RequiredLevel == 2;
