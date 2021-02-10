@@ -71,7 +71,7 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 
 		if(!context.mode.isVisible){
 			container.setAttribute("visibility", "hidden");
-		}
+		} 
 
 		this.valueChanged(null);
 	}
@@ -88,6 +88,8 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 
 		if(context.mode.isControlDisabled){
 			this._valueElement.setAttribute("disabled", "disabled");
+		} else {
+			this._valueElement.removeAttribute("disabled");
 		}
 	}
 
