@@ -15,6 +15,7 @@ export interface ICompositeControlProps {
     randNumber: number;
     onClickedDone : (compositeValue? : CompositeValue) => void;
     context?: ComponentFramework.Context<IInputs>;
+    separator : string;
 }
 
 export interface IBCompositeControlState {
@@ -52,6 +53,8 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                     onClick={() => this.setState({ showCallout : true }) }
                     styles={textFieldStyles}
                     id={"acf_compositeFullValue"+this.props.randNumber}
+                    multiline={this.props.separator.indexOf("CRLF") > 0}
+                    autoAdjustHeight={true}
                 />
                 {this.state.showCallout && (
                     <Callout
