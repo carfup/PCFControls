@@ -83,14 +83,13 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 	 */
 	public updateView(context: ComponentFramework.Context<IInputs>): void
 	{
-		// Add code to update control view
-		this._valueElement.value = this._value;
-
 		if(context.mode.isControlDisabled){
 			this._valueElement.setAttribute("disabled", "disabled");
 		} else {
 			this._valueElement.removeAttribute("disabled");
 		}
+
+		this.valueChanged(null, true);
 	}
 
 	/** 
@@ -124,8 +123,8 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 		this._displayNotificationError = (context.parameters.DisplayNotificationError && context.parameters.DisplayNotificationError.raw && context.parameters.DisplayNotificationError.raw.toLowerCase() === "true") ? true : false;
 		this._displayNotificationErrorMessage = context.parameters.DisplayNotificationErrorMessage.raw!;
 		this._displayNotificationErrorUniqueId =  Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-		this._iconValid = this._context.parameters.IconValid == undefined ? "" : String(this._context.parameters.IconValid.raw);
-		this._iconInvalid = this._context.parameters.IconInvalid == undefined ? "" : String(this._context.parameters.IconInvalid.raw);
+		this._iconValid = this._context.parameters.IconValid.raw!;
+		this._iconInvalid = this._context.parameters.IconInvalid.raw!;
 	}
 
 	/**
@@ -156,13 +155,13 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 		}
 	}
 
-	private valueChanged(evt: Event | null):void
+	private valueChanged(evt: Event | null, updatedFromContext : boolean = false):void
 	{
-		this._value = this._valueElement.value.toUpperCase().replace(/[^0-9]/g, '');
+		this._value = updatedFromContext ? this._context.parameters.SirenValue.raw! : this._valueElement.value;
+		this._valueElement.value = this._valueElement.value.toUpperCase().replace(/[^0-9]/g, '');
 
-		var isValid = false;
 		if ( (this._value.length != 9) || (isNaN(parseInt(this._value))) ){
-			isValid = false;
+			this._isValid = false;
 		}
 		else {
 			var sum = 0;
@@ -181,10 +180,8 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 				sum += tmp;
 			}
 
-			isValid = (sum % 10) == 0;
+			this._isValid = (sum % 10) == 0;
 		}
-		
-		this._isValid = isValid;
 
 		if(this._value != ""){
 			this._valueValidationElement.removeAttribute("hidden");
@@ -199,9 +196,9 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 				}
 			}
 
-			var iconToDisplay = this._iconValid == "null" ||  this._iconValid == "" || this._iconValid == undefined ? "IconValid" : this._iconValid;
+			var iconToDisplay = this._iconValid ?? "IconValid";
 			if(!this._isValid){
-				iconToDisplay = this._iconValid == "null" ||  this._iconInvalid == "" || this._iconValid == undefined ? "IconInvalid" : this._iconInvalid;
+				iconToDisplay = this._iconInvalid ?? "IconInvalid";
 			} 
 
 			this.findAndSetImage(iconToDisplay);

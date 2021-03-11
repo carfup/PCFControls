@@ -157,9 +157,10 @@ export class SiretValidator implements ComponentFramework.StandardControl<IInput
 	}
 
 	private valueChanged(evt: Event | null, updatedFromContext : boolean = false):void
-	{	this._value = updatedFromContext ? this._context.parameters.SiretValue.raw! : this._valueElement.value;
+	{	
+		this._value = updatedFromContext ? this._context.parameters.SiretValue.raw! : this._valueElement.value;
 		this._valueElement.value = this._value.toUpperCase().replace(/[^0-9]/g, '');		
-		var isValid = false;
+
 		if ( (this._value.length != 14) || (isNaN(parseInt(this._value))) ){
 			this._isValid = false;
 		}
