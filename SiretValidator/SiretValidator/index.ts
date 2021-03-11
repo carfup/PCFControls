@@ -84,14 +84,13 @@ export class SiretValidator implements ComponentFramework.StandardControl<IInput
 	 */
 	public updateView(context: ComponentFramework.Context<IInputs>): void
 	{
-		// Add code to update control view
-		this._valueElement.value = this._value;
-
 		if(context.mode.isControlDisabled){
 			this._valueElement.setAttribute("disabled", "disabled");
 		} else {
 			this._valueElement.removeAttribute("disabled");
 		}
+
+		this.valueChanged(null, true);
 	}
 
 	/** 
@@ -125,8 +124,8 @@ export class SiretValidator implements ComponentFramework.StandardControl<IInput
 		this._displayNotificationError = (context.parameters.DisplayNotificationError && context.parameters.DisplayNotificationError.raw && context.parameters.DisplayNotificationError.raw.toLowerCase() === "true") ? true : false;
 		this._displayNotificationErrorMessage = context.parameters.DisplayNotificationErrorMessage.raw!;
 		this._displayNotificationErrorUniqueId =  Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-		this._iconValid = this._context.parameters.IconValid == undefined ? "" : String(this._context.parameters.IconValid.raw);
-		this._iconInvalid = this._context.parameters.IconInvalid == undefined ? "" : String(this._context.parameters.IconInvalid.raw);
+		this._iconValid = this._context.parameters.IconValid.raw!;
+		this._iconInvalid = this._context.parameters.IconInvalid.raw!;
 	}
 
 	/**
@@ -157,15 +156,12 @@ export class SiretValidator implements ComponentFramework.StandardControl<IInput
 		}
 	}
 
-	private valueChanged(evt: Event | null):void
-	{
-		this._value = this._valueElement.value;
-		this._value = this._valueElement.value.toUpperCase().replace(/[^0-9]/g, '');
-		this._valueElement.value = this._value;
-		
+	private valueChanged(evt: Event | null, updatedFromContext : boolean = false):void
+	{	this._value = updatedFromContext ? this._context.parameters.SiretValue.raw! : this._valueElement.value;
+		this._valueElement.value = this._value.toUpperCase().replace(/[^0-9]/g, '');		
 		var isValid = false;
 		if ( (this._value.length != 14) || (isNaN(parseInt(this._value))) ){
-			isValid = false;
+			this._isValid = false;
 		}
 		else {
 			// Donc le SIRET est un numérique à 14 chiffres
@@ -188,15 +184,8 @@ export class SiretValidator implements ComponentFramework.StandardControl<IInput
 				sum += tmp;
 			}
 
-			if ((sum % 10) == 0){
-				isValid = true; // Si la somme est un multiple de 10 alors le SIRET est valide 
-			}
-			else {
-				isValid = false;
-			}
+			this._isValid = (sum % 10) == 0; // Si la somme est un multiple de 10 alors le SIRET est valide 
 		}
-		
-		this._isValid = isValid;
 
 		if(this._value != ""){
 			this._valueValidationElement.removeAttribute("hidden");
@@ -210,10 +199,10 @@ export class SiretValidator implements ComponentFramework.StandardControl<IInput
 					this._context.utils.setNotification(this._displayNotificationErrorMessage,this._displayNotificationErrorUniqueId);
 				}
 			}
-	
-			var iconToDisplay = this._iconValid == "null" ||  this._iconValid == "" || this._iconValid == undefined ? "IconValid" : this._iconValid;
+
+			var iconToDisplay = this._iconValid ?? "IconValid";
 			if(!this._isValid){
-				iconToDisplay = this._iconValid == "null" ||  this._iconInvalid == "" || this._iconValid == undefined ? "IconInvalid" : this._iconInvalid;
+				iconToDisplay = this._iconInvalid ?? "IconInvalid";
 			} 
 			
 			this.findAndSetImage(iconToDisplay);
