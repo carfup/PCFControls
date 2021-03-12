@@ -554,8 +554,9 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		}
 		catch (e){
 			this._renderingInProgress = false;
+			const message = e.message === undefined ? e : e.message;
 			this.showLoading(false);
-			this.displayMessage(MessageBarType.error, `An error occured : ${e}`);
+			this.displayMessage(MessageBarType.error, `An error occured : ${message}`);
 		}
 		
 	}
@@ -740,6 +741,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, options.fieldDefinition);
 
 					ReactDOM.render(React.createElement(TextFieldControl, options), item);
+
 				break;
 			case 'datetime':
 					let detailDateType = fieldDetail.attributeDescriptor.Format;
