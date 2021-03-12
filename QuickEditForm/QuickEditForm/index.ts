@@ -556,7 +556,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			this._renderingInProgress = false;
 			const message = e.message === undefined ? e : e.message;
 			this.showLoading(false);
-			this.displayMessage(MessageBarType.error, `An error occured : ${message}`);
+			this.displayMessage(MessageBarType.blocked, `An error occured : ${message}`);
 		}
 		
 	}
