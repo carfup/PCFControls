@@ -231,10 +231,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						dataToUpdate[data.fieldSchemaName!+"@odata.bind"] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
 					}
 					break;
-				case 'date': // dateOnly
-					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : (<any>_this.convertDate(data.fieldValue, "utc")).format("yyyy-MM-dd");
-					break;
-					case 'datetime': 
+				case 'date': 
+				case 'datetime': 
 					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this.convertDate(data.fieldValue, "utc");
 					break;
 				default:
