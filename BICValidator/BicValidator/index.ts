@@ -76,11 +76,14 @@ export class BicValidator implements ComponentFramework.StandardControl<IInputs,
 	public updateView(context: ComponentFramework.Context<IInputs>): void
 	{
 		// Add code to update control view
-		this._valueElement.value = this._value;
 
 		if(context.mode.isControlDisabled){
 			this._valueElement.setAttribute("disabled", "disabled");
+		} else {
+			this._valueElement.removeAttribute("disabled");
 		}
+
+		this.valueChanged(null, true);
 	}
 
 	/** 
@@ -114,8 +117,8 @@ export class BicValidator implements ComponentFramework.StandardControl<IInputs,
 		this._displayNotificationError = (context.parameters.DisplayNotificationError && context.parameters.DisplayNotificationError.raw && context.parameters.DisplayNotificationError.raw.toLowerCase() === "true") ? true : false;
 		this._displayNotificationErrorMessage = context.parameters.DisplayNotificationErrorMessage.raw!;
 		this._displayNotificationErrorUniqueId =  Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-		this._iconValid = this._context.parameters.IconValid == undefined ? "" : String(this._context.parameters.IconValid.raw);
-		this._iconInvalid = this._context.parameters.IconInvalid == undefined ? "" : String(this._context.parameters.IconInvalid.raw);
+		this._iconValid = this._context.parameters.IconValid.raw!;
+		this._iconInvalid = this._context.parameters.IconInvalid.raw!;
 	}
 
 	/**
@@ -146,13 +149,11 @@ export class BicValidator implements ComponentFramework.StandardControl<IInputs,
 		}
 	}
 
-	private valueChanged(evt: Event | null):void
+	private valueChanged(evt: Event | null, updatedFromContext : boolean = false):void
 	{
-		this._value = this._valueElement.value;
+		this._value = updatedFromContext ? this._context.parameters.BICValue.raw! : this._valueElement.value;
 
-		var isValid = /^([A-Z]{6}[A-Z2-9][A-NP-Z1-9])(X{3}|[A-WY-Z0-9][A-Z0-9]{2})?$/.test( this._value.toUpperCase() );
-
-		this._isValid = isValid;
+		this._isValid = /^([A-Z]{6}[A-Z2-9][A-NP-Z1-9])(X{3}|[A-WY-Z0-9][A-Z0-9]{2})?$/.test( this._value.toUpperCase() );
 		
 		if(this._value != ""){
 			this._valueValidationElement.removeAttribute("hidden");
@@ -167,9 +168,9 @@ export class BicValidator implements ComponentFramework.StandardControl<IInputs,
 				}
 			}
 
-			var iconToDisplay = this._iconValid == "null" ||  this._iconValid == "" || this._iconValid == undefined ? "IconValid" : this._iconValid;
+			var iconToDisplay = this._iconValid == null ? "IconValid" : this._iconValid;
 			if(!this._isValid){
-				iconToDisplay = this._iconValid == "null" ||  this._iconInvalid == "" || this._iconValid == undefined ? "IconInvalid" : this._iconInvalid;
+				iconToDisplay = this._iconValid == null ? "IconInvalid" : this._iconInvalid;
 			} 
 
 			this.findAndSetImage(iconToDisplay);

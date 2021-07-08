@@ -231,10 +231,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						dataToUpdate[data.fieldSchemaName!+"@odata.bind"] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
 					}
 					break;
-				case 'date': // dateOnly
-					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : (<any>_this.convertDate(data.fieldValue, "utc")).format("yyyy-MM-dd");
-					break;
-					case 'datetime': 
+				case 'date': 
+				case 'datetime': 
 					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this.convertDate(data.fieldValue, "utc");
 					break;
 				default:
@@ -554,8 +552,9 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		}
 		catch (e){
 			this._renderingInProgress = false;
+			const message = e.message === undefined ? e : e.message;
 			this.showLoading(false);
-			this.displayMessage(MessageBarType.error, `An error occured : ${e}`);
+			this.displayMessage(MessageBarType.blocked, `An error occured : ${message}`);
 		}
 		
 	}
@@ -740,6 +739,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, options.fieldDefinition);
 
 					ReactDOM.render(React.createElement(TextFieldControl, options), item);
+
 				break;
 			case 'datetime':
 					let detailDateType = fieldDetail.attributeDescriptor.Format;

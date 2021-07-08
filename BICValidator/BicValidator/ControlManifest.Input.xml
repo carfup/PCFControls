@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="BicValidator" version="0.0.12" display-name-key="Carfup.BicValidator" description-key="BicValidator description" control-type="standard">
+  <control namespace="Carfup" constructor="BicValidator" version="0.1.13" display-name-key="Carfup.BicValidator" description-key="BicValidator description" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="BICValue" display-name-key="BICValidator_BICValue" description-key="BIC field value" of-type="SingleLine.Text" usage="bound" required="true" />
     <property name="IsValid" display-name-key="BICValidator_IsValid" description-key="Is BIC valid" of-type="TwoOptions" usage="bound" required="false" />
@@ -9,8 +9,8 @@
       <value name="false" display-name-key="False" description-key="false">false</value>
     </property>
     <property name="DisplayNotificationErrorMessage" display-name-key="DisplayNotificationErrorMessage" description-key="Message displayed in notification" of-type="SingleLine.Text" usage="input" required="false" default-value="The BIC value entered is incorrect" />
-    <property name="IconValid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" />
-    <property name="IconInvalid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="IconValid" display-name-key="Url to icon" description-key="Url to Valid icon" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="IconInvalid" display-name-key="Url to icon" description-key="Url to Invalid icon" of-type="SingleLine.Text" usage="input" required="false" />
     <resources>
       <code path="index.ts" order="1" />
       <css path="css/BicValidator.css" order="1" />
