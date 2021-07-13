@@ -396,7 +396,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 		this.showLoading(true);
 		let _this = this;
 
-	//	this._globalAttr = null;
+		this._globalAttr = null;
 		
 		// Creating the new instance here
 		this._recordToUpdate = new EntityReferenceInfo();

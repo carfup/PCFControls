@@ -39,6 +39,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	private _relationShips : any;
 	private _columnNumber : number;
 	private _buttonLoaded : boolean = false;
+	private _globalAttr: any;
 
 	private notifyOutputChanged: () => void;
 
@@ -205,40 +206,28 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			if(data.fieldValue?.EntityName != undefined)
 				entityNamePlural = _this.getEntityPluralName(data.fieldValue.EntityName);
 
-			switch(data.fieldType){
-				case 'customer':
-					if(data.fieldValue == ""){
-						lookupToClear.push(`${data.fieldName!}_${_this._recordToUpdate.EntityName}`);
-					}
-					else {
-						dataToUpdate[`${data.fieldName!}_${data.fieldValue.EntityName}@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
-					}
-					break;
-				case 'regarding':
-					if(data.fieldValue == ""){
-						lookupToClear.push(`${data.fieldName!}_${_this._parentRecordDetails.EntityName}_${_this._recordToUpdate.EntityName}`);
-					}
-					else {
-						dataToUpdate[`${data.fieldName!}_${data.fieldValue.EntityName}_${_this._recordToUpdate.EntityName}@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
-					}
-					break;
-				case 'owner':
-				case 'lookup':
-					if(data.fieldValue == ""){
-						lookupToClear.push(data.fieldName!);
-					}
-					else {
-						dataToUpdate[data.fieldSchemaName!+"@odata.bind"] =  `/${entityNamePlural}(${data.fieldValue.Id})`;
-					}
-					break;
-				case 'date': 
-				case 'datetime': 
-					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this.convertDate(data.fieldValue, "utc");
-					break;
-				default:
-					dataToUpdate[data.fieldName!] = data.fieldValue
-					break;
-			}
+				switch(data.fieldType){
+					case 'customer':
+					case 'regarding':
+					case 'owner':
+					case 'lookup':
+	
+						if(data.fieldValue == ""){
+							lookupToClear.push(`${data.fieldSchemaName}`);
+						}
+						else {
+							dataToUpdate[`${data.fieldSchemaName}@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`; 	
+						}
+						break;
+					
+					case 'date': 
+					case 'datetime': 
+						dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this.convertDate(data.fieldValue, "utc");
+						break;
+					default:
+						dataToUpdate[data.fieldName!] = data.fieldValue
+						break;
+				}
 		});
 
 		// Update the record if we have "normal" dirty fields
@@ -398,7 +387,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		this.showLoading(true);
 
-		this._parentRecordDetails.Attributes = null;
+		this._globalAttr = null;
 
 		let _this = this;
 		let lookupDetails = await this._context.webAPI.retrieveRecord(this._parentRecordDetails.EntityName, this._parentRecordDetails.Id, `?$select=${this._lookupMapped}`);
@@ -423,7 +412,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			// Getting the fields of the record
 			let attr = await _this._context.webAPI.retrieveRecord(_this._recordToUpdate.EntityName, _this._recordToUpdate.Id);
 			_this.isRecordReadOnly(attr["statecode"]);
-			_this._parentRecordDetails.Attributes = attr;
+			_this._globalAttr = attr;
 		}
 		// We display a message and get property for potential quick create button
 		else {
@@ -707,10 +696,19 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			case 'partylist':
 			case 'customer':
 			case 'lookup':
-					let schemaName = this._relationShips.filter(function(relation : any){
-						return relation._referencingAttribute == techFieldName;
+					// Getting the details around the "lookup" fields
+				let entityName = this._globalAttr["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"] == undefined ? fieldDetail.attributeDescriptor.EntityLogicalName : this._globalAttr["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"];		
+				let referencedEntity = type == "owner" ? "owner" : entityName;
+				let schemaName = this._relationShips.filter(function(relation : any){
+					return relation.ReferencingAttribute == techFieldName!
+				});
+
+				// If we have more than one result => Customer / Regarding fields we need to keep the one and only one
+				if(schemaName.length > 1){
+					schemaName = schemaName.filter(function(relation : any){
+						return relation.ReferencedEntity == referencedEntity
 					});
-					let entityName = this._parentRecordDetails.Attributes["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"] == undefined ? fieldDetail.attributeDescriptor.EntityLogicalName : this._parentRecordDetails.Attributes["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"];
+				}
 					let options = {
 						width : this._context.mode.allocatedWidth,
 						label : label,
@@ -723,8 +721,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							controlId : controlId,
 							fieldValue : {
 								EntityName : entityName,
-								Name : this._parentRecordDetails.Attributes[`_${techFieldName}_value@OData.Community.Display.V1.FormattedValue`] ?? "",
-								Id: this._parentRecordDetails.Attributes[`_${techFieldName}_value`] ?? ""
+								Name : this._globalAttr[`_${techFieldName}_value@OData.Community.Display.V1.FormattedValue`] ?? "",
+								Id: this._globalAttr[`_${techFieldName}_value`] ?? ""
 							}
 						},
 						targetEntities : fieldDetail.attributeDescriptor.Targets,
@@ -752,7 +750,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							fieldName : techFieldName,
 							fieldType : detailDateType,
 							controlId : controlId,
-							fieldValue : this._parentRecordDetails.Attributes[techFieldName] === null ? null : this.convertDate(new Date(this._parentRecordDetails.Attributes[techFieldName]), "local")
+							fieldValue : this._globalAttr[techFieldName] === null ? null : this.convertDate(new Date(this._globalAttr[techFieldName]), "local")
 						},
 						disabled : isReadOnly,
 						showTime : detailDateType == "datetime",
@@ -789,7 +787,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						fieldName : techFieldName,
 						fieldType : type,
 						controlId : controlId,
-						fieldValue : this._parentRecordDetails.Attributes[techFieldName] as number ?? null
+						fieldValue : this._globalAttr[techFieldName] as number ?? null
 					},
 					disabled : isReadOnly,
 					label : label,
@@ -818,7 +816,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							fieldName : techFieldName,
 							fieldType : type,
 							controlId : controlId,
-							fieldValue : this._parentRecordDetails.Attributes[techFieldName] ?? ""
+							fieldValue : this._globalAttr[techFieldName] ?? ""
 						},
 						disabled : isReadOnly,
 						icon : type === "money" ? "Money" : "NumberField",
@@ -849,7 +847,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						fieldName : techFieldName,
 						fieldType : type,
 						controlId : controlId,
-						fieldValue : this._parentRecordDetails.Attributes[techFieldName] ?? ""
+						fieldValue : this._globalAttr[techFieldName] ?? ""
 					},
 					options: fieldDetail.attributeDescriptor.OptionSet,
 					onChangeResult : (dataFieldDefinition?: DataFieldDefinition) => {
@@ -880,7 +878,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							fieldName : techFieldName,
 							fieldType : type,
 							controlId : controlId,
-							fieldValue : this._parentRecordDetails.Attributes[techFieldName] ?? ""
+							fieldValue : this._globalAttr[techFieldName] ?? ""
 						},
 						maxLength: fieldDetail.attributeDescriptor.MaxLength,
 						icon : icon,
