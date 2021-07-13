@@ -105,13 +105,13 @@ export default class TextFieldControl extends React.Component<ITextFieldControlP
             else {
                 let id = this.props.fieldDefinition.fieldValue.Id.replace('{', '').replace('}','');
                 fieldVal = {
-                    Name : newValue ? newValue : "",
+                    Name : newValue,
                     Id : id,
                     EntityName : this.props.fieldDefinition.fieldValue.EntityName
                 };
             }
         } else {
-            fieldVal =  newValue ? newValue : "";
+            fieldVal =  newValue != "" ? newValue : null;
         }
 
         const fieldDefTemp = {...this.state}.fieldDefinition;

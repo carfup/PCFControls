@@ -823,7 +823,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						onClickResult : (fieldDefinition?: DataFieldDefinition) => {
 							if(dataFieldDefinitionsDetails != undefined && fieldDefinition != undefined){
 								dataFieldDefinitionsDetails.isDirty = true;
-								dataFieldDefinitionsDetails.fieldValue = Number(fieldDefinition.fieldValue);
+								dataFieldDefinitionsDetails.fieldValue = fieldDefinition.fieldValue != null ? Number(fieldDefinition.fieldValue) : null;
 
 								this._dataFieldDefinitions[this._dataFieldDefinitions.indexOf(dataFieldDefinitionsDetails)] = dataFieldDefinitionsDetails;
 
