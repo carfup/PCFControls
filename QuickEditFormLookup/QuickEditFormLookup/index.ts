@@ -13,6 +13,8 @@ import { IDropdownOption } from "@fluentui/react/lib/Dropdown";
 import { MessageBarType } from "@fluentui/react/lib/MessageBar";
 
 import { EntityReferenceInfo, DataFieldDefinition} from "./EntitiesDefinition";
+import { CommandBarButton } from "@fluentui/react/lib/Button";
+import { SharedLogicClass } from "./SharedLogicClass";
 
 
 export class QuickEditFormLookup implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -27,7 +29,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 	private _recordToUpdate : EntityReferenceInfo;
 	private _dataFieldDefinitions : DataFieldDefinition[];
 	private _messageComponent? : any;
-	private _buttonsComponnent? : any;
+	private _buttonsComponent? : any;
 	private _clientUrl : string;
 	private _updateError : boolean;
 	private _renderingInProgress : boolean;
@@ -39,7 +41,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 	private _lookupField : ComponentFramework.LookupValue[];
 	private _globalAttr: any;
 	private notifyOutputChanged: () => void;
-
+	private _slc : SharedLogicClass;
 	/**
 	 * Empty constructor.
 	 */
@@ -72,6 +74,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 		container.appendChild(this._formDiv);
 
 		this._container = container;
+		this._slc = new SharedLogicClass(this._context.userSettings);
 	}
 
 
@@ -131,12 +134,12 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 					onClickedRefresh : () => { this.refreshQEF() },
 					onClickedSave : () => { this.saveQEF() },
 					disabled : true,
-					loadingImage : this.generateImageSrcUrl("gif", data),
+					loadingImage : this._slc.generateImageSrcUrl("gif", data),
 					isLoadingVisible : "visible",
 					saveLabel : this._context.resources.getString("SaveButtonLabel"),
 					refreshLabel : this._context.resources.getString("RefreshButtonLabel")
 				};
-				_this._buttonsComponnent = ReactDOM.render(React.createElement(ButtonControl, options), this._buttonsDiv);
+				_this._buttonsComponent = ReactDOM.render(React.createElement(ButtonControl, options), this._buttonsDiv);
 			},
 			() => {
 				console.log('Error when downloading loading.gif image.');
@@ -150,7 +153,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 		this.unmountComponents();
 
 		//disabling save button
-		this._buttonsComponnent.setState({disabled : true});
+		this._buttonsComponent.setState({disabled : true});
 
 		this.queryQuickViewFormData(this._quickViewFormId);
 	}
@@ -172,7 +175,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 
 		if(emptyRequiredFields.length > 0){
 			_this.displayMessage(MessageBarType.error, _this._context.resources.getString("EmptyRequiredFields"));
-			this._buttonsComponnent.setState({disabled : true});
+			this._buttonsComponent.setState({disabled : true});
 			return;
 		}
 
@@ -208,7 +211,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 				
 
 			if(data.fieldValue?.EntityName != undefined)
-				entityNamePlural = _this.getEntityPluralName(data.fieldValue.EntityName);
+				entityNamePlural = _this._slc.getEntityPluralName(data.fieldValue.EntityName);
 
 			switch(data.fieldType){
 				case 'customer':
@@ -226,7 +229,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 				
 				case 'date': 
 				case 'datetime': 
-					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this.convertDate(data.fieldValue, "utc");
+					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this._slc.convertDate(data.fieldValue, "utc");
 					break;
 				default:
 					dataToUpdate[data.fieldName!] = data.fieldValue
@@ -258,7 +261,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 		_this.showLoading(false);
 
 		// disabling the save button until next change
-		this._buttonsComponnent.setState({disabled : true});
+		this._buttonsComponent.setState({disabled : true});
 
 		//If primaryName was updated, push the notifyOutput
 		if(primaryNameUpdate) 
@@ -277,7 +280,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 
 			//below line is used to delete the entity record  
 			let singularEntity = _this._recordToUpdate.EntityName;
-			let pluralEntity = _this.getEntityPluralName(singularEntity);
+			let pluralEntity = _this._slc.getEntityPluralName(singularEntity);
 
 			let url = `${_this._clientUrl}/api/data/v9.0/${pluralEntity}(${_this._recordToUpdate.Id})/${lookup}/$ref`;
 			xhr.open("DELETE", url, false);
@@ -355,7 +358,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 
 					let savedRecord = data.savedEntityReference[0];
 					let dataToUpdate : any = {};
-					dataToUpdate[_this._recordToUpdate.SchemaName!+"@odata.bind"] =  `/${_this.getEntityPluralName(savedRecord.entityType)}(${savedRecord.id.slice(1,-1)})`;
+					dataToUpdate[_this._recordToUpdate.SchemaName!+"@odata.bind"] =  `/${_this._slc.getEntityPluralName(savedRecord.entityType)}(${savedRecord.id.slice(1,-1)})`;
 					_this._context.webAPI.updateRecord(_this._parentRecordDetails.EntityName, _this._parentRecordDetails.Id, dataToUpdate).then(
 						function success(result){
 							console.log(result);
@@ -680,14 +683,11 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 		var type = fieldDetail.attributeDescriptor.Type;
 		var label = labelName;
 
-		if(this._globalAttr == null || this._globalAttr == undefined)
-			console.log("this._globalAttr = null; RESET");
-
 		let isReadOnly = !fieldDetail.attributeDescriptor.IsValidForUpdate || this._isRecordReadOnly || fieldReadOnly || this._context.mode.isControlDisabled;
 		let isRequired = fieldDetail.attributeDescriptor.RequiredLevel == 1 || fieldDetail.attributeDescriptor.RequiredLevel == 2;
 
 		// Grabing the proper datafieldDefinition
-		let dataFieldDefinitionsDetails = this.getDataFieldDefinition(techFieldName);
+		let dataFieldDefinitionsDetails = this._slc.getDataFieldDefinition(techFieldName, this._dataFieldDefinitions);
 		if(dataFieldDefinitionsDetails === undefined) return;
 
 		// Calling the proper React component based on the type
@@ -737,7 +737,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 					}
 				}
 
-				dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, options.fieldDefinition);
+				dataFieldDefinitionsDetails = this._slc.completeDataDefinition(dataFieldDefinitionsDetails, options.fieldDefinition);
 
 				ReactDOM.render(React.createElement(TextFieldControl, options), item);
 
@@ -753,7 +753,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 							fieldName : techFieldName,
 							fieldType : detailDateType,
 							controlId : controlId,
-							fieldValue : this._globalAttr[techFieldName] === null ? null : this.convertDate(new Date(this._globalAttr[techFieldName]), "local")
+							fieldValue : this._globalAttr[techFieldName] === null ? null : this._slc.convertDate(new Date(this._globalAttr[techFieldName]), "local")
 						},
 						disabled : isReadOnly,
 						showTime : detailDateType == "datetime",
@@ -768,7 +768,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 						}
 					};
 
-					dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, dpOptions.fieldDefinition);
+					dataFieldDefinitionsDetails = this._slc.completeDataDefinition(dataFieldDefinitionsDetails, dpOptions.fieldDefinition);
 
 					ReactDOM.render(React.createElement(DatePickerControl, dpOptions), item);
 				break;
@@ -802,7 +802,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 					
 				};
 
-				dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, ddOptions.fieldDefinition);
+				dataFieldDefinitionsDetails = this._slc.completeDataDefinition(dataFieldDefinitionsDetails, ddOptions.fieldDefinition);
 
 				ReactDOM.render(React.createElement(FilteredOptionsetControl, ddOptions), item);
 				break;
@@ -830,11 +830,11 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 
 								this._dataFieldDefinitions[this._dataFieldDefinitions.indexOf(dataFieldDefinitionsDetails)] = dataFieldDefinitionsDetails;
 
-								_this._buttonsComponnent.setState({disabled : false});
+								_this._buttonsComponent.setState({disabled : false});
 							}							
 						}
 					};
-					dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, moneyOptions.fieldDefinition);
+					dataFieldDefinitionsDetails = this._slc.completeDataDefinition(dataFieldDefinitionsDetails, moneyOptions.fieldDefinition);
 
 					ReactDOM.render(React.createElement(TextFieldControl, moneyOptions), item);
 				break;
@@ -858,7 +858,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 					}
 				};
 
-				dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, toggleOptions.fieldDefinition);
+				dataFieldDefinitionsDetails = this._slc.completeDataDefinition(dataFieldDefinitionsDetails, toggleOptions.fieldDefinition);
 
 				ReactDOM.render(React.createElement(ToggleControl, toggleOptions), item);
 				break;
@@ -891,7 +891,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 						}
 					}
 
-					dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, optionsText.fieldDefinition);
+					dataFieldDefinitionsDetails = this._slc.completeDataDefinition(dataFieldDefinitionsDetails, optionsText.fieldDefinition);
 
 					ReactDOM.render(React.createElement(TextFieldControl, optionsText), item);
 				break;
@@ -910,49 +910,8 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 			let index = this._dataFieldDefinitions.findIndex(x => x.fieldName == dfdChange.fieldName);
 
 			this._dataFieldDefinitions[index] = dfdChange;
-			this._buttonsComponnent.setState({disabled : false});
+			this._buttonsComponent.setState({disabled : false});
 		}	
-	}
-
-	/**
-	 * Complete the DataFieldDefinition which hold only the technical name by default
-	 * @param dfd datafielddefinition to complete
-	 * @param details details to be used to complete the exisitng DataFieldDefinition
-	 */
-	private completeDataDefinition(dfd : DataFieldDefinition, details : any): DataFieldDefinition{
-		dfd.controlId = details.controlId;
-		dfd.fieldType = details.fieldType;
-		dfd.fieldValue = details.fieldValue;
-		dfd.isDirty = false;
-		dfd.fieldName = details.fieldName;
-		dfd.isRequired = details.isRequired;
-		dfd.fieldSchemaName = details.schemaName;
-
-		return dfd;
-	}
-
-	/**
-	 * Retrieve the Data Field Definition of a field
-	 * @param fieldName field technical name
-	 */
-	private getDataFieldDefinition(fieldName : string) : DataFieldDefinition | undefined {
-		let dataFieldDefinitionsDetails = this._dataFieldDefinitions.filter(function(dfd : DataFieldDefinition){
-			return dfd.fieldName == fieldName
-		});
-
-		if(dataFieldDefinitionsDetails === undefined || dataFieldDefinitionsDetails.length === 0)
-		return;
-
-		return dataFieldDefinitionsDetails[0];
-	}
-
-	/**
- 	* return the full base64 code of an image
-	* @param filetype Name of the image extension
-	* @param fileContent Base64 image content
-	*/
-	private generateImageSrcUrl(fileType: string, fileContent: string): string {
-		return "data:image/" + fileType + ";base64," + fileContent;
 	}
 
 	/**
@@ -961,7 +920,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 	 */
 	private showLoading(show : boolean){
 		let visibility = show ? "visible" : "hidden";
-		this._buttonsComponnent?.setState({isLoadingVisible : visibility});
+		this._buttonsComponent?.setState({isLoadingVisible : visibility});
 		//console.log("isLoadingVisible : "+show);
 	}
 
@@ -983,55 +942,5 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 		if(this._isRecordReadOnly){
 			this.displayMessage(MessageBarType.warning, this._context.resources.getString("ReadOnlyRecordMessage"));
 		}
-	}
-
-	/**
-	 * Return entityname in plural version
-	 * @param entityName entity to retrieve in plural version
-	 */
-	private getEntityPluralName(entityName : string) : string{
-		if(entityName.endsWith("s"))
-			return entityName+"es";
-		else if(entityName.endsWith("y"))
-			return entityName.slice(0, entityName.length-1)+"ies";
-		else
-			return entityName+"s";
-	}
-
-	/**
-	 * convert the date into local user timezone
-	 * @param value date to convert
-	 */
-	private convertDate(value: Date, convertTo: "utc" | "local") {
-		var offsetMinutes = this._context.userSettings.getTimeZoneOffsetMinutes(value);
-		var browserOffset = new Date().getTimezoneOffset();
-		var convert = convertTo;
-		// The offset returned is the Timezone offset minutes from UTC to Local
-		// E.g. Central Time (UTC-6) - getTimeZoneOffsetMinutes will return -360 minutes
-		// To get to a utc time we must add 360 (offset)
-		// To get to local we must add -360 (offset)
-		//offsetMinutes = offsetMinutes  * (convertTo == "local" ? 1 : -1);
-		
-		var localDate = this.addMinutes(value, offsetMinutes);
-
-		if(convertTo == "utc"){
-			let offsetMinutesMinusBrowser = -offsetMinutes - browserOffset;
-			localDate = this.addMinutes(value, offsetMinutesMinusBrowser);
-			return localDate;
-		}
-			
-		return this.getUtcDate(localDate);
-	  }
-	  private addMinutes(date: Date, minutes: number): Date {
-		return new Date(date.getTime() + minutes * 60000);
-	  }
-	  private getUtcDate(localDate: Date) {
-		return new Date(
-		  localDate.getUTCFullYear(),
-		  localDate.getUTCMonth(),
-		  localDate.getUTCDate(),
-		  localDate.getUTCHours(),
-		  localDate.getUTCMinutes(),
-		);
 	}
 }
