@@ -45,6 +45,7 @@
     <ProjectReference Include="..\SiretValidator\SiretValidator.pcfproj" />
     <ProjectReference Include="..\BICValidator\BICValidator.pcfproj" />
     <ProjectReference Include="..\QuickEditForm\QuickEditForm.pcfproj" />
+    <ProjectReference Include="..\QuickEditFormLookup\QuickEditFormLookup.pcfproj" />
     <ProjectReference Include="..\AnyCompositeFields\AnyCompositeFields.pcfproj" />
   </ItemGroup>
 
