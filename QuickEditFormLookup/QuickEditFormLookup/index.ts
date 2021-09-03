@@ -86,7 +86,9 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 	{
 		// Add code to update control view
 		if((this._context.updatedProperties.length === 1 && this._context.updatedProperties[0] === "layout")
-		|| this._context.updatedProperties.indexOf("LookupField") >= 0){
+	//	|| this._context.updatedProperties.indexOf("LookupField") >= 0
+		)
+		{
 			return;
 		}
 
