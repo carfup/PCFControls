@@ -9,8 +9,8 @@
       <value name="false" display-name-key="False" description-key="false">false</value>
     </property>
     <property name="DisplayNotificationErrorMessage" display-name-key="DisplayNotificationErrorMessage" description-key="Message displayed in notification" of-type="SingleLine.Text" usage="input" required="false" default-value="The BIC value entered is incorrect" />
-    <property name="IconValid" display-name-key="Url to icon" description-key="Url to Valid icon" of-type="SingleLine.Text" usage="input" required="false" />
-    <property name="IconInvalid" display-name-key="Url to icon" description-key="Url to Invalid icon" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="IconValid" display-name-key="Url to Valid icon" description-key="Url to Valid icon" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="IconInvalid" display-name-key="Url to Invalid icon" description-key="Url to Invalid icon" of-type="SingleLine.Text" usage="input" required="false" />
     <resources>
       <code path="index.ts" order="1" />
       <css path="css/BicValidator.css" order="1" />
