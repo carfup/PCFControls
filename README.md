@@ -9,6 +9,7 @@
 [Get the latest solution here](https://github.com/carfup/PCFControls/releases)
 
 ## Quick Edit Form
+**Available to be bind on a text field or a Lookup field direct !**
 ### Purpose
 We all know the Quick View Form which allow you to display data related to a lookup field.
 However, it's just display and you have to open the lookup record in order to edit some data.
@@ -26,10 +27,10 @@ There are 4 parameters to customize the PCF.
 
 |Parameter|Description|Required|
 |:---------|:-----------|:----:|
-|FieldToAttachControl|Field to attach the control|x|
+|FieldToAttachControl|Field to attach the control|x (only for text field binding)|
 |QuickVIewFormId|Guid of the Quick View Form you want to use to display the fields|x|
-|LookupFieldMapped|This is the technical name of the lookup field used as reference - ex : *_primarycontactid_value* (for a contact from an account)|x|
-|UseTextFieldAsLookup|Give the ability to the control to dynamically load data based on the GUID put in the mapped field, skipping the value from the lookup except if the field value is empty|x|
+|LookupFieldMapped|This is the technical name of the lookup field used as reference - ex : *_primarycontactid_value* (for a contact from an account)|x (only for text field binding)|
+|UseTextFieldAsLookup|Give the ability to the control to dynamically load data based on the GUID put in the mapped field, skipping the value from the lookup except if the field value is empty|x  (only for text field binding)|
 |NumberOfColumn|If you want to split the fields into several columns, just provide the number of columns you want.||
 
 ## Any Composite Fields
@@ -44,6 +45,12 @@ You can attached up to 8 fields (the order of mapped fields is used for the rend
 ### Capabilities
 If the field holder is locked, then all fields mapped with the control will be rendered as "Read Only" mode.
 You can also lock field by field, the control will retrieve the field definition from the form and render the specific field as "Read only" mode while the others will be editable.
+
+Ability to format the final rendering using space for new line as separator. (%20 = space, CRLF = new line)
+*Example* : field|%20|field|CRLF|field|CRLF|field|%20|field wil render
+Field1 Field2
+Field3
+Field4 Field5
 
 ### Configuration
 There are 11 parameters to customize the PCF (with 5 mandatory).
