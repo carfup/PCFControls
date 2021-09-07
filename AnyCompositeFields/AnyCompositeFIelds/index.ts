@@ -11,6 +11,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 	private notifyOutputChanged: () => void;
 	private _controlDiv : HTMLDivElement;
 	private _compositeComponent? : any;
+	private _formXML : string = "";
 
 	// Field properties
 	private _compositeValue : CompositeValue;
@@ -49,7 +50,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 			container.setAttribute("visibility", "hidden");
 		}
 
-		this.buildControl(true);
+		this.buildControl();
 	}
 
 
@@ -61,7 +62,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 	{
 		// Add code to update control view
 		this.getParams();
-		this.buildControl(false);
+		this.buildControl();
 	}
 
 	/** 
@@ -99,15 +100,16 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 		ReactDOM.unmountComponentAtNode(this._container);
 	}
 
-	private async buildControl(getFormXml: boolean){
+	private async buildControl(){
 		var _this = this;
-		if(getFormXml){
+		if(this._formXML === ""){
 			// @ts-ignore
 			var formGuid = this._context.factory._customControlProperties.personalizationConfiguration.formGuid.guid;
 
 			await this._context.webAPI.retrieveRecord("systemform", formGuid, "?$select=formxml,objecttypecode").then(
 				function success(form) {
-					_this.extractFieldsFromQVF(form.formxml);
+					_this._formXML = form.formxml;
+					_this.extractFieldsFromQVF();
 				}
 			);
 
@@ -116,6 +118,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 				doneLabel : this._context.resources.getString("Done"),
 				disabled : this._context.mode.isControlDisabled,
 				visible : this._context.mode.isVisible,
+				separator : this._context.parameters.separator.raw!,
 				randNumber : Math.floor(Math.random()*(100-1+1)+1),
 				onClickedDone : (compositeValue? : CompositeValue) => {
 					this._compositeValue = compositeValue!;
@@ -123,9 +126,10 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 				}
 			}
 
-			this._compositeComponent = ReactDOM.render(React.createElement(CompositeControl, optionsText), this._controlDiv);
+			ReactDOM.render(React.createElement(CompositeControl, optionsText), this._controlDiv);
 		} 
 		else {
+			_this.extractFieldsFromQVF();
 			this._compositeComponent.setState({compositeValue : this._compositeValue, disabled : this._context.mode.isControlDisabled, visible : this._context.mode.isVisible});
 		}
 	}
@@ -143,28 +147,68 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 		this._compositeValue.fieldValue6 = this._context.parameters.field6;
 		this._compositeValue.fieldValue7 = this._context.parameters.field7;
 		this._compositeValue.fieldValue8 = this._context.parameters.field8;
-		this._compositeValue.separator = this._context.parameters.separator.raw! === "%20" ? " " : this._context.parameters.separator.raw!;
+		this._compositeValue.separator = this.getSeparator(this._context.parameters.separator.raw);
 		this._compositeValue.returnCompositeValue = (this._context.parameters.returnCompositeValue && this._context.parameters.returnCompositeValue.raw && this._context.parameters.returnCompositeValue.raw.toLowerCase() === "true") ? true : false;
 		this.buildFullValue();
 	}
 
-	private buildFullValue(): void {
-		let arrayValues = [];
+	private getSeparator(input: string | null): string {
 		
-		for(let i = 1 ; i<9; i++){
-			// @ts-ignore
-			if(this._compositeValue["fieldValue"+i]!.raw!){
-				// @ts-ignore
-				arrayValues.push(this._compositeValue["fieldValue"+i].raw);
-			}
+		switch(input){
+			case "%20" : return " ";
+			case "CRLF" : return "\r"
+			default: return input!
 		}
-
-        this._compositeValue.fullValue = arrayValues.join(this._compositeValue.separator);	
 	}
 
-	private extractFieldsFromQVF(formXml : string): void{
+	private buildFullValue(): void {
+		let arrayValues = [];
+		let fieldCount = 1;
+		let splitValue = this.getSeparator(this._context.parameters.separator.raw).split("|");
+		let finalValue = "";
+		
+		if(splitValue.length > 1){
+			for(let i = 0 ; i< splitValue.length; i++){
+				// @ts-ignore
+				if(this._compositeValue["fieldValue"+fieldCount]!.raw! && splitValue[i] === "field"){
+					// @ts-ignore
+					arrayValues.push(this._compositeValue["fieldValue"+fieldCount].raw);
+					// @ts-ignore
+					finalValue += this._compositeValue["fieldValue"+fieldCount].raw;
+					fieldCount++;
+				}
+				else {
+					let separator = splitValue[i];
+					switch(separator){
+						case "%20" : separator =  " "; break;
+						case "CRLF" : separator =  "\r"; break;
+					}
+					arrayValues.push(this.getSeparator(splitValue[i]));
+					finalValue += separator;
+				}
+			}
+		}
+		else {
+			for(let i = 1 ; i<9; i++){
+				// @ts-ignore
+				if(this._compositeValue["fieldValue"+i]!.raw!){
+					// @ts-ignore
+					arrayValues.push(this._compositeValue["fieldValue"+i].raw);
+				}
+			}
 
-		let xml = $.parseXML(formXml);
+			finalValue = arrayValues.join(splitValue[0]);
+		}
+
+
+		
+
+        this._compositeValue.fullValue = finalValue;	
+	}
+
+	private extractFieldsFromQVF(): void{
+
+		let xml = $.parseXML(this._formXML);
 		let xmlDetails = $(xml);
 		for(let i = 1 ; i<9; i++){
 			// @ts-ignore

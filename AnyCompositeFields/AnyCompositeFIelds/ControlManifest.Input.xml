@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="AnyCompositeFIelds" version="0.0.78" display-name-key="Carfup.AnyCompositeFIelds" description-key="AnyCompositeFIelds will allow  you to display any stack of fields as composite rendering." control-type="standard" preview-image="img/preview.png">
+  <control namespace="Carfup" constructor="AnyCompositeFIelds" version="0.0.82" display-name-key="Carfup.AnyCompositeFIelds" description-key="AnyCompositeFIelds will allow  you to display any stack of fields as composite rendering." control-type="standard" preview-image="img/preview.png">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="FieldToAttachControl" display-name-key="FieldToAttachControl" description-key="Field to attach the control to" of-type-group="strings" usage="bound" required="true" />
-    <property name="separator" display-name-key="Values separator" description-key="Separator to split the mapped values (for a space, put %20)" of-type="SingleLine.Text" usage="input" required="true" default-value="%20" />
+    <property name="separator" display-name-key="Values separator" description-key="Separator to format the mapped values (for a space, put %20, for jump line, put CLRF)\rYou can also define a complex format using the following : field|CLRF|field|,|field|%20" of-type="SingleLine.Text" usage="input" required="true" default-value="%20" />
     <property name="returnCompositeValue" display-name-key="Return the composite value ?" description-key="Do you want to retrieve the composite value ?" of-type="Enum" usage="input" required="true" default-value="true">
       <value name="true" display-name-key="True" description-key="true">true</value>
       <value name="false" display-name-key="False" description-key="false">false</value>
@@ -20,6 +20,8 @@
       <type>SingleLine.Email</type>
       <type>SingleLine.Text</type>
       <type>SingleLine.Phone</type>
+      <type>SingleLine.TextArea</type>
+      <type>Multiple</type>
     </type-group>
     <!-- 
       Property node's of-type attribute can be of-type-group attribute. 

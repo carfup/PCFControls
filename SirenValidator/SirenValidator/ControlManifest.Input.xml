@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="SirenValidator" version="0.0.19" display-name-key="Carfup.SirenValidator" description-key="Siren Validator for PCF" control-type="standard">
+  <control namespace="Carfup" constructor="SirenValidator" version="0.1.20" display-name-key="Carfup.SirenValidator" description-key="Siren Validator for PCF" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="SirenValue" display-name-key="SirenValidator_SirenValue" description-key="Siren field value" of-type="SingleLine.Text" usage="bound" required="true" />
     <property name="IsValid" display-name-key="SiretValidator_IsValid" description-key="Is Siret valid" of-type="TwoOptions" usage="bound" required="false" />
@@ -9,8 +9,8 @@
       <value name="false" display-name-key="False" description-key="false">false</value>
     </property>
     <property name="DisplayNotificationErrorMessage" display-name-key="DisplayNotificationErrorMessage" description-key="Message displayed in notification" of-type="SingleLine.Text" usage="input" required="false" default-value="The IBAN value entered is incorrect" />
-    <property name="IconValid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" />
-    <property name="IconInvalid" display-name-key="Url to icon" description-key="Url to icon" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="IconValid" display-name-key="Url to Valid icon" description-key="Url to Valid icon" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="IconInvalid" display-name-key="Url to Invalid icon" description-key="Url to Invalid icon" of-type="SingleLine.Text" usage="input" required="false" />
     <!-- 
       Property node's of-type attribute can be of-type-group attribute. 
       Example:

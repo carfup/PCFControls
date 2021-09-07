@@ -13,13 +13,14 @@ import { IDropdownOption } from "@fluentui/react/lib/Dropdown";
 import { MessageBarType } from "@fluentui/react/lib/MessageBar";
 
 import { EntityReferenceInfo, DataFieldDefinition} from "./EntitiesDefinition";
+import { CommandBarButton } from "@fluentui/react/lib/Button";
+import { SharedLogicClass } from "./SharedLogicClass";
 
 
-export class QuickEditForm implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class QuickEditFormLookup implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
 	private _context: ComponentFramework.Context<IInputs>;
 	private _quickViewFormId : string;
-	private _lookupMapped : string;
 	private _container: HTMLDivElement;
 	private _buttonsDiv: HTMLDivElement;
 	private _messageDiv: HTMLDivElement;
@@ -28,21 +29,19 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	private _recordToUpdate : EntityReferenceInfo;
 	private _dataFieldDefinitions : DataFieldDefinition[];
 	private _messageComponent? : any;
-	private _buttonsComponnent? : any;
+	private _buttonsComponent? : any;
 	private _clientUrl : string;
 	private _updateError : boolean;
 	private _renderingInProgress : boolean;
 	private _isRecordReadOnly: boolean;
-	private _lookupFieldDetails : any;
-	private _useTextFieldAsLookup : boolean;
-	private _forceRecordId : string;
+	private _lookupPrimaryField : string;
 	private _relationShips : any;
 	private _columnNumber : number;
 	private _buttonLoaded : boolean = false;
+	private _lookupField : ComponentFramework.LookupValue[];
 	private _globalAttr: any;
-
 	private notifyOutputChanged: () => void;
-
+	private _slc : SharedLogicClass;
 	/**
 	 * Empty constructor.
 	 */
@@ -75,6 +74,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		container.appendChild(this._formDiv);
 
 		this._container = container;
+		this._slc = new SharedLogicClass(this._context.userSettings);
 	}
 
 
@@ -85,13 +85,11 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	public async updateView(context: ComponentFramework.Context<IInputs>)
 	{
 		// Add code to update control view
-		if(this._context.updatedProperties.length === 1 && this._context.updatedProperties[0] === "layout"){
+		if((this._context.updatedProperties.length === 1 && this._context.updatedProperties[0] === "layout")
+	//	|| this._context.updatedProperties.indexOf("LookupField") >= 0
+		)
+		{
 			return;
-		}
-
-		if(this._context.updatedProperties.includes("FieldToAttachControl")){
-			if(this._useTextFieldAsLookup)
-				this._forceRecordId = context.parameters.FieldToAttachControl.raw!;
 		}
 
 		// Load params
@@ -112,7 +110,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	public getOutputs(): IOutputs
 	{
 		return {
-			FieldToAttachControl: this._forceRecordId
+			LookupField: this._lookupField
 		};
 	}
 
@@ -138,12 +136,12 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					onClickedRefresh : () => { this.refreshQEF() },
 					onClickedSave : () => { this.saveQEF() },
 					disabled : true,
-					loadingImage : this.generateImageSrcUrl("gif", data),
+					loadingImage : this._slc.generateImageSrcUrl("gif", data),
 					isLoadingVisible : "visible",
 					saveLabel : this._context.resources.getString("SaveButtonLabel"),
 					refreshLabel : this._context.resources.getString("RefreshButtonLabel")
 				};
-				_this._buttonsComponnent = ReactDOM.render(React.createElement(ButtonControl, options), this._buttonsDiv);
+				_this._buttonsComponent = ReactDOM.render(React.createElement(ButtonControl, options), this._buttonsDiv);
 			},
 			() => {
 				console.log('Error when downloading loading.gif image.');
@@ -157,7 +155,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		this.unmountComponents();
 
 		//disabling save button
-		this._buttonsComponnent.setState({disabled : true});
+		this._buttonsComponent.setState({disabled : true});
 
 		this.queryQuickViewFormData(this._quickViewFormId);
 	}
@@ -179,7 +177,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 		if(emptyRequiredFields.length > 0){
 			_this.displayMessage(MessageBarType.error, _this._context.resources.getString("EmptyRequiredFields"));
-			this._buttonsComponnent.setState({disabled : true});
+			this._buttonsComponent.setState({disabled : true});
 			return;
 		}
 
@@ -189,7 +187,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 				return dfd.isDirty;
 			}
 		});
-
 
 		if(dirtyValues.length == 0){
 			return;
@@ -202,32 +199,44 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		let dataToUpdate : any = {};
 		var lookupToClear: string[] = [];
 		let entityNamePlural = "";
+		let primaryNameUpdate = false;
 		dirtyValues.forEach(function(data){
-			if(data.fieldValue?.EntityName != undefined)
-				entityNamePlural = _this.getEntityPluralName(data.fieldValue.EntityName);
 
-				switch(data.fieldType){
-					case 'customer':
-					case 'regarding':
-					case 'owner':
-					case 'lookup':
-	
-						if(data.fieldValue == ""){
-							lookupToClear.push(`${data.fieldSchemaName}`);
-						}
-						else {
-							dataToUpdate[`${data.fieldSchemaName}@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`; 	
-						}
-						break;
-					
-					case 'date': 
-					case 'datetime': 
-						dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this.convertDate(data.fieldValue, "utc");
-						break;
-					default:
-						dataToUpdate[data.fieldName!] = data.fieldValue
-						break;
-				}
+			if(!primaryNameUpdate && _this._lookupPrimaryField == data.fieldName!){
+				primaryNameUpdate = true;
+				_this._lookupField = [{
+					entityType : _this._lookupField[0].entityType,
+					id : _this._lookupField[0].id,
+					name : data.fieldValue
+				}];
+			}
+				
+
+			if(data.fieldValue?.EntityName != undefined)
+				entityNamePlural = _this._slc.getEntityPluralName(data.fieldValue.EntityName);
+
+			switch(data.fieldType){
+				case 'customer':
+				case 'regarding':
+				case 'owner':
+				case 'lookup':
+
+					if(data.fieldValue == ""){
+						lookupToClear.push(`${data.fieldSchemaName}`);
+					}
+					else {
+						dataToUpdate[`${data.fieldSchemaName}@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`; 	
+					}
+					break;
+				
+				case 'date': 
+				case 'datetime': 
+					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this._slc.convertDate(data.fieldValue, "utc");
+					break;
+				default:
+					dataToUpdate[data.fieldName!] = data.fieldValue
+					break;
+			}
 		});
 
 		// Update the record if we have "normal" dirty fields
@@ -254,7 +263,11 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		_this.showLoading(false);
 
 		// disabling the save button until next change
-		this._buttonsComponnent.setState({disabled : true});
+		this._buttonsComponent.setState({disabled : true});
+
+		//If primaryName was updated, push the notifyOutput
+		if(primaryNameUpdate) 
+			this.notifyOutputChanged();
 	}
 
 	/**
@@ -269,7 +282,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 			//below line is used to delete the entity record  
 			let singularEntity = _this._recordToUpdate.EntityName;
-			let pluralEntity = _this.getEntityPluralName(singularEntity);
+			let pluralEntity = _this._slc.getEntityPluralName(singularEntity);
 
 			let url = `${_this._clientUrl}/api/data/v9.0/${pluralEntity}(${_this._recordToUpdate.Id})/${lookup}/$ref`;
 			xhr.open("DELETE", url, false);
@@ -347,7 +360,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 					let savedRecord = data.savedEntityReference[0];
 					let dataToUpdate : any = {};
-					dataToUpdate[_this._recordToUpdate.SchemaName!+"@odata.bind"] =  `/${_this.getEntityPluralName(savedRecord.entityType)}(${savedRecord.id.slice(1,-1)})`;
+					dataToUpdate[_this._recordToUpdate.SchemaName!+"@odata.bind"] =  `/${_this._slc.getEntityPluralName(savedRecord.entityType)}(${savedRecord.id.slice(1,-1)})`;
 					_this._context.webAPI.updateRecord(_this._parentRecordDetails.EntityName, _this._parentRecordDetails.Id, dataToUpdate).then(
 						function success(result){
 							console.log(result);
@@ -386,57 +399,46 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	private async getLookupDetails(){
 
 		this.showLoading(true);
+		let _this = this;
 
 		this._globalAttr = null;
-
-		let _this = this;
-		let lookupDetails = await this._context.webAPI.retrieveRecord(this._parentRecordDetails.EntityName, this._parentRecordDetails.Id, `?$select=${this._lookupMapped}`);
 		
-		//Checking if the lookup is not empty
-		let lookup = lookupDetails[this._lookupMapped];
-		//console.log("[getLookupDetails] retrieved lookup details ");
-
-		this._lookupFieldDetails = lookupDetails;
-
 		// Creating the new instance here
-		_this._recordToUpdate = new EntityReferenceInfo();
+		this._recordToUpdate = new EntityReferenceInfo();
 
-		if(lookup != undefined ){
-			let id = this._lookupFieldDetails[_this._lookupMapped] ?? "";
-			let entity = this._lookupFieldDetails[_this._lookupMapped+"@Microsoft.Dynamics.CRM.lookuplogicalname"] ?? "";
-
-			_this._recordToUpdate.EntityName = entity;
-			_this._recordToUpdate.Id = (_this._useTextFieldAsLookup &&  _this._forceRecordId != undefined && _this._forceRecordId != null) ?  _this._forceRecordId : id;
-			_this._recordToUpdate.Name = "lookup name here";
+		if(this._lookupField.length > 0){ 
+			this._recordToUpdate.EntityName = this._lookupField[0].entityType;
+			this._recordToUpdate.Id = this._lookupField[0].id;
+			this._recordToUpdate.Name = this._lookupField[0].name!;
 
 			// Getting the fields of the record
-			let attr = await _this._context.webAPI.retrieveRecord(_this._recordToUpdate.EntityName, _this._recordToUpdate.Id);
-			_this.isRecordReadOnly(attr["statecode"]);
-			_this._globalAttr = attr;
+			let attr = await this._context.webAPI.retrieveRecord(this._recordToUpdate.EntityName, this._recordToUpdate.Id);
+			this._globalAttr = attr;
+			this.isRecordReadOnly(attr["statecode"]);			
 		}
 		// We display a message and get property for potential quick create button
 		else {
 			// Grabbing necessary info for quick create possibility
-			let lookupCleaned = this._lookupMapped.replace("_value","").replace("_","");
+			let lookupCleaned = this._context.parameters.LookupField.attributes?.LogicalName;//!.replace("_value","").replace("_","");
 			let lookupField : string[] = [];
-			lookupField.push(lookupCleaned);
-			this._context.utils.getEntityMetadata(this._parentRecordDetails.EntityName, lookupField ).then(em => {
-				let relationships = em.ManyToOneRelationships.getAll();
-				let relationshipDetails = relationships.filter(function(relation : any){
-					return relation._referencingAttribute === lookupCleaned;
-				})[0];
+			lookupField.push(lookupCleaned!);
+			let em = await this._context.utils.getEntityMetadata(this._parentRecordDetails.EntityName, lookupField );
+			let relationships = em.ManyToOneRelationships.getAll();
+			let relationshipDetails = relationships.filter(function(relation : any){
+				return relation._referencingAttribute === lookupCleaned;
+			})[0];
 
-				this._recordToUpdate.SchemaName = relationshipDetails?.ReferencingEntityNavigationPropertyName;
-				this._recordToUpdate.EntityName = relationshipDetails?.ReferencedEntity;
+			this._recordToUpdate.SchemaName = relationshipDetails?.ReferencingEntityNavigationPropertyName;
+			this._recordToUpdate.EntityName = relationshipDetails?.ReferencedEntity;
 
-				this._context.utils.getEntityMetadata(this._recordToUpdate.EntityName, relationshipDetails?.ReferencedAttribute).then(emSubEntity => {
-					this._recordToUpdate.QuickCreateEnabled = emSubEntity.IsQuickCreateEnabled as boolean;	
-					// displaying message to warn user that lookup is empty
-					this.displayMessage(MessageBarType.info, _this._context.resources.getString("LookupFieldHasNoValue").replace("{0}", this._context.parameters.LookupFieldMapped.raw!));
-					this._renderingInProgress = false;
-					this.showLoading(false);
-				});
+			this._context.utils.getEntityMetadata(this._recordToUpdate.EntityName, relationshipDetails?.ReferencedAttribute).then(emSubEntity => {
+				this._recordToUpdate.QuickCreateEnabled = emSubEntity.IsQuickCreateEnabled as boolean;	
+				// displaying message to warn user that lookup is empty
+				this.displayMessage(MessageBarType.info, _this._context.resources.getString("LookupFieldHasNoValue").replace("{0}", this._context.parameters.LookupField.attributes?.DisplayName!));
+				this._renderingInProgress = false;
+				this.showLoading(false);
 			});
+			
 		}
 	}
 
@@ -453,18 +455,21 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		this._parentRecordDetails.Name = contextInfo.entityRecordName;
 
 		this._quickViewFormId = this._context.parameters.QuickViewFormId.raw!;
-		this._forceRecordId = this._context.parameters.FieldToAttachControl.raw!;
-
-		this._lookupMapped = this._context.parameters.LookupFieldMapped.raw!;
+		//this._forceRecordId = this._context.parameters.FieldToAttachControl.raw!;
+		this._lookupField = this._context.parameters.LookupField.raw;
 
 		// Since it's a new parameter, it can be undefined.
 		this._columnNumber = this._context.parameters.NumberOfColumn === undefined || this._context.parameters.NumberOfColumn.raw === null ? 1 : this._context.parameters.NumberOfColumn?.raw!;
 
-		this._useTextFieldAsLookup = (this._context.parameters.UseTextFieldAsLookup && this._context.parameters.UseTextFieldAsLookup.raw && this._context.parameters.UseTextFieldAsLookup.raw.toLowerCase() === "true") ? true : false;
-
 		this._clientUrl = (<any>this._context).page.getClientUrl();
 
 		this._dataFieldDefinitions = [];
+
+		if(this._lookupField.length > 0) {
+			this._context.utils.getEntityMetadata(this._lookupField[0].entityType).then(metadata => {
+				this._lookupPrimaryField = metadata.PrimaryNameAttribute;
+			});
+		}
 	}
 
 	/**
@@ -499,7 +504,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 			await this.getLookupDetails();
 
-			if(this._lookupFieldDetails != undefined && this._lookupFieldDetails[this._lookupMapped] == null){
+			if(this._lookupField.length == 0){
 				this._renderingInProgress = false;
 				this.showLoading(false);
 				return;
@@ -507,7 +512,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 			// Checking access to that entity
 			let _hasEntityPriv = await this._context.utils.hasEntityPrivilege(this._recordToUpdate.EntityName, 2||3, 0);
-			//console.log("[hasEntityPrivilege] : checking privileges ");
 			if(!_hasEntityPriv){
 				this.displayMessage(MessageBarType.warning, _this._context.resources.getString("MissingPrivilegeOnEntityMessage"));
 				return;
@@ -522,7 +526,6 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					_this._context.utils.getEntityMetadata(form.objecttypecode, allFields).then(em => {
 						let attributes = em.Attributes.getAll();
 						_this._relationShips = em.ManyToOneRelationships.getAll();
-						//console.log("[queryQuickViewFormData] attributes metadata retrieved");
 
 						// Processing the form with the details about the related attributes
 						_this.processFormXmlData(form.formxml, attributes);
@@ -686,7 +689,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		let isRequired = fieldDetail.attributeDescriptor.RequiredLevel == 1 || fieldDetail.attributeDescriptor.RequiredLevel == 2;
 
 		// Grabing the proper datafieldDefinition
-		let dataFieldDefinitionsDetails = this.getDataFieldDefinition(techFieldName);
+		let dataFieldDefinitionsDetails = this._slc.getDataFieldDefinition(techFieldName, this._dataFieldDefinitions);
 		if(dataFieldDefinitionsDetails === undefined) return;
 
 		// Calling the proper React component based on the type
@@ -696,7 +699,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			case 'partylist':
 			case 'customer':
 			case 'lookup':
-					// Getting the details around the "lookup" fields
+
+				// Getting the details around the "lookup" fields
 				let entityName = this._globalAttr["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"] == undefined ? fieldDetail.attributeDescriptor.EntityLogicalName : this._globalAttr["_" + techFieldName + "_value@Microsoft.Dynamics.CRM.lookuplogicalname"];		
 				let referencedEntity = type == "owner" ? "owner" : entityName;
 				let schemaName = this._relationShips.filter(function(relation : any){
@@ -709,34 +713,35 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						return relation.ReferencedEntity == referencedEntity
 					});
 				}
-					let options = {
-						width : this._context.mode.allocatedWidth,
-						label : label,
-						fieldDefinition : {
-							fieldSchemaName: schemaName.length == 1 ? schemaName[0].ReferencingEntityNavigationPropertyName : null,
-							isRequired : isRequired,
-							isDirty : false,
-							fieldName : techFieldName,
-							fieldType : (type == "lookup" && fieldDetail.attributeDescriptor.Format == 2)  ? "regarding" : type,
-							controlId : controlId,
-							fieldValue : {
-								EntityName : entityName,
-								Name : this._globalAttr[`_${techFieldName}_value@OData.Community.Display.V1.FormattedValue`] ?? "",
-								Id: this._globalAttr[`_${techFieldName}_value`] ?? ""
-							}
-						},
-						targetEntities : fieldDetail.attributeDescriptor.Targets,
-						disabled : isReadOnly,
-						icon : "Search",
-						context : this._context,
-						onClickResult : (dataFieldDefinition?: DataFieldDefinition) => {
-							_this.setDataFieldDefinitionAfterChange(dataFieldDefinition, dataFieldDefinitionsDetails);							
+				
+				let options = {
+					width : this._context.mode.allocatedWidth,
+					label : label,
+					fieldDefinition : {
+						fieldSchemaName: schemaName.length == 1 ? schemaName[0].ReferencingEntityNavigationPropertyName : null,
+						isRequired : isRequired,
+						isDirty : false,
+						fieldName : techFieldName,
+						fieldType : (type == "lookup" && fieldDetail.attributeDescriptor.Format == 2)  ? "regarding" : type,
+						controlId : controlId,
+						fieldValue : {
+							EntityName : entityName,
+							Name : this._globalAttr[`_${techFieldName}_value@OData.Community.Display.V1.FormattedValue`] ?? "",
+							Id: this._globalAttr[`_${techFieldName}_value`] ?? ""
 						}
+					},
+					targetEntities : fieldDetail.attributeDescriptor.Targets,
+					disabled : isReadOnly,
+					icon : "Search",
+					context : this._context,
+					onClickResult : (dataFieldDefinition?: DataFieldDefinition) => {
+						_this.setDataFieldDefinitionAfterChange(dataFieldDefinition, dataFieldDefinitionsDetails);							
 					}
+				}
 
-					dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, options.fieldDefinition);
+				dataFieldDefinitionsDetails = this._slc.completeDataDefinition(dataFieldDefinitionsDetails, options.fieldDefinition);
 
-					ReactDOM.render(React.createElement(TextFieldControl, options), item);
+				ReactDOM.render(React.createElement(TextFieldControl, options), item);
 
 				break;
 			case 'datetime':
@@ -750,7 +755,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							fieldName : techFieldName,
 							fieldType : detailDateType,
 							controlId : controlId,
-							fieldValue : this._globalAttr[techFieldName] === null ? null : this.convertDate(new Date(this._globalAttr[techFieldName]), "local")
+							fieldValue : this._globalAttr[techFieldName] === null ? null : this._slc.convertDate(new Date(this._globalAttr[techFieldName]), "local")
 						},
 						disabled : isReadOnly,
 						showTime : detailDateType == "datetime",
@@ -765,7 +770,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						}
 					};
 
-					dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, dpOptions.fieldDefinition);
+					dataFieldDefinitionsDetails = this._slc.completeDataDefinition(dataFieldDefinitionsDetails, dpOptions.fieldDefinition);
 
 					ReactDOM.render(React.createElement(DatePickerControl, dpOptions), item);
 				break;
@@ -799,7 +804,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					
 				};
 
-				dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, ddOptions.fieldDefinition);
+				dataFieldDefinitionsDetails = this._slc.completeDataDefinition(dataFieldDefinitionsDetails, ddOptions.fieldDefinition);
 
 				ReactDOM.render(React.createElement(FilteredOptionsetControl, ddOptions), item);
 				break;
@@ -827,11 +832,11 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 
 								this._dataFieldDefinitions[this._dataFieldDefinitions.indexOf(dataFieldDefinitionsDetails)] = dataFieldDefinitionsDetails;
 
-								_this._buttonsComponnent.setState({disabled : false});
+								_this._buttonsComponent.setState({disabled : false});
 							}							
 						}
 					};
-					dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, moneyOptions.fieldDefinition);
+					dataFieldDefinitionsDetails = this._slc.completeDataDefinition(dataFieldDefinitionsDetails, moneyOptions.fieldDefinition);
 
 					ReactDOM.render(React.createElement(TextFieldControl, moneyOptions), item);
 				break;
@@ -855,7 +860,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 					}
 				};
 
-				dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, toggleOptions.fieldDefinition);
+				dataFieldDefinitionsDetails = this._slc.completeDataDefinition(dataFieldDefinitionsDetails, toggleOptions.fieldDefinition);
 
 				ReactDOM.render(React.createElement(ToggleControl, toggleOptions), item);
 				break;
@@ -878,7 +883,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 							fieldName : techFieldName,
 							fieldType : type,
 							controlId : controlId,
-							fieldValue : this._globalAttr[techFieldName] ?? ""
+							fieldValue : _this._globalAttr[techFieldName] ?? ""
 						},
 						maxLength: fieldDetail.attributeDescriptor.MaxLength,
 						icon : icon,
@@ -888,7 +893,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						}
 					}
 
-					dataFieldDefinitionsDetails = this.completeDataDefinition(dataFieldDefinitionsDetails, optionsText.fieldDefinition);
+					dataFieldDefinitionsDetails = this._slc.completeDataDefinition(dataFieldDefinitionsDetails, optionsText.fieldDefinition);
 
 					ReactDOM.render(React.createElement(TextFieldControl, optionsText), item);
 				break;
@@ -907,49 +912,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 			let index = this._dataFieldDefinitions.findIndex(x => x.fieldName == dfdChange.fieldName);
 
 			this._dataFieldDefinitions[index] = dfdChange;
-			this._buttonsComponnent.setState({disabled : false});
+			this._buttonsComponent.setState({disabled : false});
 		}	
-	}
-
-	/**
-	 * Complete the DataFieldDefinition which hold only the technical name by default
-	 * @param dfd datafielddefinition to complete
-	 * @param details details to be used to complete the exisitng DataFieldDefinition
-	 */
-	private completeDataDefinition(dfd : DataFieldDefinition, details : any): DataFieldDefinition{
-		dfd.controlId = details.controlId;
-		dfd.fieldType = details.fieldType;
-		dfd.fieldValue = details.fieldValue;
-		dfd.isDirty = false;
-		dfd.fieldName = details.fieldName;
-		dfd.isRequired = details.isRequired;
-		dfd.fieldSchemaName = details.schemaName;
-
-		return dfd;
-	}
-
-	/**
-	 * Retrieve the Data Field Definition of a field
-	 * @param fieldName field technical name
-	 */
-	private getDataFieldDefinition(fieldName : string) : DataFieldDefinition | undefined {
-		let dataFieldDefinitionsDetails = this._dataFieldDefinitions.filter(function(dfd : DataFieldDefinition){
-			return dfd.fieldName == fieldName
-		});
-
-		if(dataFieldDefinitionsDetails === undefined || dataFieldDefinitionsDetails.length === 0)
-		return;
-
-		return dataFieldDefinitionsDetails[0];
-	}
-
-	/**
- 	* return the full base64 code of an image
-	* @param filetype Name of the image extension
-	* @param fileContent Base64 image content
-	*/
-	private generateImageSrcUrl(fileType: string, fileContent: string): string {
-		return "data:image/" + fileType + ";base64," + fileContent;
 	}
 
 	/**
@@ -958,7 +922,7 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 	 */
 	private showLoading(show : boolean){
 		let visibility = show ? "visible" : "hidden";
-		this._buttonsComponnent?.setState({isLoadingVisible : visibility});
+		this._buttonsComponent?.setState({isLoadingVisible : visibility});
 		//console.log("isLoadingVisible : "+show);
 	}
 
@@ -980,55 +944,5 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		if(this._isRecordReadOnly){
 			this.displayMessage(MessageBarType.warning, this._context.resources.getString("ReadOnlyRecordMessage"));
 		}
-	}
-
-	/**
-	 * Return entityname in plural version
-	 * @param entityName entity to retrieve in plural version
-	 */
-	private getEntityPluralName(entityName : string) : string{
-		if(entityName.endsWith("s"))
-			return entityName+"es";
-		else if(entityName.endsWith("y"))
-			return entityName.slice(0, entityName.length-1)+"ies";
-		else
-			return entityName+"s";
-	}
-
-	/**
-	 * convert the date into local user timezone
-	 * @param value date to convert
-	 */
-	private convertDate(value: Date, convertTo: "utc" | "local") {
-		var offsetMinutes = this._context.userSettings.getTimeZoneOffsetMinutes(value);
-		var browserOffset = new Date().getTimezoneOffset();
-		var convert = convertTo;
-		// The offset returned is the Timezone offset minutes from UTC to Local
-		// E.g. Central Time (UTC-6) - getTimeZoneOffsetMinutes will return -360 minutes
-		// To get to a utc time we must add 360 (offset)
-		// To get to local we must add -360 (offset)
-		//offsetMinutes = offsetMinutes  * (convertTo == "local" ? 1 : -1);
-		
-		var localDate = this.addMinutes(value, offsetMinutes);
-
-		if(convertTo == "utc"){
-			let offsetMinutesMinusBrowser = -offsetMinutes - browserOffset;
-			localDate = this.addMinutes(value, offsetMinutesMinusBrowser);
-			return localDate;
-		}
-			
-		return this.getUtcDate(localDate);
-	  }
-	  private addMinutes(date: Date, minutes: number): Date {
-		return new Date(date.getTime() + minutes * 60000);
-	  }
-	  private getUtcDate(localDate: Date) {
-		return new Date(
-		  localDate.getUTCFullYear(),
-		  localDate.getUTCMonth(),
-		  localDate.getUTCDate(),
-		  localDate.getUTCHours(),
-		  localDate.getUTCMinutes(),
-		);
 	}
 }
