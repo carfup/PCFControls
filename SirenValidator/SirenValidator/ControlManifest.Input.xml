@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="SirenValidator" version="0.1.20" display-name-key="Carfup.SirenValidator" description-key="Siren Validator for PCF" control-type="standard">
+  <control namespace="Carfup" constructor="SirenValidator" version="0.1.25" display-name-key="Carfup.SirenValidator" description-key="Siren Validator for PCF" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="SirenValue" display-name-key="SirenValidator_SirenValue" description-key="Siren field value" of-type="SingleLine.Text" usage="bound" required="true" />
     <property name="IsValid" display-name-key="SiretValidator_IsValid" description-key="Is Siret valid" of-type="TwoOptions" usage="bound" required="false" />
@@ -28,8 +28,7 @@
       <css path="css/SirenValidator.css" order="1" />
       <img path="img/IconValid.png" />
       <img path="img/IconInvalid.png" />
-      <!--<resx path="strings/SirenValidator.1033.resx" version="1.0.0" />
-      -->
+      <!--<resx path="strings/SirenValidator.1033.resx" version="1.0.0" />-->
     </resources>
     <!-- UNCOMMENT TO ENABLE THE SPECIFIED API
     <feature-usage>

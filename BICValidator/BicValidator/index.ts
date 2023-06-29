@@ -83,7 +83,7 @@ export class BicValidator implements ComponentFramework.StandardControl<IInputs,
 			this._valueElement.removeAttribute("disabled");
 		}
 
-		this.valueChanged(null, true);
+		//this.valueChanged(null, true);
 	}
 
 	/** 

@@ -90,7 +90,7 @@ export class SiretValidator implements ComponentFramework.StandardControl<IInput
 			this._valueElement.removeAttribute("disabled");
 		}
 
-		this.valueChanged(null, true);
+		//this.valueChanged(null, true);
 	}
 
 	/** 
@@ -158,6 +158,7 @@ export class SiretValidator implements ComponentFramework.StandardControl<IInput
 
 	private valueChanged(evt: Event | null, updatedFromContext : boolean = false):void
 	{	
+		//Coucou
 		this._value = updatedFromContext ? this._context.parameters.SiretValue.raw! : this._valueElement.value;
 		this._valueElement.value = this._value.toUpperCase().replace(/[^0-9]/g, '');		
 
@@ -188,7 +189,8 @@ export class SiretValidator implements ComponentFramework.StandardControl<IInput
 			this._isValid = (sum % 10) == 0; // Si la somme est un multiple de 10 alors le SIRET est valide 
 		}
 
-		if(this._value != ""){
+		if(this._value != "" && this._valueElement.value != ""){
+			this._value = this._valueElement.value;
 			this._valueValidationElement.removeAttribute("hidden");
 
 			if(this._displayNotificationError){
