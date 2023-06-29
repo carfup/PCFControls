@@ -226,10 +226,10 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 						dataToUpdate[`${data.fieldSchemaName}@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`; 	
 					}
 					break;
-				
-				case 'date':
-					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this._context.formatting.formatDateAsFilterStringInUTC(_this._slc.convertDate(data.fieldValue, "utc"));
+				case 'dateimedisabled':
+					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this._context.formatting.formatDateAsFilterStringInUTC(data.fieldValue);
 					break; 
+				case 'date': 
 				case 'datetime': 
 					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this._slc.convertDate(data.fieldValue, "utc");
 					break;
@@ -748,6 +748,13 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 			case 'datetime':
 					let detailDateType = fieldDetail.attributeDescriptor.Format;
 
+					if(fieldDetail.attributeDescriptor.Behavior == 2)
+					{
+						detailDateType = "dateimedisabled";
+					}
+					// Handle the IME mode
+					let dateValue = fieldDetail.attributeDescriptor.Behavior == 2 ? new Date(this._globalAttr[techFieldName]) : this._slc.convertDate(new Date(this._globalAttr[techFieldName]), "local");
+
 					let dpOptions = {
 						width : this._context.mode.allocatedWidth,
 						fieldDefinition : {
@@ -756,7 +763,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 							fieldName : techFieldName,
 							fieldType : detailDateType,
 							controlId : controlId,
-							fieldValue : this._globalAttr[techFieldName] === null ? null : this._slc.convertDate(new Date(this._globalAttr[techFieldName]), "local")
+							fieldValue : this._globalAttr[techFieldName] === null ? null : dateValue
 						},
 						disabled : isReadOnly,
 						showTime : detailDateType == "datetime",
