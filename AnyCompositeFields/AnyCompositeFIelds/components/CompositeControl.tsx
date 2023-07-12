@@ -5,7 +5,6 @@ import { Stack, IStackStyles } from '@fluentui/react/lib/Stack';
 import { Callout, ICalloutContentStyles, DirectionalHint } from '@fluentui/react/lib/Callout';
 import { CompositeValue } from '../EntitiesDefinition';
 import { IInputs } from '../generated/ManifestTypes';
-import { cpuUsage } from 'process';
 
 export interface ICompositeControlProps {
     disabled : boolean;

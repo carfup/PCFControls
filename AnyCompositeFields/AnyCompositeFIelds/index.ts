@@ -122,11 +122,12 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 				randNumber : Math.floor(Math.random()*(100-1+1)+1),
 				onClickedDone : (compositeValue? : CompositeValue) => {
 					this._compositeValue = compositeValue!;
+					this.buildFullValue();
 					this.notifyOutputChanged();
 				}
 			}
 
-			ReactDOM.render(React.createElement(CompositeControl, optionsText), this._controlDiv);
+			this._compositeComponent = ReactDOM.render(React.createElement(CompositeControl, optionsText), this._controlDiv);
 		} 
 		else {
 			_this.extractFieldsFromQVF();
@@ -199,9 +200,6 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 
 			finalValue = arrayValues.join(splitValue[0]);
 		}
-
-
-		
 
         this._compositeValue.fullValue = finalValue;	
 	}
