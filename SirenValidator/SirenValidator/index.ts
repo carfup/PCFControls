@@ -89,7 +89,7 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 			this._valueElement.removeAttribute("disabled");
 		}
 
-		//this.valueChanged(null, true);
+		this.valueChanged(null, true);
 	}
 
 	/** 
