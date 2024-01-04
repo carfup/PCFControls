@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { IRollupFieldControlProps } from '../EntitiesDefinition';
 import {  Field, FluentProvider, Input, Tooltip, webLightTheme } from '@fluentui/react-components';
-import { Calculator24Regular } from '@fluentui/react-icons';
+import { Calculator20Regular } from '@fluentui/react-icons';
 
 export interface IRollupFieldControlState {
   value?: number | null | undefined;
@@ -96,6 +96,8 @@ export class RollupFieldControl extends React.Component<IRollupFieldControlProps
             // This id is used on the tooltip itself, not the host
             // (so an element with this id only exists when the tooltip is shown)
             relationship="label"
+            withArrow
+            positioning={"above-start"}
           >
             <Field
               validationState={this.state?.result! ?? "none"}
@@ -107,10 +109,10 @@ export class RollupFieldControl extends React.Component<IRollupFieldControlProps
                 type="text"
                 aria-describedby={id}
                 style={{backgroundColor: "#F5F5F5", border: "none"}}
-                contentAfter={<Calculator24Regular  onClick={
+                contentAfter={<Calculator20Regular  onClick={
                   () => {
                   this.refreshData();
-                }}  />}
+                }}  />} 
               />
             
             </Field>
