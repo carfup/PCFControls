@@ -120,6 +120,7 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 				visible : this._context.mode.isVisible,
 				separator : this._context.parameters.separator.raw!,
 				randNumber : Math.floor(Math.random()*(100-1+1)+1),
+				buttonDisabled : this.checkIfRequiredFieldEmpty(),
 				onClickedDone : (compositeValue? : CompositeValue) => {
 					this._compositeValue = compositeValue!;
 					this.buildFullValue();
@@ -134,6 +135,20 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 			this._compositeComponent.setState({compositeValue : this._compositeValue, disabled : this._context.mode.isControlDisabled, visible : this._context.mode.isVisible});
 		}
 	}
+
+	private checkIfRequiredFieldEmpty = () : boolean => {
+        let disabled = false;
+        const elements = ['fieldValue1', 'fieldValue2', 'fieldValue3', 'fieldValue4', 'fieldValue5', 'fieldValue6', 'fieldValue7', 'fieldValue8'];
+    	elements.forEach((x) => {
+            // @ts-ignore
+            let element = this._compositeValue[x];
+            if(element.attributes.RequiredLevel == 2 && element.raw == undefined)
+                disabled = true;
+
+        });
+
+        return disabled;
+    }
 
 	/**
 	 * Retrieve all parameters of the PCF control
@@ -177,6 +192,10 @@ export class AnyCompositeFIelds implements ComponentFramework.StandardControl<II
 					// @ts-ignore
 					finalValue += this._compositeValue["fieldValue"+fieldCount].raw;
 					fieldCount++;
+				}
+				// @ts-ignore
+				else if(this._compositeValue["fieldValue"+fieldCount]!.raw == null && splitValue[i] === "field"){
+					// do nothing
 				}
 				else {
 					let separator = splitValue[i];

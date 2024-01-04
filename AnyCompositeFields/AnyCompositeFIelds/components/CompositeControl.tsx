@@ -15,6 +15,7 @@ export interface ICompositeControlProps {
     onClickedDone : (compositeValue? : CompositeValue) => void;
     context?: ComponentFramework.Context<IInputs>;
     separator : string;
+    buttonDisabled : boolean;
 }
 
 export interface IBCompositeControlState {
@@ -22,11 +23,13 @@ export interface IBCompositeControlState {
     compositeValue : CompositeValue;
     disabled : boolean;
     visible : boolean;
+    buttonDisabled : boolean;
 }
 
 const stackStyles: Partial<IStackStyles> = { root: { width: "100%" } };
 const textFieldStyles: Partial<ITextFieldStyles> = { root: { width: "100%" } };
 const calloutStyles: Partial<ICalloutContentStyles> = { root: { width: "300px" } };
+const elements = ['fieldValue1', 'fieldValue2', 'fieldValue3', 'fieldValue4', 'fieldValue5', 'fieldValue6', 'fieldValue7', 'fieldValue8'];
 
 export default class CompositeControl extends React.Component<ICompositeControlProps, IBCompositeControlState> {
     constructor(props: ICompositeControlProps) {
@@ -35,15 +38,14 @@ export default class CompositeControl extends React.Component<ICompositeControlP
             showCallout : false,
             compositeValue : this.props.compositeValue,
             disabled : this.props.disabled,
-            visible : this.props.visible
+            visible : this.props.visible,
+            buttonDisabled : this.props.buttonDisabled
         };
     }
 
     
-
+    
     render(){
-        const elements = ['fieldValue1', 'fieldValue2', 'fieldValue3', 'fieldValue4', 'fieldValue5', 'fieldValue6', 'fieldValue7', 'fieldValue8'];
-
         return (
             <Stack horizontal id="acf_compositestack" styles={stackStyles}>
                 <TextField 
@@ -68,29 +70,44 @@ export default class CompositeControl extends React.Component<ICompositeControlP
                                 let element = this.state.compositeValue[value];
                                 const isMultiline = element.type === "SingleLine.TextArea" || element.type === "Multiple";
                                 
-                                return element.attributes.LogicalName != undefined && <TextField 
-                                    value={element.raw!} 
-                                    label={element.attributes.DisplayName}
-                                    id={"acf_"+value}
-                                    onChange={this.onChangeField}
-                                    onDoubleClick={this.onDoubleClick}
-                                    disabled={this.state.disabled || element.disabled!}
-                                    styles={textFieldStyles}
-                                    multiline={isMultiline}
-                                    autoAdjustHeight={isMultiline}
-                                    required={element.attributes.RequiredLevel == 1 || element.attributes.RequiredLevel == 2}
-                                    maxLength={element.attributes.MaxLength}
-                                    iconProps={{ iconName: this.getIcon(element.type) }} 
-                                />
+                                return element.attributes.LogicalName != undefined && 
+                                    <TextField 
+                                        value={element.raw!} 
+                                        label={element.attributes.DisplayName}
+                                        id={"acf_"+value}
+                                        onChange={this.onChangeField}
+                                        onDoubleClick={this.onDoubleClick}
+                                        disabled={this.state.disabled || element.disabled!}
+                                        styles={textFieldStyles}
+                                        multiline={isMultiline}
+                                        autoAdjustHeight={isMultiline}
+                                        required={element.attributes.RequiredLevel == 1 || element.attributes.RequiredLevel == 2}
+                                        maxLength={element.attributes.MaxLength}
+                                        iconProps={{ iconName: this.getIcon(element.type) }} 
+                                    />
                             })}
 
-                            <DefaultButton text={this.props.doneLabel} onClick={this.onClick} style={{marginTop:'10px',alignSelf: "flex-end"}}/>
+                            <DefaultButton text={this.props.doneLabel} disabled={this.state.buttonDisabled} onClick={this.onClick} style={{marginTop:'10px',alignSelf: "flex-end"}}/>
                         </Stack>
                         
                     </Callout>
                 )}
             </Stack>
         );
+    }
+
+    private checkIfRequiredFieldEmpty = () : void => {
+        let disabled = false;
+        
+        elements.forEach((x : string) => {
+            // @ts-ignore
+            let element = this.state.compositeValue[x];
+            if(element.attributes.RequiredLevel == 2 && (element.raw == undefined || element.raw == ""))
+                disabled = true;
+
+        });
+
+        this.setState({ buttonDisabled : disabled });
     }
 
     /**
@@ -115,6 +132,8 @@ export default class CompositeControl extends React.Component<ICompositeControlP
         // @ts-ignore
         compositeValue[target].raw = newValue!;
         this.setState({compositeValue : compositeValue});
+
+        this.checkIfRequiredFieldEmpty();
     }
 
     /**
