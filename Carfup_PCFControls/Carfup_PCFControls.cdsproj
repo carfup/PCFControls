@@ -47,7 +47,7 @@
     <ProjectReference Include="..\QuickEditForm\QuickEditForm.pcfproj" />
     <ProjectReference Include="..\QuickEditFormLookup\QuickEditFormLookup.pcfproj" />
     <ProjectReference Include="..\AnyCompositeFields\AnyCompositeFields.pcfproj" />
-    <ProjectReference Include="..\EasyRollup\EasyRollup.pcfproj" />
+    <ProjectReference Include="..\EasyRollup\EasyRollupField.pcfproj" />
   </ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
