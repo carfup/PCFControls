@@ -1,4 +1,5 @@
 # PCF-Controls
+* [Easy Rollup Field](#easyrollup)
 * [Quick Edit Form](#quick-edit-form)
 * [Any Composite Fields](#any-composite-fields)
 * [IBAN / SIREN / SIRET Validators](#iban--siren--siret-validators)
@@ -7,6 +8,25 @@
 # Download
 
 [Get the latest solution here](https://github.com/carfup/PCFControls/releases)
+
+## Easy Rollup Field
+### Purpose 
+The out of the box rollup field are (according to me) not really well integrated into the forms.
+You have to click on the icon in order to display the recalculate button. That's kind of a waste of clicks.
+The idea of the click is to have a common field with the look'n'feel similar to the others and just have to click once to refresh it.
+
+Drawback, when attaching the PCF control to a rollup field, the look'n'feel by default remains.
+So I suggest to attach it to a random field.
+
+![](https://carfupstorage.blob.core.windows.net/sharex/2023_12_20_17-43-40_msedge.gif)
+
+### Configuration
+There are 11 parameters to customize the PCF (with 5 mandatory).
+
+|Parameter|Description|Required|
+|:---------|:-----------|:----:|
+|FieldToAttachControl|Field to attach the control|x|
+|RollupField|Logical name of the rollup field|x|
 
 ## Quick Edit Form
 ### Purpose

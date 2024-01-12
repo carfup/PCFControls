@@ -2,8 +2,7 @@
 <manifest>
   <control namespace="Carfup" constructor="EasyRollupField" version="0.0.10" display-name-key="Carfup.EasyRollup" description-key="EasyRollup description" control-type="virtual">
     <property name="FieldToAttachControl" display-name-key="FieldToAttachControl" description-key="FieldToAttachControl" of-type-group="numbers" usage="bound" required="true" />
-    <property name="RollupField" display-name-key="RollupField Logical Name" description-key="RollupField Logical Name" of-type="SingleLine.Text" usage="input" required="false" />
-    <property name="icon" display-name-key="Icon" description-key="Icon" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="RollupField" display-name-key="RollupField Logical Name" description-key="RollupField Logical Name" of-type="SingleLine.Text" usage="input" required="true" />
     <type-group name="numbers">
       <type>Currency</type>
       <type>FP</type>
