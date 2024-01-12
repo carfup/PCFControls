@@ -1,5 +1,5 @@
 # PCF-Controls
-* [Easy Rollup Field](#easyrollup)
+* [Easy Rollup Field](#easy-rollup-field)
 * [Quick Edit Form](#quick-edit-form)
 * [Any Composite Fields](#any-composite-fields)
 * [IBAN / SIREN / SIRET Validators](#iban--siren--siret-validators)
