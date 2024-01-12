@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="SiretValidator" version="0.1.23" display-name-key="Carfup.SiretValidator" description-key="Siret Validator for PCF" control-type="standard">
+  <control namespace="Carfup" constructor="SiretValidator" version="0.1.26" display-name-key="Carfup.SiretValidator" description-key="Siret Validator for PCF" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="SiretValue" display-name-key="SiretValidator_SiretValue" description-key="Siret field value" of-type="SingleLine.Text" usage="bound" required="true" />
     <property name="IsValid" display-name-key="SiretValidator_IsValid" description-key="Is Siret valid" of-type="TwoOptions" usage="bound" required="false" />
@@ -8,7 +8,7 @@
       <value name="true" display-name-key="True" description-key="true">true</value>
       <value name="false" display-name-key="False" description-key="false">false</value>
     </property>
-    <property name="DisplayNotificationErrorMessage" display-name-key="DisplayNotificationErrorMessage" description-key="Message displayed in notification" of-type="SingleLine.Text" usage="input" required="false" default-value="The IBAN value entered is incorrect" />
+    <property name="DisplayNotificationErrorMessage" display-name-key="DisplayNotificationErrorMessage" description-key="Message displayed in notification" of-type="SingleLine.Text" usage="input" required="false" default-value="The SIRET value entered is incorrect" />
     <property name="IconValid" display-name-key="Url to Valid icon" description-key="Url to Valid icon" of-type="SingleLine.Text" usage="input" required="false" />
     <property name="IconInvalid" display-name-key="Url to Invalid icon" description-key="Url to Invalid icon" of-type="SingleLine.Text" usage="input" required="false" />
     <!-- 

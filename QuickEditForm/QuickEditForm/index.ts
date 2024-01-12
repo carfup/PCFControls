@@ -221,9 +221,14 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 						break;
 					
 					case 'date': 
+					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this._context.formatting.formatDateAsFilterStringInUTC(_this.convertDate(data.fieldValue, "utc"));
+					break;
 					case 'datetime': 
 						dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this.convertDate(data.fieldValue, "utc");
 						break;
+					//case 'datenoime':
+						
+					//	break
 					default:
 						dataToUpdate[data.fieldName!] = data.fieldValue
 						break;
@@ -541,7 +546,8 @@ export class QuickEditForm implements ComponentFramework.StandardControl<IInputs
 		}
 		catch (e){
 			this._renderingInProgress = false;
-			const message = e.message === undefined ? e : e.message;
+			let ex:any = e;
+			const message = ex.message === undefined ? e : ex.message;
 			this.showLoading(false);
 			this.displayMessage(MessageBarType.blocked, `An error occured : ${message}`);
 		}

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="QuickEditFormLookup" version="0.0.6" display-name-key="Carfup.QuickEditFormLookup" description-key="QuickEditFormLookup description" control-type="standard" preview-image="img/preview.png">
+  <control namespace="Carfup" constructor="QuickEditFormLookup" version="0.0.8" display-name-key="Carfup.QuickEditFormLookup" description-key="QuickEditFormLookup description" control-type="standard" preview-image="img/preview.png">
     <property name="LookupField" display-name-key="LookupField" description-key="Lookup Field Mapped to retrieve the Quick View Form from" of-type="Lookup.Simple" usage="bound" required="true" />
     <property name="QuickViewFormId" display-name-key="QuickViewFormId" description-key="GUID of the Quick View Form to render" of-type="SingleLine.Text" usage="input" required="true" />
     <property name="NumberOfColumn" display-name-key="Number of columns" description-key="Ability to split the fields in several columns" of-type="Whole.None" usage="input" required="false" default-value="1" />

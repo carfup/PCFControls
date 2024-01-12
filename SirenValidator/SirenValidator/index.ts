@@ -183,7 +183,9 @@ export class SirenValidator implements ComponentFramework.StandardControl<IInput
 			this._isValid = (sum % 10) == 0;
 		}
 
-		if(this._value != ""){
+		if(this._value != "" && this._valueElement.value != ""){
+			this._value = this._valueElement.value;
+			
 			this._valueValidationElement.removeAttribute("hidden");
 
 			if(this._displayNotificationError){

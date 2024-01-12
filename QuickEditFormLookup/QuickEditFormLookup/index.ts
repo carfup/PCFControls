@@ -85,9 +85,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 	public async updateView(context: ComponentFramework.Context<IInputs>)
 	{
 		// Add code to update control view
-		if((this._context.updatedProperties.length === 1 && this._context.updatedProperties[0] === "layout")
-	//	|| this._context.updatedProperties.indexOf("LookupField") >= 0
-		)
+		if(this._context.updatedProperties.length === 1 && this._context.updatedProperties[0] === "layout")
 		{
 			return;
 		}
@@ -228,7 +226,9 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 						dataToUpdate[`${data.fieldSchemaName}@odata.bind`] =  `/${entityNamePlural}(${data.fieldValue.Id})`; 	
 					}
 					break;
-				
+				case 'dateimedisabled':
+					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this._context.formatting.formatDateAsFilterStringInUTC(data.fieldValue);
+					break; 
 				case 'date': 
 				case 'datetime': 
 					dataToUpdate[data.fieldName!] = data.fieldValue === null ? null : _this._slc.convertDate(data.fieldValue, "utc");
@@ -544,7 +544,8 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 		}
 		catch (e){
 			this._renderingInProgress = false;
-			const message = e.message === undefined ? e : e.message;
+			let ex:any = e;
+			const message = ex.message === undefined ? e : ex.message;
 			this.showLoading(false);
 			this.displayMessage(MessageBarType.blocked, `An error occured : ${message}`);
 		}
@@ -747,6 +748,13 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 			case 'datetime':
 					let detailDateType = fieldDetail.attributeDescriptor.Format;
 
+					if(fieldDetail.attributeDescriptor.Behavior == 2)
+					{
+						detailDateType = "dateimedisabled";
+					}
+					// Handle the IME mode
+					let dateValue = fieldDetail.attributeDescriptor.Behavior == 2 ? new Date(this._globalAttr[techFieldName]) : this._slc.convertDate(new Date(this._globalAttr[techFieldName]), "local");
+
 					let dpOptions = {
 						width : this._context.mode.allocatedWidth,
 						fieldDefinition : {
@@ -755,7 +763,7 @@ export class QuickEditFormLookup implements ComponentFramework.StandardControl<I
 							fieldName : techFieldName,
 							fieldType : detailDateType,
 							controlId : controlId,
-							fieldValue : this._globalAttr[techFieldName] === null ? null : this._slc.convertDate(new Date(this._globalAttr[techFieldName]), "local")
+							fieldValue : this._globalAttr[techFieldName] === null ? null : dateValue
 						},
 						disabled : isReadOnly,
 						showTime : detailDateType == "datetime",
