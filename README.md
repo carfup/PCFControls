@@ -23,7 +23,7 @@ On top you will find the standard behavior and at the bottom the PCF behavior
 ![](https://carfupstorage.blob.core.windows.net/sharex/2024_01_04_09-59-27_msedge.gif)
 
 ### Configuration
-There are 11 parameters to customize the PCF (with 5 mandatory).
+There are 2 mandatory parameters to customize the PCF.
 
 |Parameter|Description|Required|
 |:---------|:-----------|:----:|
