@@ -18,7 +18,9 @@ The idea of the click is to have a common field with the look'n'feel similar to 
 Drawback, when attaching the PCF control to a rollup field, the look'n'feel by default remains.
 So I suggest to attach it to a random field.
 
-![](https://carfupstorage.blob.core.windows.net/sharex/2023_12_20_17-43-40_msedge.gif)
+### Demo 
+On top you will find the standard behavior and at the bottom the PCF behavior
+![](https://carfupstorage.blob.core.windows.net/sharex/2024_01_04_09-59-27_msedge.gif)
 
 ### Configuration
 There are 11 parameters to customize the PCF (with 5 mandatory).
