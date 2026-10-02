@@ -11,5 +11,9 @@ export interface IRollupFieldControlProps {
 	context : ComponentFramework.Context<IInputs>,
 	entityRef : EntityReferenceDef,
 	rollupField : string,
-	clientUrl : string
+	clientUrl : string,
+	label? : string,
+	isUnbound : boolean,
+	labelPosition : "Left" | "Top" | "Hidden",
+	labelWidthPx : number
   }

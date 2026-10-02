@@ -1,8 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="Carfup" constructor="EasyRollupField" version="0.0.10" display-name-key="Carfup.EasyRollup" description-key="EasyRollup description" control-type="virtual">
-    <property name="FieldToAttachControl" display-name-key="FieldToAttachControl" description-key="FieldToAttachControl" of-type-group="numbers" usage="bound" required="true" />
+  <control namespace="Carfup" constructor="EasyRollupField" version="0.0.24" display-name-key="Carfup.EasyRollup" description-key="EasyRollup description" control-type="virtual">
+    <property name="FieldToAttachControl" display-name-key="FieldToAttachControl" description-key="FieldToAttachControl" of-type-group="numbers" usage="bound" required="false" />
     <property name="RollupField" display-name-key="RollupField Logical Name" description-key="RollupField Logical Name" of-type="SingleLine.Text" usage="input" required="true" />
+    <property name="LabelPosition" display-name-key="Label position" description-key="Where the form label for this control is drawn when the control is not bound to a column: Left, Top, or Hidden. Ignored when bound (the form draws the label)." of-type="Enum" usage="input" required="false" default-value="Left">
+      <value name="Left" display-name-key="Left" description-key="Label to the left of the value." default="true">Left</value>
+      <value name="Top" display-name-key="Top" description-key="Label above the value.">Top</value>
+      <value name="Hidden" display-name-key="Hidden" description-key="No label.">Hidden</value>
+    </property>
+    <property name="LabelWidthPx" display-name-key="Label width px" description-key="Width of the label column in pixels, when the label is on the left and the control is not bound to a column. The form uses a fixed label width; adjust this to line the value up with the other fields in the section. Default 184." of-type="Whole.None" usage="input" required="false" default-value="184" />
     <type-group name="numbers">
       <type>Currency</type>
       <type>FP</type>

@@ -20,7 +20,7 @@ export class EasyRollupField implements ComponentFramework.ReactControl<IInputs,
 	 * @param state A piece of data that persists in one session for a single user. Can be set at any point in a controls life cycle by calling 'setControlState' in the Mode interface.
 	 * @param container If a control is marked control-type='standard', it will receive an empty div element within which it can render its content.
 	 */
-	public async init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container:HTMLDivElement)
+	public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container:HTMLDivElement)
 	{				
 		this.rollupField = context.parameters.RollupField.raw!;
 
@@ -28,14 +28,44 @@ export class EasyRollupField implements ComponentFramework.ReactControl<IInputs,
 		this._context = context; 
 
 		this.notifyOutputChanged = notifyOutputChanged;
-		// @ts-ignore
-		var contextInfo = context.mode.contextInfo;
-
 		this._recordDetails = new EntityReferenceDef();
-		this._recordDetails.EntityName = contextInfo.entityTypeName;
-		this._recordDetails.Id = contextInfo.entityId;
-		this._recordDetails.Name = contextInfo.entityRecordName;
-		this._recordDetails.EntitySetName = this.getEntityPluralName(contextInfo.entityTypeName);
+		this.refreshRecordDetails(context);
+		const contextInfo = this.getContextInfo(context);
+
+		// Replace the guessed plural with the real entity set name once metadata is available
+		const utils = context.utils as any;
+		if (utils?.getEntityMetadata) {
+			utils.getEntityMetadata(contextInfo.entityTypeName, []).then((metadata: any) => {
+				if (metadata?.EntitySetName && metadata.EntitySetName !== this._recordDetails.EntitySetName) {
+					// entityRef is passed to the component by reference, so it picks this up on the next refresh
+					this._recordDetails.EntitySetName = metadata.EntitySetName;
+				}
+			}, () => { /* keep the guessed name */ });
+		}
+	}
+
+	private getContextInfo(context: ComponentFramework.Context<IInputs>) : any {
+		const page = (context as any).page;
+		// @ts-ignore
+		const info = context.mode.contextInfo ?? {};
+		return {
+			entityTypeName : info.entityTypeName || page?.entityTypeName,
+			entityId : info.entityId || page?.entityId,
+			entityRecordName : info.entityRecordName
+		};
+	}
+
+	// The record id can be empty at init time (form still loading, or a new unsaved record), so re-read it on every update
+	private refreshRecordDetails(context: ComponentFramework.Context<IInputs>) {
+		const info = this.getContextInfo(context);
+		if (!info.entityTypeName)
+			return;
+
+		this._recordDetails.EntityName = info.entityTypeName;
+		this._recordDetails.Id = info.entityId ? String(info.entityId).replace(/[{}]/g, "") : "";
+		this._recordDetails.Name = info.entityRecordName;
+		if (!this._recordDetails.EntitySetName)
+			this._recordDetails.EntitySetName = this.getEntityPluralName(info.entityTypeName);
 	}
 
 	private renderControl(context: ComponentFramework.Context<IInputs>) : React.ReactElement {
@@ -43,7 +73,12 @@ export class EasyRollupField implements ComponentFramework.ReactControl<IInputs,
 			context : context,
 			entityRef : this._recordDetails,
 			rollupField : this.rollupField!,
-			clientUrl : (this._context as any).page.getClientUrl()
+			clientUrl : (this._context as any).page.getClientUrl(),
+			label : context.mode.label || undefined,
+			// A bound column carries its attributes; without one the form supplies no label, so the control draws its own
+			isUnbound : !(context.parameters.FieldToAttachControl as any)?.attributes?.LogicalName,
+			labelPosition : (context.parameters.LabelPosition?.raw as any) || "Left",
+			labelWidthPx : context.parameters.LabelWidthPx?.raw ?? 184
 		}
 
 		return React.createElement(RollupFieldControl,  rollupProps);
@@ -56,6 +91,7 @@ export class EasyRollupField implements ComponentFramework.ReactControl<IInputs,
 	 */
 	public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement
 	{
+		this.refreshRecordDetails(context);
 		return this.renderControl(context);
 	}
 
